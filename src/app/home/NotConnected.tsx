@@ -3,7 +3,9 @@
 import { useTypingEffect } from "@/utils/useTypingEffect";
 
 export function NotConnected() {
-  const text = useTypingEffect(`Your wallet is not connected.`);
+  const text = useTypingEffect(
+    `Welcome to Aptogotchi! Once you connect your wallet, you'll be able to mint your new on-chain pet. Once minted, you'll be able to feed, play with, and customize your new best friend!`
+  );
 
   return (
     <div className="p-3">

@@ -2,7 +2,7 @@ import { use, useEffect, useState } from "react";
 
 const nbsp = "\xa0";
 
-export function useTypingEffect(text: string, speed: number = 50) {
+export function useTypingEffect(text: string, speed: number = 25) {
   const [typedText, setTypedText] = useState(nbsp);
 
   useEffect(() => {

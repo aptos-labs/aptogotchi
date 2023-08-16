@@ -12,29 +12,29 @@ import { cn } from "@/utils/styling";
 const buttonStyles = "nes-btn is-primary";
 
 export const WalletButtons = () => {
-  const { wallets, ...rest } = useWallet();
+  const { wallets, connected, disconnect, network, isLoading } = useWallet();
 
-  if (rest.connected) {
+  if (connected) {
     return (
       <div
         className={cn(buttonStyles, "hover:bg-blue-700")}
-        onClick={rest.disconnect}
+        onClick={disconnect}
       >
-        Disconnect from {rest.network?.name ?? "Network"}
+        Disconnect from {network?.name ?? "Network"}
+      </div>
+    );
+  }
+
+  if (isLoading || !wallets[0]) {
+    return (
+      <div className={cn(buttonStyles, "opacity-50 cursor-not-allowed")}>
+        Loading...
       </div>
     );
   }
 
   // Let's just support Petra for now
-  if (wallets[0]) {
-    return <WalletView wallet={wallets[0]} />;
-  }
-
-  return (
-    <div className={cn(buttonStyles, "opacity-50 cursor-not-allowed")}>
-      Connect Wallet
-    </div>
-  );
+  return <WalletView wallet={wallets[0]} />;
 };
 
 const WalletView = ({ wallet }: { wallet: Wallet }) => {
