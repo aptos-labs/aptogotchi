@@ -1,0 +1,15 @@
+[package]
+name = 'aptos-todo'
+version = '1.0.0'
+authors = []
+
+[addresses]
+aptogotchi_addr = 'TODO'
+
+[dev-addresses]
+[dependencies.AptosFramework]
+git = 'https://github.com/aptos-labs/aptos-core.git'
+rev = 'mainnet'
+subdir = 'aptos-move/framework/aptos-framework'
+
+[dev-dependencies]
