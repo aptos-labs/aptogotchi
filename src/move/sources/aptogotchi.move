@@ -1,7 +1,6 @@
 module aptogotchi::main {
 
     use aptos_framework::account::{Self, SignerCapability};
-    use std::signer::address_of;
     use std::string::{Self, String};
     use aptos_framework::timestamp;
     use aptos_token_objects::collection;
@@ -90,31 +89,46 @@ module aptogotchi::main {
     }
 
     #[view]
-    public fun get_health_points(user: &signer): u8 acquires AptoGotchi {
-        let user_addr = address_of(user);
+    public fun get_name(user_addr: address): String acquires AptoGotchi {
+        let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+
+        gotchi.name
+    }
+
+    #[view]
+    public fun get_health_points(user_addr: address): u8 acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
         gotchi.health_points
     }
 
     #[view]
-    public fun get_happiness(user: &signer): u8 acquires AptoGotchi {
-        let user_addr = address_of(user);
+    public fun get_happiness(user_addr: address): u8 acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
         gotchi.happiness
     }
 
-    public entry fun change_health_points(user: &signer, points_difference: u8) acquires AptoGotchi {
-        let user_addr = address_of(user);
+    #[view]
+    public fun has_aptogochi(user_addr: address): bool {
+        exists<AptoGotchi>(user_addr)
+    }
+
+    public entry fun set_name(user_addr: address, name: String) acquires AptoGotchi {
+        let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+        gotchi.name = name;
+
+        gotchi.name;
+    }
+
+    public entry fun change_health_points(user_addr: address, points_difference: u8) acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
         gotchi.health_points = gotchi.health_points + points_difference;
 
         gotchi.health_points;
     }
 
-    public entry fun change_happiness(user: &signer, happiness_difference: u8) acquires AptoGotchi {
-        let user_addr = address_of(user);
+    public entry fun change_happiness(user_addr: address, happiness_difference: u8) acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
         gotchi.happiness = gotchi.happiness + happiness_difference;
     }
