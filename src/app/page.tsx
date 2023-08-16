@@ -2,8 +2,8 @@ import dynamic from "next/dynamic";
 
 export default function Home() {
   return (
-    <main>
-      <h1>Hello World</h1>
+    <main className="flex justify-between px-4 py-3">
+      <h1 className="text-2xl">Aptogotchi</h1>
       <div>
         <WalletButtons />
       </div>
@@ -18,8 +18,8 @@ const WalletButtons = dynamic(
   },
   {
     loading: () => (
-      <div className="inline-block bg-blue-500 text-white font-bold py-2 px-4 rounded mr-4 opacity-50 cursor-not-allowed">
-        Loading
+      <div className="nes-btn is-primary opacity-50 cursor-not-allowed">
+        Connect Wallet
       </div>
     ),
     ssr: false,

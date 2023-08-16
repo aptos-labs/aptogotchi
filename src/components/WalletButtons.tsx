@@ -7,21 +7,39 @@ import {
   isRedirectable,
   WalletName,
 } from "@aptos-labs/wallet-adapter-react";
-// import { useAlert } from "./AlertProvider";
+import { cn } from "@/utils/styling";
+
+const buttonStyles = "nes-btn is-primary";
 
 export const WalletButtons = () => {
-  const { wallets } = useWallet();
+  const { wallets, ...rest } = useWallet();
+
+  console.log(wallets, rest);
+
+  if (rest.connected) {
+    return (
+      <div
+        className={cn(buttonStyles, "hover:bg-blue-700")}
+        onClick={rest.disconnect}
+      >
+        Disconnect from {rest.network?.name ?? "Network"}
+      </div>
+    );
+  }
+
+  // Let's just support Petra for now
+  if (wallets[0]) {
+    return <WalletView wallet={wallets[0]} />;
+  }
 
   return (
-    <>
-      {wallets.map((wallet: Wallet) => {
-        return WalletView(wallet);
-      })}
-    </>
+    <div className={cn(buttonStyles, "opacity-50 cursor-not-allowed")}>
+      Connect Wallet
+    </div>
   );
 };
 
-const WalletView = (wallet: Wallet) => {
+const WalletView = ({ wallet }: { wallet: Wallet }) => {
   const { connect } = useWallet();
   // const { setErrorAlertMessage } = useAlert();
   const isWalletReady =
@@ -35,7 +53,6 @@ const WalletView = (wallet: Wallet) => {
     } catch (error) {
       console.warn(error);
       window.alert("Failed to connect wallet");
-      // setErrorAlertMessage(error);
     }
   };
 
@@ -54,37 +71,38 @@ const WalletView = (wallet: Wallet) => {
     if (mobileSupport) {
       return (
         <button
-          className={`bg-blue-500 text-white font-bold py-2 px-4 rounded mr-4 hover:bg-blue-700`}
+          className={cn(buttonStyles, "hover:bg-blue-700")}
           disabled={false}
           key={wallet.name}
           onClick={() => onWalletConnectRequest(wallet.name)}
         >
-          <>{wallet.name}</>
+          Connect Wallet
         </button>
       );
     }
     // wallet does not have mobile app
     return (
       <button
-        className={`bg-blue-500 text-white font-bold py-2 px-4 rounded mr-4 opacity-50 cursor-not-allowed`}
+        className={cn(buttonStyles, "opacity-50 cursor-not-allowed")}
         disabled={true}
         key={wallet.name}
       >
-        <>{wallet.name} - Desktop Only</>
+        Connect Wallet - Desktop Only
       </button>
     );
   } else {
     // we are on desktop view
     return (
       <button
-        className={`bg-blue-500 text-white font-bold py-2 px-4 rounded mr-4 ${
+        className={cn(
+          buttonStyles,
           isWalletReady ? "hover:bg-blue-700" : "opacity-50 cursor-not-allowed"
-        }`}
+        )}
         disabled={!isWalletReady}
         key={wallet.name}
         onClick={() => onWalletConnectRequest(wallet.name)}
       >
-        <>{wallet.name}</>
+        Connect Wallet
       </button>
     );
   }
