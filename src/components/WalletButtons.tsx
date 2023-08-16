@@ -15,6 +15,10 @@ export const WalletButtons = () => {
   const { wallets, connected, disconnect, network, isLoading } = useWallet();
 
   if (connected) {
+    // check if aptogotchi already exists in user's wallet: get() call here
+    // if exists: store gotchi object in Context
+    // else: mint new aptogotchi
+
     return (
       <div
         className={cn(buttonStyles, "hover:bg-blue-700")}
