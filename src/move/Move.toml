@@ -1,15 +1,17 @@
 [package]
-name = 'aptos-todo'
+name = 'aptogotchi'
 version = '1.0.0'
-authors = []
+upgrade_policy = "compatible"
 
 [addresses]
-aptogotchi_addr = 'TODO'
+aptogotchi_addr = '71cc7f10ea20de366f1d512369df023e607fe14261e815c289eec8dc6b3ea7fe'
 
-[dev-addresses]
 [dependencies.AptosFramework]
 git = 'https://github.com/aptos-labs/aptos-core.git'
-rev = 'mainnet'
+rev = 'main'
 subdir = 'aptos-move/framework/aptos-framework'
 
-[dev-dependencies]
+[dependencies.AptosTokenObjects]
+git = 'https://github.com/aptos-labs/aptos-core.git'
+rev = 'main'
+subdir = 'aptos-move/framework/aptos-token-objects'
