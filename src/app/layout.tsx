@@ -5,7 +5,10 @@ import { PropsWithChildren } from "react";
 import "nes.css/css/nes.min.css";
 import "./globals.css";
 
-const pkmn = localFont({ src: "./pkmn.ttf", variable: "--font-pkmn" });
+const kongtext = localFont({
+  src: "./kongtext.ttf",
+  variable: "--font-kongtext",
+});
 
 export const metadata: Metadata = {
   title: "Aptogotchi",
@@ -15,7 +18,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
-      <body className={pkmn.className}>
+      <body className={kongtext.className}>
         <WalletProvider>{children}</WalletProvider>
       </body>
     </html>

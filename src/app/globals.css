@@ -4,7 +4,7 @@
 
 *, ::before, ::after {
   box-sizing: border-box;
-  word-spacing: 0.375rem; /* The font we're using has really tight word spacing so this will give it more space to breathe */
+  word-spacing: -0.25rem;
 }
 
 .nes-btn {

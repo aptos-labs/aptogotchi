@@ -14,8 +14,6 @@ const buttonStyles = "nes-btn is-primary";
 export const WalletButtons = () => {
   const { wallets, ...rest } = useWallet();
 
-  console.log(wallets, rest);
-
   if (rest.connected) {
     return (
       <div
