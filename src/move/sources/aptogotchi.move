@@ -18,6 +18,7 @@ module aptogotchi::main {
         health_points: u8,
         happiness: u8,
         mutator_ref: token::MutatorRef,
+        last_modified_timestamp: u64,
     }
 
     struct Accessory has key {
@@ -92,9 +93,10 @@ module aptogotchi::main {
         let gotchi = AptoGotchi {
             name,
             birthday: timestamp::now_seconds(),
-            health_points: 100,
-            happiness: 100,
+            health_points: 10,
+            happiness: 10,
             mutator_ref,
+            last_modified_timestamp: timestamp::now_seconds(),
         };
 
         move_to(user, gotchi);
@@ -111,12 +113,20 @@ module aptogotchi::main {
     public fun get_health_points(user_addr: address): u8 acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
+        // get new baseline (calculate how much health_points has decayed)
+        gotchi.health_points = gotchi.health_points - calculate_timestamp_diff(gotchi);
+        gotchi.last_modified_timestamp = timestamp::now_seconds();
+
         gotchi.health_points
     }
 
     #[view]
     public fun get_happiness(user_addr: address): u8 acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+
+        // get new baseline (calculate how much happiness has decayed)
+        gotchi.happiness = gotchi.happiness - calculate_timestamp_diff(gotchi);
+        gotchi.last_modified_timestamp = timestamp::now_seconds();
 
         gotchi.happiness
     }
@@ -135,6 +145,11 @@ module aptogotchi::main {
 
     public entry fun change_health_points(user_addr: address, points_difference: u8) acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+
+        // get new baseline (calculate how much health_points has decayed first, then add the points_difference)
+        gotchi.health_points = gotchi.health_points - calculate_timestamp_diff(gotchi);
+        gotchi.last_modified_timestamp = timestamp::now_seconds();
+
         gotchi.health_points = gotchi.health_points + points_difference;
 
         gotchi.health_points;
@@ -142,6 +157,21 @@ module aptogotchi::main {
 
     public entry fun change_happiness(user_addr: address, happiness_difference: u8) acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+        
+        // get new baseline (calculate how much happiness has decayed first, then add the points_difference)
+        gotchi.happiness = gotchi.happiness - calculate_timestamp_diff(gotchi);
+        gotchi.last_modified_timestamp = timestamp::now_seconds();
+
         gotchi.happiness = gotchi.happiness + happiness_difference;
+
+        gotchi.happiness;
+    }
+
+    fun calculate_timestamp_diff(gotchi: &AptoGotchi): u8 {
+        let current_timestamp = timestamp::now_seconds();
+        let timestamp_diff = current_timestamp - gotchi.last_modified_timestamp;
+        timestamp_diff_formatted = timestamp_diff / 60;
+
+        timestamp_diff_formatted;
     }
 }
