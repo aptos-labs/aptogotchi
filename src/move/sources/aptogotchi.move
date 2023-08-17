@@ -1,12 +1,16 @@
 module aptogotchi::main {
 
     use aptos_framework::account::{Self, SignerCapability};
-    use std::signer::address_of;
     use std::string::{Self, String};
     use aptos_framework::timestamp;
     use aptos_token_objects::collection;
     use std::option;
     use aptos_token_objects::token;
+
+    // enum for the different categories of accessories
+    const ACCESSORY_CATEGORY_HAT: vector<u8> = b"ACCESSORY_CATEGORY_HAT";
+    const ACCESSORY_CATEGORY_CLOTH: vector<u8> = b"ACCESSORY_CATEGORY_CLOTH";
+    const ACCESSORY_CATEGORY_GLASSES: vector<u8> = b"ACCESSORY_CATEGORY_GLASSES";
 
     struct AptoGotchi has key {
         name: String,
@@ -14,6 +18,13 @@ module aptogotchi::main {
         health_points: u8,
         happiness: u8,
         mutator_ref: token::MutatorRef,
+    }
+
+    struct Accessory has key {
+        category: String,
+        name: String,
+        happiness_multiplier: u8,
+        health_points_multiplier: u8,
     }
 
     /// Tokens require a signer to create, so this is the signer for the collection
@@ -63,7 +74,7 @@ module aptogotchi::main {
         );
     }
 
-    public entry fun create_aptogotchi(user: &signer, name: String) acquires CollectionCapability {
+    public entry fun create_aptogotchi(_gas_payer: &signer, user: &signer, name: String) acquires CollectionCapability {
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
 
@@ -90,31 +101,46 @@ module aptogotchi::main {
     }
 
     #[view]
-    public fun get_health_points(user: &signer): u8 acquires AptoGotchi {
-        let user_addr = address_of(user);
+    public fun get_name(user_addr: address): String acquires AptoGotchi {
+        let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+
+        gotchi.name
+    }
+
+    #[view]
+    public fun get_health_points(user_addr: address): u8 acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
         gotchi.health_points
     }
 
     #[view]
-    public fun get_happiness(user: &signer): u8 acquires AptoGotchi {
-        let user_addr = address_of(user);
+    public fun get_happiness(user_addr: address): u8 acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
         gotchi.happiness
     }
 
-    public entry fun change_health_points(user: &signer, points_difference: u8) acquires AptoGotchi {
-        let user_addr = address_of(user);
+    #[view]
+    public fun has_aptogochi(user_addr: address): bool {
+        exists<AptoGotchi>(user_addr)
+    }
+
+    public entry fun set_name(user_addr: address, name: String) acquires AptoGotchi {
+        let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+        gotchi.name = name;
+
+        gotchi.name;
+    }
+
+    public entry fun change_health_points(user_addr: address, points_difference: u8) acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
         gotchi.health_points = gotchi.health_points + points_difference;
 
         gotchi.health_points;
     }
 
-    public entry fun change_happiness(user: &signer, happiness_difference: u8) acquires AptoGotchi {
-        let user_addr = address_of(user);
+    public entry fun change_happiness(user_addr: address, happiness_difference: u8) acquires AptoGotchi {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
         gotchi.happiness = gotchi.happiness + happiness_difference;
     }
