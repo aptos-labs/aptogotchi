@@ -7,12 +7,24 @@ module aptogotchi::main {
     use std::option;
     use aptos_token_objects::token;
 
+    // enum for the different categories of accessories
+    const ACCESSORY_CATEGORY_HAT: vector<u8> = b"ACCESSORY_CATEGORY_HAT";
+    const ACCESSORY_CATEGORY_CLOTH: vector<u8> = b"ACCESSORY_CATEGORY_CLOTH";
+    const ACCESSORY_CATEGORY_GLASSES: vector<u8> = b"ACCESSORY_CATEGORY_GLASSES";
+
     struct AptoGotchi has key {
         name: String,
         birthday: u64,
         health_points: u8,
         happiness: u8,
         mutator_ref: token::MutatorRef,
+    }
+
+    struct Accessory has key {
+        category: String,
+        name: String,
+        happiness_multiplier: u8,
+        health_points_multiplier: u8,
     }
 
     /// Tokens require a signer to create, so this is the signer for the collection
@@ -62,7 +74,7 @@ module aptogotchi::main {
         );
     }
 
-    public entry fun create_aptogotchi(user: &signer, name: String) acquires CollectionCapability {
+    public entry fun create_aptogotchi(_gas_payer: &signer, user: &signer, name: String) acquires CollectionCapability {
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
 

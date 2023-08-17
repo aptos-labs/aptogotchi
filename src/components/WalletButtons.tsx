@@ -7,6 +7,7 @@ import {
   isRedirectable,
   WalletName,
 } from "@aptos-labs/wallet-adapter-react";
+import {AptosAccount} from "aptos"
 // import { useAlert } from "./AlertProvider";
 
 export const WalletButtons = () => {
