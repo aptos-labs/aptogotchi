@@ -7,5 +7,5 @@ export interface PetImageProps {
 }
 
 export function PetImage(props: PetImageProps) {
-  return <div className="h-80 w-80 bg-neutral-300">Pet image</div>;
+  return <div className="h-80 w-80 bg-[hsl(104,40%,75%)]">Pet image</div>;
 }

@@ -5,8 +5,8 @@ import { Pet } from "./Pet";
 export function Connected() {
   const pet = {
     name: "Bob",
-    health: 5,
-    happiness: 9,
+    health: 10,
+    happiness: 10,
   };
 
   return (
