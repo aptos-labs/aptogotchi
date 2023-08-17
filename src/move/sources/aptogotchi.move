@@ -40,7 +40,6 @@ module aptogotchi::main {
     const APTOGOTCHI_COLLECTION_DESCRIPTION: vector<u8> = b"Aptogotchi Collection Description";
     const APTOGOTCHI_COLLECTION_URI: vector<u8> = b"https://knight.collection.uri";
     const HEALTH_MULTIPLIER: u8 = 1;
-    const HAPPINESS_MULTIPLIER: u8 = 0.5;
 
     fun init_module(account: &signer) {
         let (token_resource, token_signer_cap) = account::create_resource_account(
@@ -127,7 +126,7 @@ module aptogotchi::main {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
         // get new baseline (calculate how much happiness has decayed)
-        gotchi.happiness = gotchi.happiness - (HAPPINESS_MULTIPLIER * calculate_timestamp_diff(gotchi));
+        gotchi.happiness = gotchi.happiness - ((calculate_timestamp_diff(gotchi))/2);
         gotchi.last_modified_timestamp = timestamp::now_seconds();
 
         gotchi.happiness
@@ -161,7 +160,7 @@ module aptogotchi::main {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
         
         // get new baseline (calculate how much happiness has decayed first, then add the points_difference)
-        gotchi.happiness = gotchi.happiness - (HAPPINESS_MULTIPLIER * calculate_timestamp_diff(gotchi));
+        gotchi.happiness = gotchi.happiness - (calculate_timestamp_diff(gotchi))/2;
         gotchi.last_modified_timestamp = timestamp::now_seconds();
 
         gotchi.happiness = gotchi.happiness + happiness_difference;
@@ -172,8 +171,8 @@ module aptogotchi::main {
     fun calculate_timestamp_diff(gotchi: &AptoGotchi): u8 {
         let current_timestamp = timestamp::now_seconds();
         let timestamp_diff = current_timestamp - gotchi.last_modified_timestamp;
-        timestamp_diff_formatted = timestamp_diff / 60;
+        let timestamp_diff_formatted = ((timestamp_diff / 60) as u8);
 
-        timestamp_diff_formatted;
+        timestamp_diff_formatted
     }
 }
