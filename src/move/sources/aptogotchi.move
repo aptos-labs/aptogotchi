@@ -77,7 +77,7 @@ module aptogotchi::main {
         );
     }
 
-    public entry fun create_aptogotchi(_gas_payer: &signer, user: &signer, name: String) acquires CollectionCapability {
+    public entry fun create_aptogotchi(user: &signer, name: String) acquires CollectionCapability {
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
 
