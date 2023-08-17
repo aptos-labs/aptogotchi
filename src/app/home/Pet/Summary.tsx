@@ -9,11 +9,11 @@ export interface SummaryProps {
 
 export function Summary({ pet }: SummaryProps) {
   const isSad = pet.happiness < 6;
-  const isHungry = pet.health < 6;
+  const isHungry = pet.health_points < 6;
   const isReallySad = pet.happiness < 3;
-  const isReallyHungry = pet.health < 3;
+  const isReallyHungry = pet.health_points < 3;
   const isDepressed = pet.happiness === 0;
-  const isStarved = pet.health === 0;
+  const isStarved = pet.health_points === 0;
 
   let text = `${pet.name} is doing great!`;
 

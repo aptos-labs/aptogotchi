@@ -7,7 +7,7 @@ import { Summary } from "./Summary";
 
 export interface Pet {
   name: string;
-  health: number;
+  health_points: number;
   happiness: number;
 }
 

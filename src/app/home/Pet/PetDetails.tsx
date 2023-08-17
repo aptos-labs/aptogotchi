@@ -36,7 +36,11 @@ export function PetDetails({ pet }: PetDetailsProps) {
       </div>
       <div className="flex flex-col">
         <label>HP</label>
-        <HealthBar totalHealth={10} currentHealth={pet.health} icon="heart" />
+        <HealthBar
+          totalHealth={10}
+          currentHealth={pet.health_points}
+          icon="heart"
+        />
       </div>
       <div className="flex flex-col">
         <label>Happiness</label>

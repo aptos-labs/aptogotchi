@@ -9,6 +9,14 @@ export interface ActionsProps {}
 export function Actions(props: ActionsProps) {
   const [selectedAction, setSelectedAction] = useState<PetAction>("feed");
 
+  const handleFeed = () => {
+    setSelectedAction("feed");
+  };
+
+  const handlePlay = () => {
+    setSelectedAction("play");
+  };
+
   return (
     <div className="nes-container with-title flex-1 bg-white">
       <p className="title">Actions</p>
@@ -20,7 +28,7 @@ export function Actions(props: ActionsProps) {
               className="nes-radio"
               name="action"
               checked={selectedAction === "feed"}
-              onChange={() => setSelectedAction("feed")}
+              onChange={handleFeed}
             />
             <span>Feed</span>
           </label>
@@ -30,7 +38,7 @@ export function Actions(props: ActionsProps) {
               className="nes-radio"
               name="action"
               checked={selectedAction === "play"}
-              onChange={() => setSelectedAction("play")}
+              onChange={handlePlay}
             />
             <span>Play</span>
           </label>
