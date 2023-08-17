@@ -1,13 +1,21 @@
 import dynamic from "next/dynamic";
+import { Body } from "./home/Body";
 
 export default function Home() {
   return (
-    <main>
-      <h1>Hello World</h1>
-      <div>
-        <WalletButtons />
-      </div>
+    <main className="flex flex-col">
+      <Header />
+      <Body />
     </main>
+  );
+}
+
+function Header() {
+  return (
+    <header className="sticky top-0 z-10 flex justify-between items-center px-6 py-4 bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 shadow-md">
+      <h1 className="text-2xl">Aptogotchi</h1>
+      <WalletButtons />
+    </header>
   );
 }
 
@@ -18,8 +26,8 @@ const WalletButtons = dynamic(
   },
   {
     loading: () => (
-      <div className="inline-block bg-blue-500 text-white font-bold py-2 px-4 rounded mr-4 opacity-50 cursor-not-allowed">
-        Loading
+      <div className="nes-btn is-primary opacity-50 cursor-not-allowed">
+        Loading...
       </div>
     ),
     ssr: false,
