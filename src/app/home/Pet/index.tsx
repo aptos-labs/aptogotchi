@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Actions, PetAction } from "./Actions";
 import { PetDetails } from "./PetDetails";
 import { PetImage, bodies, ears, faces } from "./PetImage";
@@ -14,9 +14,10 @@ export interface Pet {
 
 interface PetProps {
   pet: Pet;
+  setPet: Dispatch<SetStateAction<Pet | undefined>>;
 }
 
-export function Pet({ pet }: PetProps) {
+export function Pet({ pet, setPet }: PetProps) {
   const [selectedAction, setSelectedAction] = useState<PetAction>("feed");
 
   return (
@@ -35,6 +36,7 @@ export function Pet({ pet }: PetProps) {
         <Actions
           selectedAction={selectedAction}
           setSelectedAction={setSelectedAction}
+          setPet={setPet}
         />
       </div>
       <Summary pet={pet} />

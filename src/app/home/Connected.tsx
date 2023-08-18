@@ -31,11 +31,16 @@ export function Connected() {
 
     // if no pet exists, show minting component
     if (JSON.stringify(response) !== JSON.stringify(noPet)) {
+      console.log(
+        response,
+        new Date(parseInt(response[1] as unknown as string) * 1000)
+      );
+
       // get and set pet data from user's wallet
       setPet({
         name: response[0] as unknown as string,
-        health_points: response[2] as unknown as number,
-        happiness: response[3] as unknown as number,
+        health_points: parseInt(response[2] as unknown as string),
+        happiness: parseInt(response[3] as unknown as string),
       });
     }
     setIsLoading(false);
@@ -52,7 +57,7 @@ export function Connected() {
 
   return (
     <div className="flex flex-col gap-3 p-3">
-      {pet ? <Pet pet={pet} /> : <Mint fetchPet={fetchPet} />}
+      {pet ? <Pet pet={pet} setPet={setPet} /> : <Mint fetchPet={fetchPet} />}
     </div>
   );
 }

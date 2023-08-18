@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
+import { Pet } from ".";
 
 export const provider = new Provider(Network.DEVNET);
 
@@ -11,9 +12,14 @@ export type PetAction = "feed" | "play" | "customize";
 export interface ActionsProps {
   selectedAction: PetAction;
   setSelectedAction: (action: PetAction) => void;
+  setPet: Dispatch<SetStateAction<Pet | undefined>>;
 }
 
-export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
+export function Actions({
+  selectedAction,
+  setSelectedAction,
+  setPet,
+}: ActionsProps) {
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
@@ -49,6 +55,10 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
       const response = await signAndSubmitTransaction(payload);
       // wait for transaction
       await provider.waitForTransaction(response.hash);
+      setPet((pet) => {
+        if (!pet) return pet;
+        return { ...pet, health_points: pet.health_points + 1 };
+      });
     } catch (error: any) {
       console.error(error);
     } finally {
@@ -74,6 +84,10 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
       const response = await signAndSubmitTransaction(payload);
       // wait for transaction
       await provider.waitForTransaction(response.hash);
+      setPet((pet) => {
+        if (!pet) return pet;
+        return { ...pet, happiness: pet.happiness + 1 };
+      });
     } catch (error: any) {
       console.error(error);
     } finally {
@@ -119,20 +133,15 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
         </div>
         <div className="w-1 h-full bg-zinc-300 flex-shrink-0" />
         <div className="flex flex-col gap-1 justify-between">
-          {transactionInProgress ? (
-            <p>{selectedAction} Transaction Processing...</p>
-          ) : (
-            <>
-              <p>{actionDescriptions[selectedAction]}</p>
-              <button
-                type="button"
-                className="nes-btn is-success"
-                onClick={handleStart}
-              >
-                Start
-              </button>
-            </>
-          )}
+          <p>{actionDescriptions[selectedAction]}</p>
+          <button
+            type="button"
+            className="nes-btn is-success"
+            onClick={handleStart}
+            disabled={transactionInProgress}
+          >
+            {transactionInProgress ? "Processing..." : "Start"}
+          </button>
         </div>
       </div>
     </div>
