@@ -10,6 +10,7 @@ export const provider = new Provider(Network.DEVNET);
 
 export function Connected() {
   const [pet, setPet] = useState<Pet>();
+  const [isLoading, setIsLoading] = useState(true);
   const { account, network } = useWallet();
 
   useEffect(() => {
@@ -39,10 +40,14 @@ export function Connected() {
           happiness: response[3] as unknown as number,
         });
       }
+      setIsLoading(false);
     };
 
     fetchData();
   }, []);
+
+  // TODO: Design a nice loading screen
+  if (isLoading) return null;
 
   return (
     <div className="flex flex-col gap-3 p-3">
