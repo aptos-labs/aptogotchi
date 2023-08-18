@@ -8,13 +8,8 @@ import { Network, Provider } from "aptos";
 export const provider = new Provider(Network.DEVNET);
 
 export function Connected() {
-  const [pet, setPet] = useState<Pet>({
-    name: "Bob",
-    health_points: 10,
-    happiness: 10,
-  });
-  const [hasPet, setHasPet] = useState<boolean>(false); // TODO: check if pet exists in user's wallet
-  const { account, network, signAndSubmitTransaction } = useWallet();
+  const [pet, setPet] = useState<Pet>();
+  const { account, network } = useWallet();
 
   useEffect(() => {
     if (!account || !network) return;
@@ -32,19 +27,13 @@ export function Connected() {
       const noPet = ["", "0", 0, 0];
 
       // if no pet exists, show minting component
-      if (response !== noPet) {
+      if (JSON.stringify(response) !== JSON.stringify(noPet)) {
         // get and set pet data from user's wallet
-        const name: string = response[0];
-        const health_points: number = parseInt(response[2]);
-        const happiness: number = parseInt(response[3]);
         setPet({
-          name: name,
-          health_points: health_points,
-          happiness: happiness,
+          name: response[0] as unknown as string,
+          health_points: response[2] as unknown as number,
+          happiness: response[3] as unknown as number,
         });
-        setHasPet(true);
-      } else {
-        setHasPet(false);
       }
     };
 
@@ -53,7 +42,7 @@ export function Connected() {
 
   return (
     <div className="flex flex-col gap-3 p-3">
-      {hasPet ? <Pet pet={pet} /> : <>mint component</>}
+      {pet ? <Pet pet={pet} /> : <>mint component</>}
     </div>
   );
 }
