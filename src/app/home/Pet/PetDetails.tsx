@@ -29,7 +29,7 @@ export function PetDetails({ pet }: PetDetailsProps) {
     const payload = {
       type: "entry_function_payload",
       function:
-        "0x71cc7f10ea20de366f1d512369df023e607fe14261e815c289eec8dc6b3ea7fe::main::set_name",
+        "0xe8a7346fd49d2aeaa1ddd1c58c865eeb617c4f88870c8b0a25cfae2938eb5574::main::set_name",
       type_arguments: [],
       arguments: [account.address, newName],
     };
