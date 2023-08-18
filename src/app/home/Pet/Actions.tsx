@@ -41,7 +41,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
       function:
         "0xe8a7346fd49d2aeaa1ddd1c58c865eeb617c4f88870c8b0a25cfae2938eb5574::main::change_health_points",
       type_arguments: [],
-      arguments: [account.address, 1],
+      arguments: [account.address, 2],
     };
 
     try {
@@ -66,7 +66,7 @@ export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
       function:
         "0xe8a7346fd49d2aeaa1ddd1c58c865eeb617c4f88870c8b0a25cfae2938eb5574::main::change_happiness",
       type_arguments: [],
-      arguments: [account.address, 1],
+      arguments: [account.address, 2],
     };
 
     try {
