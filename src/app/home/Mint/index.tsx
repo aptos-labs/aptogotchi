@@ -4,10 +4,13 @@ import { Network, Provider } from "aptos";
 
 export const provider = new Provider(Network.DEVNET);
 
-export function Mint() {
+export interface MintProps {
+  fetchPet: () => Promise<void>;
+}
+
+export function Mint({ fetchPet }: MintProps) {
   const [newName, setNewName] = useState("");
-  const [transactionInProgress, setTransactionInProgress] =
-    useState<boolean>(false);
+  const [transactionInProgress, setTransactionInProgress] = useState(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
 
   const handleMint = async () => {
@@ -31,6 +34,7 @@ export function Mint() {
     } catch (error: any) {
       console.error(error);
     } finally {
+      fetchPet();
       setTransactionInProgress(false);
     }
   };
@@ -51,10 +55,10 @@ export function Mint() {
       <button
         type="button"
         className={`nes-btn ${newName ? "is-success" : "is-disabled"}`}
-        disabled={!newName}
+        disabled={!newName || transactionInProgress}
         onClick={handleMint}
       >
-        Mint Pet
+        {transactionInProgress ? "Loading..." : "Mint Pet"}
       </button>
     </div>
   );
