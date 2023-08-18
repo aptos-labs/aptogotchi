@@ -25,10 +25,13 @@ export function Connected() {
       };
 
       const response = await provider.view(payload);
-      const noPet = ["", "0", 0, 0];
+      const noPet = ["", "0", "0", "0"];
 
       // if no pet exists, show minting component
       if (JSON.stringify(response) !== JSON.stringify(noPet)) {
+        console.log("RESPONSE: ", JSON.stringify(response));
+        console.log("NO PET: ", JSON.stringify(noPet));
+        console.log("PET: ", pet);
         // get and set pet data from user's wallet
         setPet({
           name: response[0] as unknown as string,

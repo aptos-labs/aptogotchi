@@ -11,7 +11,7 @@ export interface PetDetailsProps {
   pet: Pet;
 }
 
-export const provider = new Provider(Network.TESTNET);
+export const provider = new Provider(Network.DEVNET);
 
 export function PetDetails({ pet }: PetDetailsProps) {
   const [newName, setNewName] = useState(pet.name);
