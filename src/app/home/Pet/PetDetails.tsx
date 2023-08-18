@@ -3,17 +3,18 @@
 import { AiFillSave } from "react-icons/ai";
 import { HealthBar } from "@/components/HealthBar";
 import { Pet } from ".";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 
 export interface PetDetailsProps {
   pet: Pet;
+  setPet: Dispatch<SetStateAction<Pet | undefined>>;
 }
 
 export const provider = new Provider(Network.DEVNET);
 
-export function PetDetails({ pet }: PetDetailsProps) {
+export function PetDetails({ pet, setPet }: PetDetailsProps) {
   const [newName, setNewName] = useState(pet.name);
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
@@ -39,6 +40,10 @@ export function PetDetails({ pet }: PetDetailsProps) {
       const response = await signAndSubmitTransaction(payload);
       // wait for transaction
       await provider.waitForTransaction(response.hash);
+      setPet((pet) => {
+        if (!pet) return pet;
+        return { ...pet, name: newName };
+      });
     } catch (error: any) {
       console.error(error);
     } finally {

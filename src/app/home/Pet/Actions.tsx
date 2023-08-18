@@ -57,7 +57,7 @@ export function Actions({
       await provider.waitForTransaction(response.hash);
       setPet((pet) => {
         if (!pet) return pet;
-        return { ...pet, health_points: pet.health_points + 1 };
+        return { ...pet, health_points: pet.health_points + 2 };
       });
     } catch (error: any) {
       console.error(error);
@@ -86,7 +86,7 @@ export function Actions({
       await provider.waitForTransaction(response.hash);
       setPet((pet) => {
         if (!pet) return pet;
-        return { ...pet, happiness: pet.happiness + 1 };
+        return { ...pet, happiness: pet.happiness + 2 };
       });
     } catch (error: any) {
       console.error(error);
