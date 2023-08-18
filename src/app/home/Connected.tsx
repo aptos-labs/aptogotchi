@@ -5,7 +5,7 @@ import { Pet } from "./Pet";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 
-export const provider = new Provider(Network.TESTNET);
+export const provider = new Provider(Network.DEVNET);
 
 export function Connected() {
   const [pet, setPet] = useState<Pet>({
@@ -20,36 +20,31 @@ export function Connected() {
     if (!account || !network) return;
 
     const fetchData = async () => {
-      // if no pet exists, show minting component
       // build a transaction payload to be submitted
       const payload = {
-        type: "entry_function_payload",
         function:
           "0x71cc7f10ea20de366f1d512369df023e607fe14261e815c289eec8dc6b3ea7fe::main::get_aptogotchi",
         type_arguments: [],
         arguments: [account.address],
       };
 
-      try {
-        // sign and submit transaction to chain
-        const response = await signAndSubmitTransaction(payload);
-        const noPet = ["", 0, 0, 0];
+      const response = await provider.view(payload);
+      const noPet = ["", "0", 0, 0];
 
-        console.log("response: ", response);
-
-        if (response !== noPet) {
-          // get and set pet data from user's wallet
-          setPet({
-            name: "Bob",
-            health_points: 10,
-            happiness: 10,
-          });
-        }
-
-        // wait for transaction
-        await provider.waitForTransaction(response.hash);
-      } catch (error: any) {
-        console.error(error);
+      // if no pet exists, show minting component
+      if (response !== noPet) {
+        // get and set pet data from user's wallet
+        const name: string = response[0];
+        const health_points: number = parseInt(response[2]);
+        const happiness: number = parseInt(response[3]);
+        setPet({
+          name: name,
+          health_points: health_points,
+          happiness: happiness,
+        });
+        setHasPet(true);
+      } else {
+        setHasPet(false);
       }
     };
 
@@ -58,7 +53,7 @@ export function Connected() {
 
   return (
     <div className="flex flex-col gap-3 p-3">
-      <Pet pet={pet} />
+      {hasPet ? <Pet pet={pet} /> : <>mint component</>}
     </div>
   );
 }
