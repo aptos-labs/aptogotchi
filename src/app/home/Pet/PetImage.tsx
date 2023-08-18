@@ -7,13 +7,18 @@ import { PetAction } from "./Actions";
 export interface PetImageProps {
   pet: Pet;
   selectedAction: PetAction;
+  petParts: {
+    body: string;
+    ears: string;
+    face: string;
+  };
 }
 
 export function PetImage(props: PetImageProps) {
-  const head = "/pet-parts/head.png";
-  const body = "/pet-parts/body1.png";
-  const ears = "/pet-parts/ear1.png";
-  const face = "/pet-parts/face1.png";
+  const head = BASE_PATH + "head.png";
+  const body = BASE_PATH + props.petParts.body;
+  const ears = BASE_PATH + props.petParts.ears;
+  const face = BASE_PATH + props.petParts.face;
 
   const imgClass = "absolute top-0 left-0 w-full h-full object-contain";
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Actions, PetAction } from "./Actions";
 import { PetDetails } from "./PetDetails";
-import { PetImage } from "./PetImage";
+import { PetImage, bodies, ears, faces } from "./PetImage";
 import { Summary } from "./Summary";
 
 export interface Pet {
@@ -22,7 +22,15 @@ export function Pet({ pet }: PetProps) {
   return (
     <div className="flex flex-col gap-6 px-4 py-3">
       <div className="flex flex-wrap gap-6">
-        <PetImage pet={pet} selectedAction={selectedAction} />
+        <PetImage
+          pet={pet}
+          selectedAction={selectedAction}
+          petParts={{
+            body: bodies[0],
+            ears: ears[0],
+            face: faces[0],
+          }}
+        />
         <PetDetails pet={pet} />
         <Actions
           selectedAction={selectedAction}
