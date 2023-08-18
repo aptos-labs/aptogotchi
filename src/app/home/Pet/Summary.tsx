@@ -35,6 +35,9 @@ export function Summary({ pet }: SummaryProps) {
   if (isStarved) {
     text = `${pet.name} is literally starving. Feed them right now!!`;
   }
+  if (isDepressed && isStarved) {
+    text = `${pet.name} has died. RIP.`;
+  }
 
   const typedText = useTypingEffect(text);
 

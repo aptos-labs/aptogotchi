@@ -4,25 +4,29 @@ import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 
-type PetAction = "Feed" | "Play" | "Customize";
-export interface ActionsProps {}
 export const provider = new Provider(Network.TESTNET);
 
-export function Actions(props: ActionsProps) {
-  const [selectedAction, setSelectedAction] = useState<PetAction>("Feed");
+export type PetAction = "feed" | "play" | "customize";
+
+export interface ActionsProps {
+  selectedAction: PetAction;
+  setSelectedAction: (action: PetAction) => void;
+}
+
+export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
 
   const handleStart = () => {
     switch (selectedAction) {
-      case "Feed":
+      case "feed":
         handleFeed();
         break;
-      case "Play":
+      case "play":
         handlePlay();
         break;
-      case "Customize":
+      case "customize":
         break;
     }
   };
@@ -87,8 +91,8 @@ export function Actions(props: ActionsProps) {
               type="radio"
               className="nes-radio"
               name="action"
-              checked={selectedAction === "Feed"}
-              onChange={() => setSelectedAction("Feed")}
+              checked={selectedAction === "feed"}
+              onChange={() => setSelectedAction("feed")}
             />
             <span>Feed</span>
           </label>
@@ -97,8 +101,8 @@ export function Actions(props: ActionsProps) {
               type="radio"
               className="nes-radio"
               name="action"
-              checked={selectedAction === "Play"}
-              onChange={() => setSelectedAction("Play")}
+              checked={selectedAction === "play"}
+              onChange={() => setSelectedAction("play")}
             />
             <span>Play</span>
           </label>
@@ -107,8 +111,8 @@ export function Actions(props: ActionsProps) {
               type="radio"
               className="nes-radio"
               name="action"
-              checked={selectedAction === "Customize"}
-              onChange={() => setSelectedAction("Customize")}
+              checked={selectedAction === "customize"}
+              onChange={() => setSelectedAction("customize")}
             />
             <span>Customize</span>
           </label>
@@ -136,8 +140,8 @@ export function Actions(props: ActionsProps) {
 }
 
 const actionDescriptions: Record<PetAction, string> = {
-  Feed: "Feeding your pet will boost its HP and Happiness stats...",
-  Play: "Playing with your pet will greatly boost its Happiness stat but deplete some of its HP...",
-  Customize:
+  feed: "Feeding your pet will boost its HP and Happiness stats...",
+  play: "Playing with your pet will greatly boost its Happiness stat but deplete some of its HP...",
+  customize:
     "Customize your pet to give it a fresh new look and truly make it yours...",
 };

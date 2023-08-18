@@ -14,7 +14,7 @@ export interface PetDetailsProps {
 export const provider = new Provider(Network.TESTNET);
 
 export function PetDetails({ pet }: PetDetailsProps) {
-  const [newName, setNewName] = useState<String>();
+  const [newName, setNewName] = useState(pet.name);
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
