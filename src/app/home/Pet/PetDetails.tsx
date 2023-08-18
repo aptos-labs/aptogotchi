@@ -4,15 +4,47 @@ import { AiFillSave } from "react-icons/ai";
 import { HealthBar } from "@/components/HealthBar";
 import { Pet } from ".";
 import { useState } from "react";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { Network, Provider } from "aptos";
 
 export interface PetDetailsProps {
   pet: Pet;
 }
 
+export const provider = new Provider(Network.TESTNET);
+
 export function PetDetails({ pet }: PetDetailsProps) {
-  const [newName, setNewName] = useState(pet.name);
+  const [newName, setNewName] = useState<String>();
+  const [transactionInProgress, setTransactionInProgress] =
+    useState<boolean>(false);
+  const { account, network, signAndSubmitTransaction } = useWallet();
 
   const canSave = newName !== pet.name;
+
+  const handleNameChange = async () => {
+    if (!account || !network) return;
+
+    setTransactionInProgress(true);
+    // build a transaction payload to be submitted
+    const payload = {
+      type: "entry_function_payload",
+      function:
+        "0x71cc7f10ea20de366f1d512369df023e607fe14261e815c289eec8dc6b3ea7fe::main::set_name",
+      type_arguments: [],
+      arguments: [account.address, newName],
+    };
+
+    try {
+      // sign and submit transaction to chain
+      const response = await signAndSubmitTransaction(payload);
+      // wait for transaction
+      await provider.waitForTransaction(response.hash);
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setTransactionInProgress(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -29,6 +61,7 @@ export function PetDetails({ pet }: PetDetailsProps) {
           <button
             className="absolute right-4 top-1/2 -translate-y-1/2 nes-pointer disabled:cursor-not-allowed text-sky-500 disabled:text-gray-400"
             disabled={!canSave}
+            onClick={handleNameChange}
           >
             <AiFillSave className=" h-8 w-8 drop-shadow-sm" />
           </button>
