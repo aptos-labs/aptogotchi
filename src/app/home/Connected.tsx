@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Pet } from "./Pet";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
+import { Mint } from "./Mint";
 
 export const provider = new Provider(Network.DEVNET);
 
@@ -42,7 +43,7 @@ export function Connected() {
 
   return (
     <div className="flex flex-col gap-3 p-3">
-      {pet ? <Pet pet={pet} /> : <>mint component</>}
+      {pet ? <Pet pet={pet} /> : <Mint />}
     </div>
   );
 }
