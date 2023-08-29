@@ -197,7 +197,8 @@ module aptogotchi::main {
         (gotchi.name, gotchi.birthday, gotchi.health_points, gotchi.happiness)
     }
 
-    // fun calculate_health_happiness_decay(gotchi: &AptoGotchi) {
-    //     // TODO: make helper funct, call in both getters, both setters       
-    // }
+    fun calculate_health_happiness_decay(gotchi: &AptoGotchi) {
+        // TODO: make helper funct, call in both getters, both setters
+        
+    }
 }
