@@ -41,7 +41,6 @@ export function Actions({
     if (!account || !network) return;
 
     setTransactionInProgress(true);
-    // build a transaction payload to be submitted
     const payload = {
       type: "entry_function_payload",
       function:
@@ -51,9 +50,7 @@ export function Actions({
     };
 
     try {
-      // sign and submit transaction to chain
       const response = await signAndSubmitTransaction(payload);
-      // wait for transaction
       await provider.waitForTransaction(response.hash);
       setPet((pet) => {
         if (!pet) return pet;
@@ -70,7 +67,6 @@ export function Actions({
     if (!account || !network) return;
 
     setTransactionInProgress(true);
-    // build a transaction payload to be submitted
     const payload = {
       type: "entry_function_payload",
       function:
@@ -80,9 +76,7 @@ export function Actions({
     };
 
     try {
-      // sign and submit transaction to chain
       const response = await signAndSubmitTransaction(payload);
-      // wait for transaction
       await provider.waitForTransaction(response.hash);
       setPet((pet) => {
         if (!pet) return pet;
@@ -98,8 +92,11 @@ export function Actions({
   return (
     <div className="nes-container with-title flex-1 bg-white">
       <p className="title">Actions</p>
-      <div className="flex flex-col md:flex-row gap-12 justify-between h-full">
-        <div className="flex flex-col flex-shrink-0 gap-1">
+      <div className="flex flex-col gap-2 justify-between h-full">
+        <div
+          className="flex flex-col flex-shrink-0 gap-2"
+          style={{ borderBottom: "1px solid #D1D5DB" }}
+        >
           <label>
             <input
               type="radio"
@@ -120,7 +117,7 @@ export function Actions({
             />
             <span>Play</span>
           </label>
-          <label>
+          {/* <label>
             <input
               type="radio"
               className="nes-radio"
@@ -129,10 +126,9 @@ export function Actions({
               onChange={() => setSelectedAction("customize")}
             />
             <span>Customize</span>
-          </label>
+          </label> */}
         </div>
-        <div className="w-1 h-full bg-zinc-300 flex-shrink-0 md:block hidden" />
-        <div className="flex flex-col gap-1 justify-between">
+        <div className="flex flex-col gap-4 justify-between">
           <p>{actionDescriptions[selectedAction]}</p>
           <button
             type="button"
@@ -149,8 +145,8 @@ export function Actions({
 }
 
 const actionDescriptions: Record<PetAction, string> = {
-  feed: "Feeding your pet will boost its HP and Happiness stats...",
-  play: "Playing with your pet will greatly boost its Happiness stat but deplete some of its HP...",
+  feed: "Feeding your pet will boost its HP and Happiness...",
+  play: "Playing with your pet will boost its Happiness, but deplete some of its HP...",
   customize:
     "Customize your pet to give it a fresh new look and truly make it yours...",
 };

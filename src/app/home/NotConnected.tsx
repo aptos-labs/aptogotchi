@@ -2,7 +2,7 @@
 
 import { useTypingEffect } from "@/utils/useTypingEffect";
 import { Pet } from "./Pet";
-import { PetImage, bodies, ears, faces } from "./Pet/PetImage";
+import { PetImage, bodies, ears, faces } from "./Pet/Image";
 
 const defaultPet: Pet = {
   name: "Unknown",
@@ -17,7 +17,7 @@ export function NotConnected() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div className="flex gap-6 self-center">
+      <div className="flex flex-col gap-6 self-center">
         <PetImage
           pet={defaultPet}
           selectedAction={"feed"}
@@ -25,24 +25,6 @@ export function NotConnected() {
             body: bodies[0],
             ears: ears[0],
             face: faces[0],
-          }}
-        />
-        <PetImage
-          pet={defaultPet}
-          selectedAction={"play"}
-          petParts={{
-            body: bodies[1],
-            ears: ears[1],
-            face: faces[1],
-          }}
-        />
-        <PetImage
-          pet={defaultPet}
-          selectedAction={"feed"}
-          petParts={{
-            body: bodies[2],
-            ears: ears[2],
-            face: faces[2],
           }}
         />
       </div>

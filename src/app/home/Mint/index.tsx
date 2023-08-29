@@ -17,7 +17,6 @@ export function Mint({ fetchPet }: MintProps) {
     if (!account || !network) return;
 
     setTransactionInProgress(true);
-    // build a transaction payload to be submitted
     const payload = {
       type: "entry_function_payload",
       function:
@@ -27,9 +26,7 @@ export function Mint({ fetchPet }: MintProps) {
     };
 
     try {
-      // sign and submit transaction to chain
       const response = await signAndSubmitTransaction(payload);
-      // wait for transaction
       await provider.waitForTransaction(response.hash);
     } catch (error: any) {
       console.error(error);
@@ -41,7 +38,7 @@ export function Mint({ fetchPet }: MintProps) {
 
   return (
     <div className="flex flex-col gap-8 max-w-md self-center pt-8">
-      <h2 className="text-xl pb-4">Tell us about your pet</h2>
+      <h2 className="text-xl pb-4">Tell us about your pet!</h2>
       <div className="nes-field">
         <label htmlFor="name_field">Name</label>
         <input

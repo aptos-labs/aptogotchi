@@ -26,7 +26,6 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
     if (!account || !network) return;
 
     setTransactionInProgress(true);
-    // build a transaction payload to be submitted
     const payload = {
       type: "entry_function_payload",
       function:
@@ -36,9 +35,8 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
     };
 
     try {
-      // sign and submit transaction to chain
       const response = await signAndSubmitTransaction(payload);
-      // wait for transaction
+
       await provider.waitForTransaction(response.hash);
       setPet((pet) => {
         if (!pet) return pet;
@@ -52,7 +50,7 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
   };
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 items-center">
       <div className="nes-field">
         <label htmlFor="name_field">Name</label>
         <div className="relative">
@@ -80,7 +78,7 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
           icon="heart"
         />
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-4">
         <label>Happiness</label>
         <HealthBar totalHealth={10} currentHealth={pet.happiness} icon="star" />
       </div>

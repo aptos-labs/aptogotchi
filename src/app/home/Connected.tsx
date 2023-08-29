@@ -15,8 +15,8 @@ export function Connected() {
 
   const fetchPet = useCallback(async () => {
     if (!account?.address) return;
+    setIsLoading(true);
 
-    // build a transaction payload to be submitted
     const payload = {
       function:
         "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::get_aptogotchi",
@@ -24,19 +24,10 @@ export function Connected() {
       arguments: [account.address],
     };
 
-    setIsLoading(true);
-
     const response = await provider.view(payload);
     const noPet = ["", "0", "0", "0"];
 
-    // if no pet exists, show minting component
     if (JSON.stringify(response) !== JSON.stringify(noPet)) {
-      console.log(
-        response,
-        new Date(parseInt(response[1] as unknown as string) * 1000)
-      );
-
-      // get and set pet data from user's wallet
       setPet({
         name: response[0] as unknown as string,
         health_points: parseInt(response[2] as unknown as string),

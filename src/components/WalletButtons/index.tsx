@@ -7,24 +7,17 @@ import {
   isRedirectable,
   WalletName,
 } from "@aptos-labs/wallet-adapter-react";
-
 import { cn } from "@/utils/styling";
 
 const buttonStyles = "nes-btn is-primary";
 
 export const WalletButtons = () => {
-  const { wallets, connected, disconnect, network, isLoading } = useWallet();
+  const { wallets, connected, disconnect, isLoading } = useWallet();
 
   if (connected) {
-    // TODO: make network dropdown change network
+    // TODO: make network dropdown change network in global state
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+      <div className="flex flex-row">
         <select
           id="Network"
           className="bg-gray-50 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
