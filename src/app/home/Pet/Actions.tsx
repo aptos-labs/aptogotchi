@@ -45,7 +45,7 @@ export function Actions({
     const payload = {
       type: "entry_function_payload",
       function:
-        "0xe8a7346fd49d2aeaa1ddd1c58c865eeb617c4f88870c8b0a25cfae2938eb5574::main::change_health_points",
+        "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::change_health_points",
       type_arguments: [],
       arguments: [account.address, 2],
     };
@@ -74,7 +74,7 @@ export function Actions({
     const payload = {
       type: "entry_function_payload",
       function:
-        "0xe8a7346fd49d2aeaa1ddd1c58c865eeb617c4f88870c8b0a25cfae2938eb5574::main::change_happiness",
+        "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::change_happiness",
       type_arguments: [],
       arguments: [account.address, 2],
     };
@@ -98,7 +98,7 @@ export function Actions({
   return (
     <div className="nes-container with-title flex-1 bg-white">
       <p className="title">Actions</p>
-      <div className="flex gap-12 justify-between h-full">
+      <div className="flex flex-col md:flex-row gap-12 justify-between h-full">
         <div className="flex flex-col flex-shrink-0 gap-1">
           <label>
             <input
@@ -131,7 +131,7 @@ export function Actions({
             <span>Customize</span>
           </label>
         </div>
-        <div className="w-1 h-full bg-zinc-300 flex-shrink-0" />
+        <div className="w-1 h-full bg-zinc-300 flex-shrink-0 md:block hidden" />
         <div className="flex flex-col gap-1 justify-between">
           <p>{actionDescriptions[selectedAction]}</p>
           <button

@@ -21,3 +21,15 @@ body {
   /* This fixes a bug in NES.css */
   border-image-repeat: stretch !important;
 }
+
+@media (max-width: 768px) {
+  h1.text-2xl {
+    font-size: 1rem;
+  }
+
+  .btn-small {
+    padding: 8px 16px;
+    font-size: 14px;
+    width: 200px;
+  }
+}

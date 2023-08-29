@@ -30,7 +30,7 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
     const payload = {
       type: "entry_function_payload",
       function:
-        "0xe8a7346fd49d2aeaa1ddd1c58c865eeb617c4f88870c8b0a25cfae2938eb5574::main::set_name",
+        "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::set_name",
       type_arguments: [],
       arguments: [account.address, newName],
     };

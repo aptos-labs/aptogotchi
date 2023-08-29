@@ -19,7 +19,7 @@ export function Connected() {
     // build a transaction payload to be submitted
     const payload = {
       function:
-        "0xe8a7346fd49d2aeaa1ddd1c58c865eeb617c4f88870c8b0a25cfae2938eb5574::main::get_aptogotchi",
+        "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::get_aptogotchi",
       type_arguments: [],
       arguments: [account.address],
     };

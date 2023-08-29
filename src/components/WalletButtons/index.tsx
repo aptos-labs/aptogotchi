@@ -12,21 +12,36 @@ import { cn } from "@/utils/styling";
 
 const buttonStyles = "nes-btn is-primary";
 
-
 export const WalletButtons = () => {
   const { wallets, connected, disconnect, network, isLoading } = useWallet();
 
   if (connected) {
-    // check if aptogotchi already exists in user's wallet: get() call here
-    // if exists: store gotchi object in Context
-    // else: mint new aptogotchi
-
+    // TODO: make network dropdown change network
     return (
       <div
-        className={cn(buttonStyles, "hover:bg-blue-700")}
-        onClick={disconnect}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
       >
-        Disconnect from {network?.name ?? "Network"}
+        <select
+          id="Network"
+          className="bg-gray-50 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+          style={{ marginRight: "15px" }}
+        >
+          <option selected value="Devnet">
+            Devnet
+          </option>
+          <option value="Testnet">Testnet</option>
+          <option value="Mainnet">Mainnet</option>
+        </select>
+        <div
+          className={cn(buttonStyles, "hover:bg-blue-700 btn-small")}
+          onClick={disconnect}
+        >
+          Disconnect
+        </div>
       </div>
     );
   }
@@ -39,13 +54,11 @@ export const WalletButtons = () => {
     );
   }
 
-  // Let's just support Petra for now
   return <WalletView wallet={wallets[0]} />;
 };
 
 const WalletView = ({ wallet }: { wallet: Wallet }) => {
   const { connect } = useWallet();
-  // const { setErrorAlertMessage } = useAlert();
   const isWalletReady =
     wallet.readyState === WalletReadyState.Installed ||
     wallet.readyState === WalletReadyState.Loadable;
@@ -95,7 +108,7 @@ const WalletView = ({ wallet }: { wallet: Wallet }) => {
       </button>
     );
   } else {
-    // we are on desktop view
+    // desktop
     return (
       <button
         className={cn(
