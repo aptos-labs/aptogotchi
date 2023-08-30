@@ -6,7 +6,7 @@ import "nes.css/css/nes.min.css";
 import "./globals.css";
 
 const kongtext = localFont({
-  src: "./kongtext.ttf",
+  src: "./../../public/kongtext.ttf",
   variable: "--font-kongtext",
 });
 

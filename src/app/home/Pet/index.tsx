@@ -10,6 +10,7 @@ export interface Pet {
   name: string;
   health_points: number;
   happiness: number;
+  parts: string[];
 }
 
 interface PetProps {
@@ -55,9 +56,9 @@ export function Pet({ pet, setPet }: PetProps) {
           pet={pet}
           selectedAction={selectedAction}
           petParts={{
-            body: bodies[0],
-            ears: ears[0],
-            face: faces[0],
+            body: pet.parts[0],
+            ears: pet.parts[1],
+            face: pet.parts[2],
           }}
         />
         <PetDetails pet={pet} setPet={setPet} />

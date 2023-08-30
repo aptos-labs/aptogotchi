@@ -25,13 +25,14 @@ export function Connected() {
     };
 
     const response = await provider.view(payload);
-    const noPet = ["", "0", "0", "0"];
+    const noPet = ["", "0", "0", "0", [] as unknown as string[]];
 
     if (JSON.stringify(response) !== JSON.stringify(noPet)) {
       setPet({
         name: response[0] as unknown as string,
         health_points: parseInt(response[2] as unknown as string),
         happiness: parseInt(response[3] as unknown as string),
+        parts: response[4] as unknown as string[],
       });
     }
     setIsLoading(false);

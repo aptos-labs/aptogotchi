@@ -22,6 +22,23 @@ body {
   border-image-repeat: stretch !important;
 }
 
+.selected {
+  border: 2px solid #006bb3;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 @media (max-width: 768px) {
   h1.text-2xl {
     font-size: 1rem;

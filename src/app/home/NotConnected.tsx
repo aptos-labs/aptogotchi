@@ -8,6 +8,7 @@ const defaultPet: Pet = {
   name: "Unknown",
   health_points: 0,
   happiness: 0,
+  parts: [],
 };
 
 export function NotConnected() {
@@ -25,6 +26,24 @@ export function NotConnected() {
             body: bodies[0],
             ears: ears[0],
             face: faces[0],
+          }}
+        />
+        <PetImage
+          pet={defaultPet}
+          selectedAction={"play"}
+          petParts={{
+            body: bodies[1],
+            ears: ears[1],
+            face: faces[1],
+          }}
+        />
+        <PetImage
+          pet={defaultPet}
+          selectedAction={"feed"}
+          petParts={{
+            body: bodies[2],
+            ears: ears[2],
+            face: faces[2],
           }}
         />
       </div>
