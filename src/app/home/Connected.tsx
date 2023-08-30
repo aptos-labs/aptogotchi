@@ -22,8 +22,9 @@ export function Connected() {
     };
 
     const response = await provider.view(payload);
-    console.log("CONNECTED: ", response);
-    const noPet = ["", "0", "0", "0", [] as unknown as string[]];
+    console.log("CONNECTED: ", JSON.stringify(response));
+    const noPet = ["", "0", "0", "0", "0x"];
+    console.log("noPet: " + JSON.stringify(noPet));
 
     if (JSON.stringify(response) !== JSON.stringify(noPet)) {
       setPet({

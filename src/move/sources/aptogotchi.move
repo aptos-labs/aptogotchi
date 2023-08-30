@@ -4,6 +4,7 @@ module aptogotchi::main {
     use aptos_framework::timestamp;
     use aptos_token_objects::collection;
     use std::option;
+    use std::vector;
     use aptos_token_objects::token;
 
     const HP_UPPER_BOUND: u64 = 4;
@@ -200,7 +201,7 @@ module aptogotchi::main {
         let has_gotchi = exists<AptoGotchi>(user_addr);
 
         if (!has_gotchi) {
-            return (string::utf8(b""), 0, 0, 0, vector[])
+            return (string::utf8(b""), 0, 0, 0, vector::empty<u8>())
         };
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
