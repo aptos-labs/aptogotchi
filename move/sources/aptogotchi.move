@@ -7,8 +7,8 @@ module aptogotchi::main {
     use std::vector;
     use aptos_token_objects::token;
 
-    const HP_UPPER_BOUND: u64 = 4;
-    const HAPPINESS_UPPER_BOUND: u64 = 4;
+    const HP_UPPER_BOUND: u64 = 10;
+    const HAPPINESS_UPPER_BOUND: u64 = 10;
 
     struct AptoGotchi has key {
         name: String,
