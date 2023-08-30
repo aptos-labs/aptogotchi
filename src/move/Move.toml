@@ -4,7 +4,7 @@ version = '1.0.0'
 upgrade_policy = "compatible"
 
 [addresses]
-aptogotchi = 'b230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f'
+aptogotchi = '2ac71788ac930be964c3f92ddea7d2d2cb6331f75f07169a54d8b356c2d2c32c'
 
 [dependencies.AptosFramework]
 git = 'https://github.com/aptos-labs/aptos-core.git'
