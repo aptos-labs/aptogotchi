@@ -6,8 +6,10 @@ import { Network, Provider } from "aptos";
 import { Pet } from ".";
 
 export const provider = new Provider(Network.DEVNET);
-
 export type PetAction = "feed" | "play" | "customize";
+
+const HEALTH_INCREASE = 2;
+const HAPPINESS_INCREASE = 2;
 
 export interface ActionsProps {
   selectedAction: PetAction;
@@ -43,18 +45,18 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function:
-        "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::change_health_points",
+      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::change_health_points`,
       type_arguments: [],
-      arguments: [account.address, 2],
+      arguments: [account.address, HEALTH_INCREASE],
     };
 
     try {
       const response = await signAndSubmitTransaction(payload);
       await provider.waitForTransaction(response.hash);
+
       setPet((pet) => {
         if (!pet) return pet;
-        return { ...pet, health_points: pet.health_points + 2 };
+        return { ...pet, health_points: pet.health_points + HEALTH_INCREASE };
       });
     } catch (error: any) {
       console.error(error);
@@ -69,18 +71,18 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function:
-        "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::change_happiness",
+      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::change_happiness`,
       type_arguments: [],
-      arguments: [account.address, 2],
+      arguments: [account.address, HAPPINESS_INCREASE],
     };
 
     try {
       const response = await signAndSubmitTransaction(payload);
       await provider.waitForTransaction(response.hash);
+
       setPet((pet) => {
         if (!pet) return pet;
-        return { ...pet, happiness: pet.happiness + 2 };
+        return { ...pet, happiness: pet.happiness + HAPPINESS_INCREASE };
       });
     } catch (error: any) {
       console.error(error);

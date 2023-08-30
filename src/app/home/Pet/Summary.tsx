@@ -15,28 +15,28 @@ export function Summary({ pet }: SummaryProps) {
   const isDepressed = pet.happiness === 0;
   const isStarved = pet.health_points === 0;
 
-  let text = `${pet.name} is doing great!`;
+  let text = `${pet.name} is doing great! 😄`;
 
   if (isSad) {
-    text = `${pet.name} is getting a little lonely. You should consider playing with them...`;
+    text = `${pet.name} is getting a little lonely 🙁. You should consider playing with them...`;
   }
   if (isHungry) {
-    text = `${pet.name} is starting to get hungry. You should consider feeding them...`;
+    text = `${pet.name} is starting to get hungry 😕. You should consider feeding them...`;
   }
   if (isReallySad) {
-    text = `${pet.name} is really sad. You should play with them as soon as you can...`;
+    text = `${pet.name} is really sad 😔. You should play with them as soon as you can...`;
   }
   if (isReallyHungry) {
-    text = `${pet.name} is really hungry. You should feed them as soon as you can...`;
+    text = `${pet.name} is really hungry 😖. You should feed them as soon as you can...`;
   }
   if (isDepressed) {
-    text = `${pet.name} has never been sadder in their life. Play with them right now!!`;
+    text = `${pet.name} has never been sadder 😢. Play with them right now!`;
   }
   if (isStarved) {
-    text = `${pet.name} is literally starving. Feed them right now!!`;
+    text = `${pet.name} is literally starving 😥. Feed them right now!`;
   }
   if (isDepressed && isStarved) {
-    text = `${pet.name} has died. RIP.`;
+    text = `${pet.name} has died. RIP. 🪦`;
   }
 
   const typedText = useTypingEffect(text);

@@ -46,7 +46,7 @@ export function Pet({ pet, setPet }: PetProps) {
       });
 
       return () => clearInterval(interval);
-    }, 1000 * 60 * 2);
+    }, 1000 * 60);
   }, []);
 
   return (

@@ -28,16 +28,15 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function:
-        "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::set_name",
+      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::set_name`,
       type_arguments: [],
       arguments: [account.address, newName],
     };
 
     try {
       const response = await signAndSubmitTransaction(payload);
-
       await provider.waitForTransaction(response.hash);
+
       setPet((pet) => {
         if (!pet) return pet;
         return { ...pet, name: newName };

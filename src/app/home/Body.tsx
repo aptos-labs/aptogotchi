@@ -5,10 +5,7 @@ import { Connected } from "./Connected";
 import { NotConnected } from "./NotConnected";
 
 export function Body() {
-  const { connected, isLoading } = useWallet();
-
-  // TODO: Design a nice loading screen
-  if (isLoading) return null;
+  const { connected } = useWallet();
 
   if (connected) return <Connected />;
 

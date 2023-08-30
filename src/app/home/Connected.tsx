@@ -10,21 +10,19 @@ export const provider = new Provider(Network.DEVNET);
 
 export function Connected() {
   const [pet, setPet] = useState<Pet>();
-  const [isLoading, setIsLoading] = useState(true);
   const { account, network } = useWallet();
 
   const fetchPet = useCallback(async () => {
     if (!account?.address) return;
-    setIsLoading(true);
 
     const payload = {
-      function:
-        "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::get_aptogotchi",
+      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::get_aptogotchi`,
       type_arguments: [],
       arguments: [account.address],
     };
 
     const response = await provider.view(payload);
+    console.log("CONNECTED: ", response);
     const noPet = ["", "0", "0", "0", [] as unknown as string[]];
 
     if (JSON.stringify(response) !== JSON.stringify(noPet)) {
@@ -35,7 +33,6 @@ export function Connected() {
         parts: response[4] as unknown as string[],
       });
     }
-    setIsLoading(false);
   }, [account?.address]);
 
   useEffect(() => {
@@ -43,9 +40,6 @@ export function Connected() {
 
     fetchPet();
   }, [account?.address, fetchPet, network]);
-
-  // TODO: Design a nice loading screen
-  if (isLoading) return null;
 
   return (
     <div className="flex flex-col gap-3 p-3">

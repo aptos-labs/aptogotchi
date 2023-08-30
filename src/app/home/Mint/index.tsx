@@ -30,8 +30,7 @@ export function Mint({ fetchPet }: MintProps) {
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function:
-        "0xb230322f28966237ee14b9d764f230b8ad9382653331ebb419d2909ea817a07f::main::create_aptogotchi",
+      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::create_aptogotchi`,
       type_arguments: [],
       arguments: [newName, parts],
     };
@@ -47,6 +46,29 @@ export function Mint({ fetchPet }: MintProps) {
     }
   };
 
+  function createPetImage(body: string, ear: string, face: string) {
+    return (
+      <div
+        onClick={() => setParts([body, ear, face])}
+        className={
+          JSON.stringify(parts) == JSON.stringify([body, ear, face])
+            ? "selected"
+            : ""
+        }
+      >
+        <PetImage
+          pet={defaultPet}
+          selectedAction={"feed"}
+          petParts={{
+            body: body,
+            ears: ear,
+            face: face,
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-8 max-w-md self-center pt-8">
       <h2 className="text-xl pb-4">Create your pet!</h2>
@@ -61,63 +83,9 @@ export function Mint({ fetchPet }: MintProps) {
         />
       </div>
       <div className="flex flex-col gap-6 self-center">
-        <div
-          onClick={() => setParts([bodies[0], ears[0], faces[0]])}
-          className={
-            JSON.stringify(parts) ==
-            JSON.stringify([bodies[0], ears[0], faces[0]])
-              ? "selected"
-              : ""
-          }
-        >
-          <PetImage
-            pet={defaultPet}
-            selectedAction={"feed"}
-            petParts={{
-              body: bodies[0],
-              ears: ears[0],
-              face: faces[0],
-            }}
-          />
-        </div>
-        <div
-          onClick={() => setParts([bodies[1], ears[1], faces[1]])}
-          className={
-            JSON.stringify(parts) ==
-            JSON.stringify([bodies[1], ears[1], faces[1]])
-              ? "selected"
-              : ""
-          }
-        >
-          <PetImage
-            pet={defaultPet}
-            selectedAction={"play"}
-            petParts={{
-              body: bodies[1],
-              ears: ears[1],
-              face: faces[1],
-            }}
-          />
-        </div>
-        <div
-          onClick={() => setParts([bodies[2], ears[2], faces[2]])}
-          className={
-            JSON.stringify(parts) ==
-            JSON.stringify([bodies[2], ears[2], faces[2]])
-              ? "selected"
-              : ""
-          }
-        >
-          <PetImage
-            pet={defaultPet}
-            selectedAction={"feed"}
-            petParts={{
-              body: bodies[2],
-              ears: ears[2],
-              face: faces[2],
-            }}
-          />
-        </div>
+        {createPetImage(bodies[0], ears[0], faces[0])}
+        {createPetImage(bodies[1], ears[1], faces[1])}
+        {createPetImage(bodies[2], ears[2], faces[2])}
       </div>
       <button
         type="button"
