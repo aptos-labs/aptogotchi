@@ -113,7 +113,7 @@ module aptogotchi::main {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
         // get new baseline (calculate how much health_points has decayed)
-        let hp_decay = calculate_decay(gotchi)[0];
+        let (hp_decay, _) = calculate_decay(gotchi);
         gotchi.health_points = gotchi.health_points - hp_decay;
         
         gotchi.last_modified_timestamp = timestamp::now_seconds();
@@ -130,7 +130,7 @@ module aptogotchi::main {
             gotchi.health_points + hp_difference
         };
 
-        let hp_decay = calculate_decay(gotchi)[0];
+        let (hp_decay, _) = calculate_decay(gotchi);
         gotchi.health_points = gotchi.health_points - hp_decay;
 
         gotchi.last_modified_timestamp = timestamp::now_seconds();
@@ -143,7 +143,7 @@ module aptogotchi::main {
         let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
         // get new baseline
-        let happiness_decay = calculate_decay(gotchi)[1];
+        let (_, happiness_decay) = calculate_decay(gotchi);
         gotchi.happiness = gotchi.happiness - happiness_decay;
 
         gotchi.last_modified_timestamp = timestamp::now_seconds();
@@ -160,7 +160,7 @@ module aptogotchi::main {
             gotchi.happiness + happiness_difference
         };
 
-        let happiness_decay = calculate_decay(gotchi)[1];
+        let (_, happiness_decay) = calculate_decay(gotchi);
         gotchi.happiness = gotchi.happiness - happiness_decay;
 
         gotchi.last_modified_timestamp = timestamp::now_seconds();
@@ -202,14 +202,28 @@ module aptogotchi::main {
         if (!has_gotchi) {
             return (string::utf8(b""), 0, 0, 0, vector[])
         };
-        let gotchi = borrow_global<AptoGotchi>(user_addr);
+        let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
 
-        let hp_decay = calculate_decay(gotchi)[0];
+        let (hp_decay, _) = calculate_decay(gotchi);
         gotchi.health_points = gotchi.health_points - hp_decay;
 
-        let happiness_decay = calculate_decay(gotchi)[1];
+        let (_, happiness_decay) = calculate_decay(gotchi);
         gotchi.happiness = gotchi.happiness - happiness_decay;
 
         (gotchi.name, gotchi.birthday, gotchi.health_points, gotchi.happiness, gotchi.parts)
+    }
+
+    #[view]
+    public fun get_parts(user_addr: address): vector<u8> acquires AptoGotchi {
+        let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+
+        gotchi.parts
+    }
+
+    public entry fun set_parts(user_addr: address, parts: vector<u8>) acquires AptoGotchi {
+        let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+        gotchi.parts = parts;
+
+        gotchi.parts;
     }
 }
