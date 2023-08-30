@@ -1,0 +1,46 @@
+.nes-list {
+  // prettier-ignore
+  $disc: (
+    (0,0,0,1,1,0,0,0),
+    (0,0,1,1,1,1,0,0),
+    (0,1,1,1,1,1,1,0),
+    (0,1,1,1,1,1,1,0),
+    (0,0,1,1,1,1,0,0),
+    (0,0,0,1,1,0,0,0)
+    );
+
+  // prettier-ignore
+  $circle: (
+    (0,0,0,1,1,0,0,0),
+    (0,0,1,1,1,1,0,0),
+    (0,1,1,0,0,1,1,0),
+    (0,1,1,0,0,1,1,0),
+    (0,0,1,1,1,1,0,0),
+    (0,0,0,1,1,0,0,0)
+  );
+  $colors: ($base-color, map-get($default-colors, "shadow"));
+
+  list-style-type: none;
+
+  & li {
+    position: relative;
+  }
+
+  &.is-disc li::before {
+    position: absolute;
+    top: calc(50% - 8px);
+    left: -22px;
+    content: "";
+
+    @include pixelize(2px, $disc, $colors);
+  }
+
+  &.is-circle li::before {
+    position: absolute;
+    top: calc(50% - 8px);
+    left: -22px;
+    content: "";
+
+    @include pixelize(2px, $circle, $colors);
+  }
+}
