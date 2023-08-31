@@ -26,7 +26,7 @@ export function PetImage(props: PetImageProps) {
     props.selectedAction === "play" ? "animate-hop" : "animate-wiggle";
 
   return (
-    <div className="h-72 w-72 bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative">
+    <div className="h-56 w-56 bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative">
       <div className={`relative h-full w-full ${animation}`}>
         <img src={head} className={imgClass} alt="pet head" />
         <img src={body} className={imgClass} alt="pet body" />

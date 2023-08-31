@@ -50,8 +50,8 @@ export function Pet({ pet, setPet }: PetProps) {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6 px-4 py-3">
-      <div className="flex flex-wrap gap-6 justify-center">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap gap-4 justify-center">
         <PetImage
           pet={pet}
           selectedAction={selectedAction}
