@@ -227,4 +227,19 @@ module aptogotchi::main {
 
         gotchi.parts;
     }
+
+    // public entry fun delete_aptogotchi(user_addr: address) acquires AptoGotchi {
+    //     let has_gotchi = exists<AptoGotchi>(user_addr);
+
+    //     if (!has_gotchi) {
+    //         return;
+    //     };
+
+    //     let gotchi = borrow_global_mut<AptoGotchi>(user_addr);
+
+    //     let mutator_ref = gotchi.mutator_ref;
+    //     let burn_signer = account::create_signer_with_capability(&borrow_global<CollectionCapability>(@aptogotchi).burn_signer_capability);
+
+    //     token::burn_token(&burn_signer, mutator_ref);
+    // }
 }
