@@ -8,10 +8,8 @@ import { Pet } from ".";
 export const provider = new Provider(Network.DEVNET);
 export type PetAction = "feed" | "play" | "customize";
 
-const HEALTH_INCREASE = 2;
-const HAPPINESS_INCREASE = 2;
-
 export interface ActionsProps {
+  pet: Pet;
   selectedAction: PetAction;
   setSelectedAction: (action: PetAction) => void;
   setPet: Dispatch<SetStateAction<Pet | undefined>>;
@@ -21,6 +19,7 @@ export function Actions({
   selectedAction,
   setSelectedAction,
   setPet,
+  pet,
 }: ActionsProps) {
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
@@ -35,6 +34,7 @@ export function Actions({
         handlePlay();
         break;
       case "customize":
+        handleCustomize();
         break;
     }
   };
@@ -47,7 +47,10 @@ export function Actions({
       type: "entry_function_payload",
       function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::change_health_points`,
       type_arguments: [],
-      arguments: [account.address, HEALTH_INCREASE],
+      arguments: [
+        account.address,
+        process.env.NEXT_PUBLIC_REACT_APP_HEALTH_INCREASE,
+      ],
     };
 
     try {
@@ -56,7 +59,16 @@ export function Actions({
 
       setPet((pet) => {
         if (!pet) return pet;
-        return { ...pet, health_points: pet.health_points + HEALTH_INCREASE };
+        return {
+          ...pet,
+          health_points:
+            pet.health_points +
+              Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_INCREASE) >
+            Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_CAP)
+              ? Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_CAP)
+              : pet.health_points +
+                Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_INCREASE),
+        };
       });
     } catch (error: any) {
       console.error(error);
@@ -73,7 +85,10 @@ export function Actions({
       type: "entry_function_payload",
       function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::change_happiness`,
       type_arguments: [],
-      arguments: [account.address, HAPPINESS_INCREASE],
+      arguments: [
+        account.address,
+        process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_INCREASE,
+      ],
     };
 
     try {
@@ -82,7 +97,16 @@ export function Actions({
 
       setPet((pet) => {
         if (!pet) return pet;
-        return { ...pet, happiness: pet.happiness + HAPPINESS_INCREASE };
+        return {
+          ...pet,
+          happiness:
+            pet.happiness +
+              Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_INCREASE) >
+            Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_CAP)
+              ? Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_CAP)
+              : pet.happiness +
+                Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_INCREASE),
+        };
       });
     } catch (error: any) {
       console.error(error);
@@ -90,6 +114,16 @@ export function Actions({
       setTransactionInProgress(false);
     }
   };
+
+  const handleCustomize = async () => {};
+
+  const disabled =
+    (selectedAction === "feed" &&
+      pet.health_points ===
+        Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_CAP)) ||
+    (selectedAction === "play" &&
+      pet.happiness ===
+        Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_CAP));
 
   return (
     <div className="nes-container with-title flex-1 bg-white">
@@ -119,7 +153,7 @@ export function Actions({
             />
             <span>Play</span>
           </label>
-          {/* <label>
+          <label>
             <input
               type="radio"
               className="nes-radio"
@@ -128,15 +162,15 @@ export function Actions({
               onChange={() => setSelectedAction("customize")}
             />
             <span>Customize</span>
-          </label> */}
+          </label>
         </div>
         <div className="flex flex-col gap-4 justify-between">
           <p>{actionDescriptions[selectedAction]}</p>
           <button
             type="button"
-            className="nes-btn is-success"
+            className={`nes-btn is-success ${disabled ? "is-disabled" : ""}`}
             onClick={handleStart}
-            disabled={transactionInProgress}
+            disabled={transactionInProgress || disabled}
           >
             {transactionInProgress ? "Processing..." : "Start"}
           </button>

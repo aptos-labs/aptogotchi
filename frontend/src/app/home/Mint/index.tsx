@@ -3,6 +3,7 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 import { PetImage, bodies, ears, faces } from "../Pet/Image";
 import { Pet } from "../Pet";
+import { PiShuffleAngularFill } from "react-icons/pi";
 
 export const provider = new Provider(Network.DEVNET);
 
@@ -18,11 +19,34 @@ const defaultPet: Pet = {
 };
 
 export function Mint({ fetchPet }: MintProps) {
-  const [newName, setNewName] = useState("");
-  const [parts, setParts] = useState([0, 0, 0]);
+  const [newName, setNewName] = useState<string>("");
+  const [parts, setParts] = useState<number[]>([0, 0, 0]);
+  const [selectedAction, setSelectedAction] = useState<"feed" | "play">("feed");
+  const [transactionInProgress, setTransactionInProgress] =
+    useState<boolean>(false);
 
-  const [transactionInProgress, setTransactionInProgress] = useState(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
+
+  const handleShuffle = () => {
+    const randomParts = [
+      Math.floor(
+        Math.random() * Number(process.env.NEXT_PUBLIC_REACT_APP_BODY_OPTIONS)
+      ),
+      Math.floor(
+        Math.random() * Number(process.env.NEXT_PUBLIC_REACT_APP_EAR_OPTIONS)
+      ),
+      Math.floor(
+        Math.random() * Number(process.env.NEXT_PUBLIC_REACT_APP_FACE_OPTIONS)
+      ),
+    ];
+    setParts(randomParts);
+
+    const actions = ["feed", "play"];
+    const randomAction = actions[Math.floor(Math.random() * actions.length)] as
+      | "feed"
+      | "play";
+    setSelectedAction(randomAction);
+  };
 
   const handleMint = async () => {
     if (!account || !network) return;
@@ -46,7 +70,7 @@ export function Mint({ fetchPet }: MintProps) {
     }
   };
 
-  function createPetImage(body: number, ear: number, face: number) {
+  function createPetImage([body, ear, face]: number[]) {
     return (
       <div
         onClick={() => setParts([body, ear, face])}
@@ -58,7 +82,7 @@ export function Mint({ fetchPet }: MintProps) {
       >
         <PetImage
           pet={defaultPet}
-          selectedAction={"feed"}
+          selectedAction={selectedAction}
           petParts={{
             body: bodies[body],
             ears: ears[ear],
@@ -83,9 +107,15 @@ export function Mint({ fetchPet }: MintProps) {
         />
       </div>
       <div className="flex flex-col gap-6 self-center">
-        {createPetImage(0, 0, 0)}
-        {createPetImage(1, 1, 1)}
-        {createPetImage(2, 2, 2)}
+        {createPetImage(parts)}
+        <button
+          type="button"
+          className="nes-btn flex flex-row justify-center items-center"
+          onClick={handleShuffle}
+        >
+          <h2>Shuffle</h2>
+          <PiShuffleAngularFill className="h-8 w-8 drop-shadow-sm" />
+        </button>
       </div>
       <button
         type="button"

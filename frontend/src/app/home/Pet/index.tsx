@@ -66,6 +66,7 @@ export function Pet({ pet, setPet }: PetProps) {
           selectedAction={selectedAction}
           setSelectedAction={setSelectedAction}
           setPet={setPet}
+          pet={pet}
         />
       </div>
       <Summary pet={pet} />
