@@ -23,15 +23,9 @@ export function NotConnected() {
 
   const handleShuffle = () => {
     const randomPet = [
-      Math.floor(
-        Math.random() * Number(process.env.NEXT_PUBLIC_REACT_APP_BODY_OPTIONS)
-      ),
-      Math.floor(
-        Math.random() * Number(process.env.NEXT_PUBLIC_REACT_APP_EAR_OPTIONS)
-      ),
-      Math.floor(
-        Math.random() * Number(process.env.NEXT_PUBLIC_REACT_APP_FACE_OPTIONS)
-      ),
+      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_BODY_OPTIONS)),
+      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_EAR_OPTIONS)),
+      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_FACE_OPTIONS)),
     ];
     setActivePet(randomPet);
 

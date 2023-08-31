@@ -45,12 +45,9 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::change_health_points`,
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::change_health_points`,
       type_arguments: [],
-      arguments: [
-        account.address,
-        process.env.NEXT_PUBLIC_REACT_APP_HEALTH_INCREASE,
-      ],
+      arguments: [account.address, process.env.NEXT_PUBLIC_HEALTH_INCREASE],
     };
 
     try {
@@ -63,11 +60,11 @@ export function Actions({
           ...pet,
           health_points:
             pet.health_points +
-              Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_INCREASE) >
-            Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_CAP)
-              ? Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_CAP)
+              Number(process.env.NEXT_PUBLIC_HEALTH_INCREASE) >
+            Number(process.env.NEXT_PUBLIC_HEALTH_CAP)
+              ? Number(process.env.NEXT_PUBLIC_HEALTH_CAP)
               : pet.health_points +
-                Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_INCREASE),
+                Number(process.env.NEXT_PUBLIC_HEALTH_INCREASE),
         };
       });
     } catch (error: any) {
@@ -83,12 +80,9 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::change_happiness`,
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::change_happiness`,
       type_arguments: [],
-      arguments: [
-        account.address,
-        process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_INCREASE,
-      ],
+      arguments: [account.address, process.env.NEXT_PUBLIC_HAPPINESS_INCREASE],
     };
 
     try {
@@ -100,12 +94,11 @@ export function Actions({
         return {
           ...pet,
           happiness:
-            pet.happiness +
-              Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_INCREASE) >
-            Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_CAP)
-              ? Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_CAP)
+            pet.happiness + Number(process.env.NEXT_PUBLIC_HAPPINESS_INCREASE) >
+            Number(process.env.NEXT_PUBLIC_HAPPINESS_CAP)
+              ? Number(process.env.NEXT_PUBLIC_HAPPINESS_CAP)
               : pet.happiness +
-                Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_INCREASE),
+                Number(process.env.NEXT_PUBLIC_HAPPINESS_INCREASE),
         };
       });
     } catch (error: any) {
@@ -119,11 +112,9 @@ export function Actions({
 
   const disabled =
     (selectedAction === "feed" &&
-      pet.health_points ===
-        Number(process.env.NEXT_PUBLIC_REACT_APP_HEALTH_CAP)) ||
+      pet.health_points === Number(process.env.NEXT_PUBLIC_HEALTH_CAP)) ||
     (selectedAction === "play" &&
-      pet.happiness ===
-        Number(process.env.NEXT_PUBLIC_REACT_APP_HAPPINESS_CAP));
+      pet.happiness === Number(process.env.NEXT_PUBLIC_HAPPINESS_CAP));
 
   return (
     <div className="nes-container with-title flex-1 bg-white">
@@ -153,7 +144,7 @@ export function Actions({
             />
             <span>Play</span>
           </label>
-          <label>
+          {/* <label>
             <input
               type="radio"
               className="nes-radio"
@@ -162,7 +153,7 @@ export function Actions({
               onChange={() => setSelectedAction("customize")}
             />
             <span>Customize</span>
-          </label>
+          </label> */}
         </div>
         <div className="flex flex-col gap-4 justify-between">
           <p>{actionDescriptions[selectedAction]}</p>

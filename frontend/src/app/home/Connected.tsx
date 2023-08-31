@@ -16,7 +16,7 @@ export function Connected() {
     if (!account?.address) return;
 
     const payload = {
-      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
       type_arguments: [],
       arguments: [account.address],
     };

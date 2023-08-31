@@ -29,15 +29,9 @@ export function Mint({ fetchPet }: MintProps) {
 
   const handleShuffle = () => {
     const randomParts = [
-      Math.floor(
-        Math.random() * Number(process.env.NEXT_PUBLIC_REACT_APP_BODY_OPTIONS)
-      ),
-      Math.floor(
-        Math.random() * Number(process.env.NEXT_PUBLIC_REACT_APP_EAR_OPTIONS)
-      ),
-      Math.floor(
-        Math.random() * Number(process.env.NEXT_PUBLIC_REACT_APP_FACE_OPTIONS)
-      ),
+      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_BODY_OPTIONS)),
+      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_EAR_OPTIONS)),
+      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_FACE_OPTIONS)),
     ];
     setParts(randomParts);
 
@@ -54,7 +48,7 @@ export function Mint({ fetchPet }: MintProps) {
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::create_aptogotchi`,
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
       type_arguments: [],
       arguments: [newName, parts],
     };
@@ -72,14 +66,7 @@ export function Mint({ fetchPet }: MintProps) {
 
   function createPetImage([body, ear, face]: number[]) {
     return (
-      <div
-        onClick={() => setParts([body, ear, face])}
-        className={
-          JSON.stringify(parts) == JSON.stringify([body, ear, face])
-            ? "selected"
-            : ""
-        }
-      >
+      <div onClick={() => setParts([body, ear, face])}>
         <PetImage
           pet={defaultPet}
           selectedAction={selectedAction}

@@ -28,7 +28,7 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_REACT_APP_CONTRACT_ADDRESS}::main::set_name`,
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::set_name`,
       type_arguments: [],
       arguments: [account.address, newName],
     };
