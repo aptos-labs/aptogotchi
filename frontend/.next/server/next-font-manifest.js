@@ -1,1 +1,0 @@
-self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/darren/Desktop/Projects/aptogotchi/frontend/src/app/layout\":[\"static/media/03f4cb0148379bc4-s.p.ttf\"]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"
