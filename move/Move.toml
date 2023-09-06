@@ -5,6 +5,7 @@ upgrade_policy = "compatible"
 
 [addresses]
 aptogotchi = '_'
+
 [dependencies.AptosFramework]
 git = 'https://github.com/aptos-labs/aptos-core.git'
 rev = 'main'
