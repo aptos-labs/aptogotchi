@@ -233,8 +233,9 @@ module aptogotchi::main {
     public fun get_aptogotchi(user_addr: address): (String, u64, u64, u64, vector<u8>) acquires AptoGotchi, CollectionCapability {
         let collection = string::utf8(APTOGOTCHI_COLLECTION_NAME);
         let token_name = to_string(&user_addr);
+        let creator = &get_token_signer();
         let token_address = token::create_token_address(
-            &user_addr,
+            &signer::address_of(creator),
             &collection,
             &token_name,
         );
