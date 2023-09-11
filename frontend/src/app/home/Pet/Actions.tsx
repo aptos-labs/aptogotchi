@@ -33,9 +33,6 @@ export function Actions({
       case "play":
         handlePlay();
         break;
-      case "customize":
-        handleCustomize();
-        break;
     }
   };
 
@@ -108,13 +105,12 @@ export function Actions({
     }
   };
 
-  const handleCustomize = async () => {};
-
-  const disabled =
-    (selectedAction === "feed" &&
-      pet.health_points === Number(process.env.NEXT_PUBLIC_HEALTH_CAP)) ||
-    (selectedAction === "play" &&
-      pet.happiness === Number(process.env.NEXT_PUBLIC_HAPPINESS_CAP));
+  const feedDisabled =
+    selectedAction === "feed" &&
+    pet.health_points === Number(process.env.NEXT_PUBLIC_HEALTH_CAP);
+  const playDisabled =
+    selectedAction === "play" &&
+    pet.happiness === Number(process.env.NEXT_PUBLIC_HAPPINESS_CAP);
 
   return (
     <div className="nes-container with-title flex-1 bg-white">
@@ -159,9 +155,11 @@ export function Actions({
           <p>{actionDescriptions[selectedAction]}</p>
           <button
             type="button"
-            className={`nes-btn is-success ${disabled ? "is-disabled" : ""}`}
+            className={`nes-btn is-success ${
+              feedDisabled || playDisabled ? "is-disabled" : ""
+            }`}
             onClick={handleStart}
-            disabled={transactionInProgress || disabled}
+            disabled={transactionInProgress || feedDisabled || playDisabled}
           >
             {transactionInProgress ? "Processing..." : "Start"}
           </button>
@@ -175,5 +173,5 @@ const actionDescriptions: Record<PetAction, string> = {
   feed: "Feeding your pet will boost its HP and Happiness...",
   play: "Playing with your pet will boost its Happiness, but deplete some of its HP...",
   customize:
-    "Customize your pet to give it a fresh new look and truly make it yours...",
+    "Customize your pet to give it a fresh new look and make it truly yours...",
 };
