@@ -12,7 +12,7 @@ export interface PetDetailsProps {
   setPet: Dispatch<SetStateAction<Pet | undefined>>;
 }
 
-export const provider = new Provider(Network.DEVNET);
+export const provider = new Provider(Network.TESTNET);
 
 export function PetDetails({ pet, setPet }: PetDetailsProps) {
   const [newName, setNewName] = useState(pet.name);

@@ -54,7 +54,7 @@ export function NotConnected() {
           onClick={handleShuffle}
         >
           <h2>Shuffle</h2>
-          <PiShuffleAngularFill className="h-8 w-8 drop-shadow-sm" />
+          <PiShuffleAngularFill className="h-8 w-8 drop-shadow-sm ml-2" />
         </button>
       </div>
       <div className="nes-container is-dark with-title">

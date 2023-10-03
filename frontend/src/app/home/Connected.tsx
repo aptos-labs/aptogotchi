@@ -6,7 +6,7 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 import { Mint } from "./Mint";
 
-export const provider = new Provider(Network.DEVNET);
+export const provider = new Provider(Network.TESTNET);
 
 export function Connected() {
   const [pet, setPet] = useState<Pet>();
@@ -22,6 +22,7 @@ export function Connected() {
     };
 
     const response = await provider.view(payload);
+    console.log("GET APTOGOTCHI: ", response);
     const noPet = ["", "0", "0", "0", "0x"];
 
     if (JSON.stringify(response) !== JSON.stringify(noPet)) {

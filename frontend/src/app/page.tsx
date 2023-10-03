@@ -12,7 +12,7 @@ export default function Home() {
 
 function Header() {
   return (
-    <header className="sticky top-0 z-10 flex flex-col justify-between sm:justify-center px-6 py-4 bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 shadow-md w-full gap-2">
+    <header className="sticky top-0 z-10 flex flex-col sm:flex-row justify-between px-6 py-4 bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 shadow-md w-full">
       <h1 className="text-2xl hidden sm:block">Aptogotchi</h1>
       <WalletButtons />
     </header>

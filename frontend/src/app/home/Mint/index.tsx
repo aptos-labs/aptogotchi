@@ -5,7 +5,7 @@ import { PetImage, bodies, ears, faces } from "../Pet/Image";
 import { Pet } from "../Pet";
 import { PiShuffleAngularFill } from "react-icons/pi";
 
-export const provider = new Provider(Network.DEVNET);
+export const provider = new Provider(Network.TESTNET);
 
 export interface MintProps {
   fetchPet: () => Promise<void>;
@@ -46,7 +46,6 @@ export function Mint({ fetchPet }: MintProps) {
     if (!account || !network) return;
 
     setTransactionInProgress(true);
-    console.log("MINT PET: ", newName, parts);
     const payload = {
       type: "entry_function_payload",
       function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
@@ -102,7 +101,7 @@ export function Mint({ fetchPet }: MintProps) {
           onClick={handleShuffle}
         >
           <h2>Shuffle</h2>
-          <PiShuffleAngularFill className="h-8 w-8 drop-shadow-sm" />
+          <PiShuffleAngularFill className="h-8 w-8 drop-shadow-sm ml-2" />
         </button>
       </div>
       <button
