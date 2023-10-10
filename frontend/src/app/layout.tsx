@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { PropsWithChildren } from "react";
 import "nes.css/css/nes.min.css";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 
 const kongtext = localFont({
   src: "./../../public/kongtext.ttf",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
     <html lang="en">
       <body className={kongtext.className}>
         <WalletProvider>{children}</WalletProvider>
+        <Analytics />
       </body>
     </html>
   );

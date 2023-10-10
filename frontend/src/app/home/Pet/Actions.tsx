@@ -5,7 +5,7 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 import { Pet } from ".";
 
-export const provider = new Provider(Network.DEVNET);
+export const provider = new Provider(Network.TESTNET);
 export type PetAction = "feed" | "play" | "customize";
 
 export interface ActionsProps {

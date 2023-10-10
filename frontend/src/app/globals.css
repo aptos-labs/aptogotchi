@@ -22,6 +22,10 @@ body {
   border-image-repeat: stretch !important;
 }
 
+.ans_connector_button {
+
+}
+
 @media (max-width: 768px) {
   .btn-small {
     padding: 8px 16px;

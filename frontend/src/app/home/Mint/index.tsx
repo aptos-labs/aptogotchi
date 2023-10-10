@@ -5,7 +5,7 @@ import { PetImage, bodies, ears, faces } from "../Pet/Image";
 import { Pet } from "../Pet";
 import { PiShuffleAngularFill } from "react-icons/pi";
 
-export const provider = new Provider(Network.DEVNET);
+export const provider = new Provider(Network.TESTNET);
 
 export interface MintProps {
   fetchPet: () => Promise<void>;

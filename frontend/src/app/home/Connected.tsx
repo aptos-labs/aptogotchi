@@ -6,7 +6,7 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 import { Mint } from "./Mint";
 
-export const provider = new Provider(Network.DEVNET);
+export const provider = new Provider(Network.TESTNET);
 
 export function Connected() {
   const [pet, setPet] = useState<Pet>();
