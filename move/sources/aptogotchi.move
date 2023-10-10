@@ -1,21 +1,31 @@
 module aptogotchi::main {
     use aptos_framework::account::{Self, SignerCapability};
+    use aptos_framework::event;
     use aptos_framework::object;
     use aptos_framework::timestamp;
     use aptos_std::string_utils::{to_string};
     use aptos_token_objects::collection;
     use aptos_token_objects::token;
+    use std::error;
     use std::option;
     use std::signer::address_of;
     use std::signer;
     use std::string::{Self, String};
-    use std::error;
 
     /// aptogotchi not available
     const ENOT_AVAILABLE: u64 = 1;
 
     const HP_UPPER_BOUND: u64 = 10;
     const HAPPINESS_UPPER_BOUND: u64 = 10;
+
+    struct MintAptogotchiEvents has key {
+        mint_aptogotchi_events: event::EventHandle<MintAptogotchiEvent>,
+    }
+
+    struct MintAptogotchiEvent has drop, store {
+        aptogotchi_name: String,
+        parts: vector<u8>,
+    }
 
     struct AptoGotchi has key {
         name: String,
@@ -54,6 +64,10 @@ module aptogotchi::main {
             burn_signer_capability,
         });
 
+        move_to(account, MintAptogotchiEvents {
+            mint_aptogotchi_events: account::new_event_handle<MintAptogotchiEvent>(account),
+        });
+
         create_aptogotchi_collection(&token_resource);
     }
 
@@ -75,7 +89,7 @@ module aptogotchi::main {
         );
     }
 
-    public entry fun create_aptogotchi(user: &signer, name: String, parts: vector<u8>) acquires CollectionCapability {
+    public entry fun create_aptogotchi(user: &signer, name: String, parts: vector<u8>) acquires CollectionCapability, MintAptogotchiEvents {
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
         let token_name = to_string(&address_of(user));
@@ -105,6 +119,14 @@ module aptogotchi::main {
         };
 
         move_to(&token_signer, gotchi);
+
+        event::emit_event<MintAptogotchiEvent>(
+            &mut borrow_global_mut<MintAptogotchiEvents>(signer::address_of(&token_signer)).mint_aptogotchi_events,
+            MintAptogotchiEvent {
+                aptogotchi_name: name,
+                parts,
+            },
+        );
     }
 
     fun get_aptogotchi_address(creator_addr: &address): (address) acquires CollectionCapability {
