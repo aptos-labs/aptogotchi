@@ -143,8 +143,7 @@ module aptogotchi::main {
     }
 
     #[view]
-    public fun get_name(owner: signer): String acquires AptoGotchi, CollectionCapability {
-        let owner_addr = signer::address_of(&owner);
+    public fun get_name(owner_addr: address): String acquires AptoGotchi, CollectionCapability {
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global<AptoGotchi>(token_address);
 
@@ -162,6 +161,10 @@ module aptogotchi::main {
 
     #[view]
     public fun get_health_points(owner_addr: address): u64 acquires AptoGotchi, CollectionCapability {
+        if (has_aptogotchi(owner_addr) == false) {
+            assert!(false, error::unavailable(ENOT_AVAILABLE));
+        };
+
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global<AptoGotchi>(token_address);
 
@@ -175,22 +178,26 @@ module aptogotchi::main {
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
 
+        let (hp_decay, _) = calculate_decay(gotchi);
+        gotchi.health_points = gotchi.health_points - hp_decay;
+
+        gotchi.last_modified_timestamp = timestamp::now_seconds();
+
         gotchi.health_points = if (gotchi.health_points + hp_difference > HP_UPPER_BOUND) {
             HP_UPPER_BOUND
         } else {
             gotchi.health_points + hp_difference
         };
 
-        let (hp_decay, _) = calculate_decay(gotchi);
-        gotchi.health_points = gotchi.health_points - hp_decay;
-
-        gotchi.last_modified_timestamp = timestamp::now_seconds();
-
         gotchi.health_points;
     }
 
     #[view]
     public fun get_happiness(owner_addr: address): u64 acquires AptoGotchi, CollectionCapability {
+        if (has_aptogotchi(owner_addr) == false) {
+            assert!(false, error::unavailable(ENOT_AVAILABLE));
+        };
+
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global<AptoGotchi>(token_address);
 
@@ -204,16 +211,16 @@ module aptogotchi::main {
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
 
+        let (_, happiness_decay) = calculate_decay(gotchi);
+        gotchi.happiness = gotchi.happiness - happiness_decay;
+
+        gotchi.last_modified_timestamp = timestamp::now_seconds();
+
         gotchi.happiness = if (gotchi.happiness + happiness_difference > HAPPINESS_UPPER_BOUND) {
             HAPPINESS_UPPER_BOUND
         } else {
             gotchi.happiness + happiness_difference
         };
-
-        let (_, happiness_decay) = calculate_decay(gotchi);
-        gotchi.happiness = gotchi.happiness - happiness_decay;
-
-        gotchi.last_modified_timestamp = timestamp::now_seconds();
 
         gotchi.happiness;
     }
@@ -226,7 +233,6 @@ module aptogotchi::main {
         timestamp_diff_formatted
     }
 
-    
     fun calculate_decay(gotchi: &AptoGotchi): (u64, u64) {
         let minutes_passed = calculate_timestamp_diff(gotchi);
 
@@ -246,33 +252,32 @@ module aptogotchi::main {
     }
 
     #[view]
-    public fun get_aptogotchi(owner_addr: address): (String, u64, u64, u64, vector<u8>) acquires AptoGotchi, CollectionCapability {
-        let collection = string::utf8(APTOGOTCHI_COLLECTION_NAME);
-        let token_name = to_string(&owner_addr);
-        let creator = &get_token_signer();
-        let token_address = token::create_token_address(
-            &signer::address_of(creator),
-            &collection,
-            &token_name,
-        );
-
+    public fun has_aptogotchi(owner_addr: address): (bool) acquires CollectionCapability {
+        let token_address = get_aptogotchi_address(&owner_addr);
         let has_gotchi = exists<AptoGotchi>(token_address);
-        assert!(!has_gotchi, error::unavailable(ENOT_AVAILABLE));
+
+        has_gotchi
+    }
+
+    #[view]
+    public fun get_aptogotchi(owner_addr: address): (String, u64, u64, u64, vector<u8>) acquires AptoGotchi, CollectionCapability {
+        if (has_aptogotchi(owner_addr) == false) {
+            assert!(false, error::unavailable(ENOT_AVAILABLE));
+        };
 
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
 
-        let (hp_decay, _) = calculate_decay(gotchi);
-        gotchi.health_points = gotchi.health_points - hp_decay;
-
-        let (_, happiness_decay) = calculate_decay(gotchi);
-        gotchi.happiness = gotchi.happiness - happiness_decay;
-
-        (gotchi.name, gotchi.birthday, gotchi.health_points, gotchi.happiness, gotchi.parts)
+        let (hp_decay, happiness_decay) = calculate_decay(gotchi);
+        (gotchi.name, gotchi.birthday, gotchi.health_points - hp_decay, gotchi.happiness - happiness_decay, gotchi.parts)
     }
 
     #[view]
     public fun get_parts(owner_addr: address): vector<u8> acquires AptoGotchi, CollectionCapability {
+        if (has_aptogotchi(owner_addr) == false) {
+            assert!(false, error::unavailable(ENOT_AVAILABLE));
+        };
+
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global<AptoGotchi>(token_address);
 
@@ -286,5 +291,31 @@ module aptogotchi::main {
         gotchi.parts = parts;
 
         gotchi.parts;
+    }
+
+    #[test_only]
+    use aptos_framework::account::create_account_for_test;
+    use std::string::utf8;
+
+    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    fun test_create_aptogotchi(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability {
+        init_module(account);
+        timestamp::set_time_has_started_for_testing(aptos);
+        create_account_for_test(signer::address_of(creator));
+        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);
+
+        let has_aptogotchi = has_aptogotchi(signer::address_of(creator));
+        assert!(has_aptogotchi, 1);
+    }
+
+    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[expected_failure]
+    fun test_get_aptogotchi_without_creation(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, AptoGotchi {
+        init_module(account);
+        timestamp::set_time_has_started_for_testing(aptos);
+        create_account_for_test(signer::address_of(creator));
+
+        // get aptogotchi without creating it
+        get_aptogotchi(signer::address_of(creator));
     }
 }
