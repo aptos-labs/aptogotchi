@@ -127,6 +127,7 @@ module aptogotchi::main {
 
         move_to(&token_signer, gotchi);
 
+        // Emit event for minting Aptogotchi token
         event::emit_event<MintAptogotchiEvent>(
             &mut borrow_global_mut<MintAptogotchiEvents>(signer::address_of(&token_signer)).mint_aptogotchi_events,
             MintAptogotchiEvent {
