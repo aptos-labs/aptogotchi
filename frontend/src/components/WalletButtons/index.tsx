@@ -23,10 +23,10 @@ export const WalletButtons = () => {
           className="bg-gray-50 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
           style={{ marginRight: "15px" }}
         >
-          <option selected value="Devnet">
-            Devnet
+          <option value="Devnet">Devnet</option>
+          <option selected value="Testnet">
+            Testnet
           </option>
-          <option value="Testnet">Testnet</option>
           <option value="Mainnet">Mainnet</option>
         </select>
         <div
@@ -85,6 +85,7 @@ const WalletView = ({ wallet }: { wallet: Wallet }) => {
           disabled={false}
           key={wallet.name}
           onClick={() => onWalletConnectRequest(wallet.name)}
+          style={{ maxWidth: "300px" }}
         >
           Connect Wallet
         </button>
@@ -96,6 +97,7 @@ const WalletView = ({ wallet }: { wallet: Wallet }) => {
         className={cn(buttonStyles, "opacity-50 cursor-not-allowed")}
         disabled={true}
         key={wallet.name}
+        style={{ maxWidth: "300px" }}
       >
         Connect Wallet - Desktop Only
       </button>
@@ -111,6 +113,7 @@ const WalletView = ({ wallet }: { wallet: Wallet }) => {
         disabled={!isWalletReady}
         key={wallet.name}
         onClick={() => onWalletConnectRequest(wallet.name)}
+        style={{ maxWidth: "300px" }}
       >
         Connect Wallet
       </button>
