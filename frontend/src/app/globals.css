@@ -22,11 +22,17 @@ body {
   border-image-repeat: stretch !important;
 }
 
-.ans_connector_button {
-  margin-top: 15px;
-  border-radius: 8px !important;
+.ans_button {
+  width: 264px;
+  height: 48px;
   cursor: pointer;
-  padding: 8px 10px !important;
+  margin: auto;
+  display: flex;
+  align-items: center;
+}
+
+.MuiButtonBase-root {
+  background-color: transparent !important;
 }
 
 .MuiBox-root {

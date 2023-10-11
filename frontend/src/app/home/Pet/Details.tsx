@@ -24,7 +24,6 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
   const [owner, setOwner] = useState<string>(
     account?.ansName || account?.address || ""
   );
-  console.log("WALLET: ", useWallet());
 
   const canSave = newName !== pet.name;
 
@@ -98,18 +97,20 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
             disabled
             value={`${owner}.apt`}
           />
-          {owner === account?.address ||
-            (owner === "" && (
-              <button className="ans_connector_button">
-                <AptosNamesConnector
-                  onSignTransaction={handleMintName}
-                  isWalletConnected={true}
-                  network="testnet"
-                  buttonLabel="Claim Your Aptos Name"
-                />
-              </button>
-            ))}
         </div>
+        <br />
+        {!account?.ansName && (
+          <button type="button" className="nes-btn is-primary ans_button">
+            <span style={{ zIndex: 9 }}>
+              <AptosNamesConnector
+                onSignTransaction={handleMintName}
+                isWalletConnected={true}
+                network="testnet"
+                buttonLabel="Claim Your Aptos Name"
+              />
+            </span>
+          </button>
+        )}
       </div>
       <div className="flex flex-col w-6/12">
         <label>HP</label>
