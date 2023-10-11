@@ -23,7 +23,18 @@ body {
 }
 
 .ans_connector_button {
+  margin-top: 15px;
+  border-radius: 8px !important;
+  cursor: pointer;
+  padding: 8px 10px !important;
+}
 
+.MuiBox-root {
+  background-color: #fff !important;
+}
+
+.MuiTypography-body1 li {
+  color: #000 !important;
 }
 
 @media (max-width: 768px) {

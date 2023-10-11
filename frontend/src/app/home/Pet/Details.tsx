@@ -54,6 +54,19 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
     }
   };
 
+  const handleMintName = async (payload: any): Promise<any> => {
+    try {
+      const response = await signAndSubmitTransaction(payload);
+      await provider.waitForTransaction(response.hash);
+
+      setOwner(response.payload.arguments[0]);
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setTransactionInProgress(false);
+    }
+  };
+
   return (
     <div className="flex flex-row gap-4 ml-4">
       <div className="flex flex-col w-6/12">
@@ -83,16 +96,19 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
             id="owner_field"
             className="nes-input"
             disabled
-            value={owner}
+            value={`${owner}.apt`}
           />
-          {!account?.ansName && (
-            <AptosNamesConnector
-              onSignTransaction={signAndSubmitTransaction}
-              isWalletConnected={true}
-              network="testnet"
-              buttonLabel="Claim Your Aptos Name"
-            />
-          )}
+          {owner === account?.address ||
+            (owner === "" && (
+              <button className="ans_connector_button">
+                <AptosNamesConnector
+                  onSignTransaction={handleMintName}
+                  isWalletConnected={true}
+                  network="testnet"
+                  buttonLabel="Claim Your Aptos Name"
+                />
+              </button>
+            ))}
         </div>
       </div>
       <div className="flex flex-col w-6/12">
