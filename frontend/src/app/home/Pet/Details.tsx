@@ -67,52 +67,50 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
   };
 
   return (
-    <div className="flex flex-row gap-4 ml-4">
-      <div className="flex flex-col w-6/12">
-        <div className="nes-field">
-          <label htmlFor="name_field">Name</label>
-          <div className="relative">
-            <input
-              type="text"
-              id="name_field"
-              className="nes-input"
-              value={newName}
-              onChange={(e) => setNewName(e.currentTarget.value)}
-            />
-            <button
-              className="absolute right-4 top-1/2 -translate-y-1/2 nes-pointer disabled:cursor-not-allowed text-sky-500 disabled:text-gray-400"
-              disabled={!canSave}
-              onClick={handleNameChange}
-            >
-              <AiFillSave className=" h-8 w-8 drop-shadow-sm" />
-            </button>
-          </div>
-        </div>
-        <div className="nes-field">
-          <label htmlFor="owner_field">Owner</label>
+    <div className="flex flex-col gap-2 ml-8">
+      <div className="nes-field">
+        <label htmlFor="name_field">Name</label>
+        <div className="relative">
           <input
             type="text"
-            id="owner_field"
+            id="name_field"
             className="nes-input"
-            disabled
-            value={`${owner}.apt`}
+            value={newName}
+            onChange={(e) => setNewName(e.currentTarget.value)}
           />
-        </div>
-        <br />
-        {!account?.ansName && (
-          <button type="button" className="nes-btn is-primary ans_button">
-            <span style={{ zIndex: 9 }}>
-              <AptosNamesConnector
-                onSignTransaction={handleMintName}
-                isWalletConnected={true}
-                network="testnet"
-                buttonLabel="Claim Your Aptos Name"
-              />
-            </span>
+          <button
+            className="absolute right-4 top-1/2 -translate-y-1/2 nes-pointer disabled:cursor-not-allowed text-sky-500 disabled:text-gray-400"
+            disabled={!canSave}
+            onClick={handleNameChange}
+          >
+            <AiFillSave className=" h-8 w-8 drop-shadow-sm" />
           </button>
-        )}
+        </div>
       </div>
-      <div className="flex flex-col w-6/12">
+      <div className="nes-field">
+        <label htmlFor="owner_field">Owner</label>
+        <input
+          type="text"
+          id="owner_field"
+          className="nes-input"
+          disabled
+          value={`${owner}.apt`}
+        />
+      </div>
+      <br />
+      {!account?.ansName && (
+        <button type="button" className="nes-btn is-primary ans_button">
+          <span style={{ zIndex: 9 }}>
+            <AptosNamesConnector
+              onSignTransaction={handleMintName}
+              isWalletConnected={true}
+              network="testnet"
+              buttonLabel="Claim Your Aptos Name"
+            />
+          </span>
+        </button>
+      )}
+      <div className="flex flex-col justify-center items-center">
         <label>HP</label>
         <HealthBar
           totalHealth={10}
