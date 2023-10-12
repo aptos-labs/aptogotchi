@@ -82,7 +82,7 @@ export function Mint({ fetchPet }: MintProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4 max-w-md self-center pt-6">
+    <div className="flex flex-col gap-4 max-w-md self-center m-6">
       <h2 className="text-xl w-full text-center">Create your pet!</h2>
       <div className="nes-field w-full">
         <label htmlFor="name_field">Name</label>
@@ -94,18 +94,20 @@ export function Mint({ fetchPet }: MintProps) {
           onChange={(e) => setNewName(e.currentTarget.value)}
         />
       </div>
-      <div className="flex flex-col gap-4 self-center">
+      <div className="flex flex-col self-center p-2">
         {createPetImage(parts)}
       </div>
-      <ShuffleButton handleShuffle={handleShuffle} />
-      <button
-        type="button"
-        className={`nes-btn ${newName ? "is-success" : "is-disabled"}`}
-        disabled={!newName || transactionInProgress}
-        onClick={handleMint}
-      >
-        {transactionInProgress ? "Loading..." : "Mint Pet"}
-      </button>
+      <div className="flex flex-col gap-6">
+        <ShuffleButton handleShuffle={handleShuffle} />
+        <button
+          type="button"
+          className={`nes-btn ${newName ? "is-success" : "is-disabled"}`}
+          disabled={!newName || transactionInProgress}
+          onClick={handleMint}
+        >
+          {transactionInProgress ? "Loading..." : "Mint Pet"}
+        </button>
+      </div>
     </div>
   );
 }
