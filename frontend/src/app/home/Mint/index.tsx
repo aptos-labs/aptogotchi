@@ -3,7 +3,7 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 import { PetImage, bodies, ears, faces } from "../Pet/Image";
 import { Pet } from "../Pet";
-import { PiShuffleAngularFill } from "react-icons/pi";
+import { ShuffleButton } from "@/components/ShuffleButton";
 
 export const provider = new Provider(Network.TESTNET);
 
@@ -82,9 +82,9 @@ export function Mint({ fetchPet }: MintProps) {
   }
 
   return (
-    <div className="flex flex-col gap-8 max-w-md self-center pt-8">
-      <h2 className="text-xl pb-4">Create your pet!</h2>
-      <div className="nes-field">
+    <div className="flex flex-col gap-4 max-w-md self-center pt-6">
+      <h2 className="text-xl w-full text-center">Create your pet!</h2>
+      <div className="nes-field w-full">
         <label htmlFor="name_field">Name</label>
         <input
           type="text"
@@ -94,17 +94,10 @@ export function Mint({ fetchPet }: MintProps) {
           onChange={(e) => setNewName(e.currentTarget.value)}
         />
       </div>
-      <div className="flex flex-col gap-6 self-center">
+      <div className="flex flex-col gap-4 self-center">
         {createPetImage(parts)}
-        <button
-          type="button"
-          className="nes-btn flex flex-row justify-center items-center"
-          onClick={handleShuffle}
-        >
-          <h2>Shuffle</h2>
-          <PiShuffleAngularFill className="h-8 w-8 drop-shadow-sm" />
-        </button>
       </div>
+      <ShuffleButton handleShuffle={handleShuffle} />
       <button
         type="button"
         className={`nes-btn ${newName ? "is-success" : "is-disabled"}`}

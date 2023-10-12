@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useTypingEffect } from "@/utils/useTypingEffect";
 import { Pet } from "./Pet";
 import { PetImage, bodies, ears, faces } from "./Pet/Image";
-import { PiShuffleAngularFill } from "react-icons/pi";
+import { ShuffleButton } from "@/components/ShuffleButton";
 
 const defaultPet: Pet = {
   name: "Unknown",
@@ -48,14 +48,7 @@ export function NotConnected() {
             face: faces[activePet[2]],
           }}
         />
-        <button
-          type="button"
-          className="nes-btn flex flex-row justify-center items-center"
-          onClick={handleShuffle}
-        >
-          <h2>Shuffle</h2>
-          <PiShuffleAngularFill className="h-8 w-8 drop-shadow-sm" />
-        </button>
+        <ShuffleButton handleShuffle={handleShuffle} />
       </div>
       <div className="nes-container is-dark with-title">
         <p className="title">Welcome</p>
