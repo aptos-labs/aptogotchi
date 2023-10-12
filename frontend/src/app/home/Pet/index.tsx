@@ -50,8 +50,8 @@ export function Pet({ pet, setPet }: PetProps) {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6 mt-8">
-      <div className="flex flex-wrap gap-4 justify-center">
+    <div className="flex flex-row self-center gap-12 m-8">
+      <div className="flex flex-col gap-4 w-[360px]">
         <PetImage
           pet={pet}
           selectedAction={selectedAction}
@@ -60,18 +60,19 @@ export function Pet({ pet, setPet }: PetProps) {
             ears: ears[pet.parts[1]],
             face: faces[pet.parts[2]],
           }}
+          avatarStyle
         />
         <PetDetails pet={pet} setPet={setPet} />
       </div>
-      <br />
-      <Actions
-        selectedAction={selectedAction}
-        setSelectedAction={setSelectedAction}
-        setPet={setPet}
-        pet={pet}
-      />
-      <br />
-      <Summary pet={pet} />
+      <div className="flex flex-col gap-8 w-[680px] h-full">
+        <Actions
+          selectedAction={selectedAction}
+          setSelectedAction={setSelectedAction}
+          setPet={setPet}
+          pet={pet}
+        />
+        <Summary pet={pet} />
+      </div>
     </div>
   );
 }

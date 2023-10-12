@@ -42,7 +42,7 @@ export function Summary({ pet }: SummaryProps) {
   const typedText = useTypingEffect(text);
 
   return (
-    <div className="nes-container is-dark with-title">
+    <div className="nes-container is-dark with-title h-[240px]">
       <p className="title">Summary</p>
       <p>{typedText}</p>
     </div>
