@@ -113,13 +113,10 @@ export function Actions({
     pet.happiness === Number(process.env.NEXT_PUBLIC_HAPPINESS_CAP);
 
   return (
-    <div className="nes-container with-title flex-1 bg-white">
+    <div className="nes-container with-title flex-1 bg-white h-[320px]">
       <p className="title">Actions</p>
       <div className="flex flex-col gap-2 justify-between h-full">
-        <div
-          className="flex flex-col flex-shrink-0 gap-2"
-          style={{ borderBottom: "1px solid #D1D5DB" }}
-        >
+        <div className="flex flex-col flex-shrink-0 gap-2 border-b border-gray-300">
           <label>
             <input
               type="radio"
@@ -140,16 +137,6 @@ export function Actions({
             />
             <span>Play</span>
           </label>
-          {/* <label>
-            <input
-              type="radio"
-              className="nes-radio"
-              name="action"
-              checked={selectedAction === "customize"}
-              onChange={() => setSelectedAction("customize")}
-            />
-            <span>Customize</span>
-          </label> */}
         </div>
         <div className="flex flex-col gap-4 justify-between">
           <p>{actionDescriptions[selectedAction]}</p>

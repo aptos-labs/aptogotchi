@@ -12,21 +12,27 @@ export interface PetImageProps {
     ears: string;
     face: string;
   };
+  avatarStyle?: boolean;
 }
 
 export function PetImage(props: PetImageProps) {
+  const { avatarStyle, petParts, selectedAction } = props;
   const head = BASE_PATH + "head.png";
-  const body = BASE_PATH + props.petParts.body;
-  const ears = BASE_PATH + props.petParts.ears;
-  const face = BASE_PATH + props.petParts.face;
+  const body = BASE_PATH + petParts.body;
+  const ears = BASE_PATH + petParts.ears;
+  const face = BASE_PATH + petParts.face;
 
   const imgClass = "absolute top-0 left-0 w-full h-full object-contain";
 
   const animation =
-    props.selectedAction === "play" ? "animate-hop" : "animate-wiggle";
+    selectedAction === "play" ? "animate-hop" : "animate-wiggle";
 
   return (
-    <div className="h-80 w-80 bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative">
+    <div
+      className={`bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative ${
+        avatarStyle ? "h-44 w-44" : "h-80 w-80"
+      }`}
+    >
       <div className={`relative h-full w-full ${animation}`}>
         <img src={head} className={imgClass} alt="pet head" />
         <img src={body} className={imgClass} alt="pet body" />
