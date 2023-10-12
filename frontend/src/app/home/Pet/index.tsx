@@ -50,7 +50,7 @@ export function Pet({ pet, setPet }: PetProps) {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 mt-8">
       <div className="flex flex-wrap gap-4 justify-center">
         <PetImage
           pet={pet}
@@ -62,13 +62,15 @@ export function Pet({ pet, setPet }: PetProps) {
           }}
         />
         <PetDetails pet={pet} setPet={setPet} />
-        <Actions
-          selectedAction={selectedAction}
-          setSelectedAction={setSelectedAction}
-          setPet={setPet}
-          pet={pet}
-        />
       </div>
+      <br />
+      <Actions
+        selectedAction={selectedAction}
+        setSelectedAction={setSelectedAction}
+        setPet={setPet}
+        pet={pet}
+      />
+      <br />
       <Summary pet={pet} />
     </div>
   );

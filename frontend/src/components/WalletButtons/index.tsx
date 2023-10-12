@@ -15,20 +15,8 @@ export const WalletButtons = () => {
   const { wallets, connected, disconnect, isLoading } = useWallet();
 
   if (connected) {
-    // TODO: make network dropdown change network in global state
     return (
       <div className="flex flex-row">
-        <select
-          id="Network"
-          className="bg-gray-50 text-sm rounded-lg block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-          style={{ marginRight: "15px" }}
-        >
-          <option value="Devnet">Devnet</option>
-          <option selected value="Testnet">
-            Testnet
-          </option>
-          <option value="Mainnet">Mainnet</option>
-        </select>
         <div
           className={cn(buttonStyles, "hover:bg-blue-700 btn-small")}
           onClick={disconnect}
