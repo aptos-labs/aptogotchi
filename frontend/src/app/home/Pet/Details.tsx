@@ -6,8 +6,6 @@ import { Pet } from ".";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
-import { AptosNamesConnector } from "@aptos-labs/aptos-names-connector";
-import "@aptos-labs/aptos-names-connector/dist/index.css";
 
 export interface PetDetailsProps {
   pet: Pet;
@@ -18,19 +16,14 @@ export const provider = new Provider(Network.TESTNET);
 
 export function PetDetails({ pet, setPet }: PetDetailsProps) {
   const [newName, setNewName] = useState(pet.name);
-  const [transactionInProgress, setTransactionInProgress] =
-    useState<boolean>(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
-  const [owner, setOwner] = useState<string>(
-    account?.ansName || account?.address || ""
-  );
+  const owner = account?.ansName || account?.address || "";
 
   const canSave = newName !== pet.name;
 
   const handleNameChange = async () => {
     if (!account || !network) return;
 
-    setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
       function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::set_name`,
@@ -48,21 +41,6 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
       });
     } catch (error: any) {
       console.error(error);
-    } finally {
-      setTransactionInProgress(false);
-    }
-  };
-
-  const handleMintName = async (payload: any): Promise<any> => {
-    try {
-      const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
-
-      setOwner(response.payload.arguments[0]);
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      setTransactionInProgress(false);
     }
   };
 
@@ -109,18 +87,6 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
           />
         </div>
         <br />
-        {!account?.ansName && (
-          <button type="button" className="nes-btn is-primary ans_button">
-            <span style={{ zIndex: 9 }}>
-              <AptosNamesConnector
-                onSignTransaction={handleMintName}
-                isWalletConnected={true}
-                network="testnet"
-                buttonLabel="Claim Your Aptos Name"
-              />
-            </span>
-          </button>
-        )}
       </div>
     </div>
   );
