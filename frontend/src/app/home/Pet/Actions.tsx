@@ -6,7 +6,7 @@ import { Network, Provider } from "aptos";
 import { Pet } from ".";
 
 export const provider = new Provider(Network.TESTNET);
-export type PetAction = "feed" | "play" | "customize";
+export type PetAction = "feed" | "play";
 
 export interface ActionsProps {
   pet: Pet;
@@ -42,9 +42,9 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::change_health_points`,
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::feed`,
       type_arguments: [],
-      arguments: [account.address, process.env.NEXT_PUBLIC_HEALTH_INCREASE],
+      arguments: [process.env.NEXT_PUBLIC_ENERGY_INCREASE],
     };
 
     try {
@@ -53,15 +53,16 @@ export function Actions({
 
       setPet((pet) => {
         if (!pet) return pet;
+        if (
+          pet.energy_points + Number(process.env.NEXT_PUBLIC_ENERGY_INCREASE) >
+          Number(process.env.NEXT_PUBLIC_ENERGY_CAP)
+        )
+          return pet;
+
         return {
           ...pet,
-          health_points:
-            pet.health_points +
-              Number(process.env.NEXT_PUBLIC_HEALTH_INCREASE) >
-            Number(process.env.NEXT_PUBLIC_HEALTH_CAP)
-              ? Number(process.env.NEXT_PUBLIC_HEALTH_CAP)
-              : pet.health_points +
-                Number(process.env.NEXT_PUBLIC_HEALTH_INCREASE),
+          energy_points:
+            pet.energy_points + Number(process.env.NEXT_PUBLIC_ENERGY_INCREASE),
         };
       });
     } catch (error: any) {
@@ -77,9 +78,9 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::change_happiness`,
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::play`,
       type_arguments: [],
-      arguments: [account.address, process.env.NEXT_PUBLIC_HAPPINESS_INCREASE],
+      arguments: [process.env.NEXT_PUBLIC_ENERGY_DECREASE],
     };
 
     try {
@@ -88,14 +89,15 @@ export function Actions({
 
       setPet((pet) => {
         if (!pet) return pet;
+        if (
+          pet.energy_points <= Number(process.env.NEXT_PUBLIC_ENERGY_DECREASE)
+        )
+          return pet;
+
         return {
           ...pet,
-          happiness:
-            pet.happiness + Number(process.env.NEXT_PUBLIC_HAPPINESS_INCREASE) >
-            Number(process.env.NEXT_PUBLIC_HAPPINESS_CAP)
-              ? Number(process.env.NEXT_PUBLIC_HAPPINESS_CAP)
-              : pet.happiness +
-                Number(process.env.NEXT_PUBLIC_HAPPINESS_INCREASE),
+          energy_points:
+            pet.energy_points - Number(process.env.NEXT_PUBLIC_ENERGY_DECREASE),
         };
       });
     } catch (error: any) {
@@ -107,10 +109,9 @@ export function Actions({
 
   const feedDisabled =
     selectedAction === "feed" &&
-    pet.health_points === Number(process.env.NEXT_PUBLIC_HEALTH_CAP);
+    pet.energy_points === Number(process.env.NEXT_PUBLIC_ENERGY_CAP);
   const playDisabled =
-    selectedAction === "play" &&
-    pet.happiness === Number(process.env.NEXT_PUBLIC_HAPPINESS_CAP);
+    selectedAction === "play" && pet.energy_points === Number(0);
 
   return (
     <div className="nes-container with-title flex-1 bg-white h-[320px]">
@@ -157,8 +158,6 @@ export function Actions({
 }
 
 const actionDescriptions: Record<PetAction, string> = {
-  feed: "Feeding your pet will boost its HP and Happiness...",
-  play: "Playing with your pet will boost its Happiness, but deplete some of its HP...",
-  customize:
-    "Customize your pet to give it a fresh new look and make it truly yours...",
+  feed: "Feeding your pet will boost its Energy Points...",
+  play: "Playing with your pet will make it happy and consume its Energy Points...",
 };
