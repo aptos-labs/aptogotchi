@@ -97,14 +97,12 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col">
-        <label>HP</label>
+        <label>Energy Points</label>
         <HealthBar
           totalHealth={10}
-          currentHealth={pet.health_points}
-          icon="heart"
+          currentHealth={pet.energy_points}
+          icon="star"
         />
-        <label>Happiness</label>
-        <HealthBar totalHealth={10} currentHealth={pet.happiness} icon="star" />
       </div>
       <div className="flex flex-col gap-2">
         {nameFieldComponent}
