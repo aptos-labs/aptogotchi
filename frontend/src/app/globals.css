@@ -22,15 +22,6 @@ body {
   border-image-repeat: stretch !important;
 }
 
-.ans_button {
-  width: 264px;
-  height: 48px;
-  cursor: pointer;
-  margin: auto;
-  display: flex;
-  align-items: center;
-}
-
 .MuiButtonBase-root {
   background-color: transparent !important;
 }
