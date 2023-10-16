@@ -13,8 +13,7 @@ export interface MintProps {
 
 const defaultPet: Pet = {
   name: "Unknown",
-  health_points: 0,
-  happiness: 0,
+  energy_points: 0,
   parts: [],
 };
 
