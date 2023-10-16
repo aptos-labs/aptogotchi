@@ -62,6 +62,7 @@ module aptogotchi::main {
             account,
             BURN_SIGNER_CAPABILITY_SEED,
         );
+
         move_to(account, CollectionCapability {
             capability: token_signer_cap,
             burn_signer_capability,
@@ -112,6 +113,7 @@ module aptogotchi::main {
         let token_signer = object::generate_signer(&constructor_ref);
         let mutator_ref = token::generate_mutator_ref(&constructor_ref);
         let burn_ref = token::generate_burn_ref(&constructor_ref);
+        let transfer_ref = object::generate_transfer_ref(&constructor_ref);
 
         // initialize/set default Aptogotchi struct values
         let gotchi = AptoGotchi {
@@ -129,12 +131,14 @@ module aptogotchi::main {
 
         // Emit event for minting Aptogotchi token
         event::emit_event<MintAptogotchiEvent>(
-            &mut borrow_global_mut<MintAptogotchiEvents>(signer::address_of(&token_signer)).mint_aptogotchi_events,
+            &mut borrow_global_mut<MintAptogotchiEvents>(@aptogotchi).mint_aptogotchi_events,
             MintAptogotchiEvent {
                 aptogotchi_name: name,
                 parts,
             },
         );
+
+        object::transfer_with_ref(object::generate_linear_transfer_ref(&transfer_ref), address_of(user));
     }
 
     // Get reference to Aptogotchi token object (CAN'T modify the reference)
@@ -280,11 +284,7 @@ module aptogotchi::main {
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global<AptoGotchi>(token_address);
 
-        // verify default struct values
-        assert!(get_name(&caller) == name, 1);
-        assert!(get_health_points(&caller) == HP_UPPER_BOUND, 1);
-        assert!(get_happiness(&caller) == HAPPINESS_UPPER_BOUND, 1);
-        assert!(get_parts(&caller) == parts, );
+        gotchi.parts
     }
 
     // Sets Aptogotchi's body parts
@@ -334,12 +334,15 @@ module aptogotchi::main {
 
     // Test creating an Aptogotchi
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    fun test_create_aptogotchi(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability {
-        init_module(account);
-        timestamp::set_time_has_started_for_testing(aptos);
+    fun test_create_aptogotchi(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents {
 
         // create a fake account (only for testing purposes)
         create_account_for_test(signer::address_of(creator));
+        create_account_for_test(signer::address_of(account));
+
+        timestamp::set_time_has_started_for_testing(aptos);
+        init_module(account);
+
         create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);
 
         let has_aptogotchi = has_aptogotchi(signer::address_of(creator));
@@ -348,12 +351,13 @@ module aptogotchi::main {
 
     // Test getting an Aptogotchi, when user has not minted
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    #[expected_failure]
+    #[expected_failure(abort_code = 851969, location = aptogotchi::main)]
     fun test_get_aptogotchi_without_creation(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, AptoGotchi {
-        init_module(account);
-        timestamp::set_time_has_started_for_testing(aptos);
-
         create_account_for_test(signer::address_of(creator));
+        create_account_for_test(signer::address_of(account));
+
+        timestamp::set_time_has_started_for_testing(aptos);
+        init_module(account);
 
         // get aptogotchi without creating it
         get_aptogotchi(signer::address_of(creator));
