@@ -68,7 +68,7 @@ module aptogotchi::main {
             burn_signer_capability,
         });
 
-        move_to(&token_resource, MintAptogotchiEvents {
+        move_to(account, MintAptogotchiEvents {
             mint_aptogotchi_events: account::new_event_handle<MintAptogotchiEvent>(account),
         });
 
@@ -335,11 +335,13 @@ module aptogotchi::main {
     // Test creating an Aptogotchi
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
     fun test_create_aptogotchi(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents {
-        init_module(account);
-        timestamp::set_time_has_started_for_testing(aptos);
 
         // create a fake account (only for testing purposes)
         create_account_for_test(signer::address_of(creator));
+        create_account_for_test(signer::address_of(account));
+
+        timestamp::set_time_has_started_for_testing(aptos);
+        init_module(account);
 
         create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);
 
@@ -349,12 +351,13 @@ module aptogotchi::main {
 
     // Test getting an Aptogotchi, when user has not minted
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    #[expected_failure]
+    #[expected_failure(abort_code = 851969, location = aptogotchi::main)]
     fun test_get_aptogotchi_without_creation(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, AptoGotchi {
-        init_module(account);
-        timestamp::set_time_has_started_for_testing(aptos);
-
         create_account_for_test(signer::address_of(creator));
+        create_account_for_test(signer::address_of(account));
+
+        timestamp::set_time_has_started_for_testing(aptos);
+        init_module(account);
 
         // get aptogotchi without creating it
         get_aptogotchi(signer::address_of(creator));
