@@ -31,7 +31,7 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
       type: "entry_function_payload",
       function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::set_name`,
       type_arguments: [],
-      arguments: [account.address, newName],
+      arguments: [newName],
     };
 
     try {
