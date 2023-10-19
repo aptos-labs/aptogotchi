@@ -16,10 +16,9 @@ export interface Pet {
 interface PetProps {
   pet: Pet;
   setPet: Dispatch<SetStateAction<Pet | undefined>>;
-  collectionID: string;
 }
 
-export function Pet({ pet, setPet, collectionID }: PetProps) {
+export function Pet({ pet, setPet }: PetProps) {
   const [selectedAction, setSelectedAction] = useState<PetAction>("feed");
 
   return (
@@ -36,7 +35,7 @@ export function Pet({ pet, setPet, collectionID }: PetProps) {
           avatarStyle
         />
         <PetDetails pet={pet} setPet={setPet} />
-        <Collection collectionID={collectionID} />
+        <Collection />
       </div>
       <div className="flex flex-col gap-8 w-[680px] h-full">
         <Actions

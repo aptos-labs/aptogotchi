@@ -7,10 +7,6 @@ import { padAddressIfNeeded } from "@/utils/address";
 
 export const provider = new Provider(Network.TESTNET);
 
-export interface CollectionProps {
-  collectionID: string;
-}
-
 export type Collection = {
   collection_id: string;
   collection_name: string;
@@ -28,7 +24,7 @@ export type CollectionResponse = {
   current_collection_ownership_v2_view: CollectionHolder[];
 };
 
-export function Collection({ collectionID }: CollectionProps) {
+export function Collection() {
   const { account, network } = useWallet();
   const [collection, setCollection] = useState<Collection>();
   const [collectionHolders, setCollectionHolders] =
@@ -36,6 +32,18 @@ export function Collection({ collectionID }: CollectionProps) {
 
   const fetchCollection = useCallback(async () => {
     if (!account?.address) return;
+
+    const getAptogotchiCollectionIDPayload = {
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_collection_id`,
+      type_arguments: [],
+      arguments: [],
+    };
+
+    const aptogotchiCollectionIDResponse = (await provider.view(
+      getAptogotchiCollectionIDPayload
+    )) as [`0x${string}`];
+
+    const collectionID = aptogotchiCollectionIDResponse[0];
 
     const getCollectionDataGql = {
       query: `
@@ -93,6 +101,7 @@ export function Collection({ collectionID }: CollectionProps) {
       <label htmlFor="owner_field">All Holders</label>
       <ul className="nes-list is-disc">
         <label>
+          {/* we should paginate this if there are lots of holders */}
           {JSON.stringify(
             collectionHolders?.map(
               (holder) => holder.owner_address.substring(0, 5) + "..."
