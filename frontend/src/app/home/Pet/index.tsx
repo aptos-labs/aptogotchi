@@ -11,15 +11,15 @@ export interface Pet {
   name: string;
   energy_points: number;
   parts: number[];
-  address: string;
 }
 
 interface PetProps {
   pet: Pet;
   setPet: Dispatch<SetStateAction<Pet | undefined>>;
+  collectionID: string;
 }
 
-export function Pet({ pet, setPet }: PetProps) {
+export function Pet({ pet, setPet, collectionID }: PetProps) {
   const [selectedAction, setSelectedAction] = useState<PetAction>("feed");
 
   return (
@@ -36,7 +36,7 @@ export function Pet({ pet, setPet }: PetProps) {
           avatarStyle
         />
         <PetDetails pet={pet} setPet={setPet} />
-        <Collection pet={pet} />
+        <Collection collectionID={collectionID} />
       </div>
       <div className="flex flex-col gap-8 w-[680px] h-full">
         <Actions

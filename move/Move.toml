@@ -6,7 +6,7 @@ upgrade_policy = "compatible"
 [addresses]
 aptogotchi = '_'
 
-# used for testing so you don't need to manually pass in the address
+# used for testing so you don't need to manually pass in the address in cli
 [dev-addresses]
 aptogotchi = "0x100"
 

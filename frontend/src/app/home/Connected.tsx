@@ -10,6 +10,7 @@ export const provider = new Provider(Network.TESTNET);
 
 export function Connected() {
   const [pet, setPet] = useState<Pet>();
+  const [collectionID, setCollectionID] = useState<string>();
   const { account, network } = useWallet();
 
   const fetchPet = useCallback(async () => {
@@ -21,16 +22,7 @@ export function Connected() {
       arguments: [account.address],
     };
 
-    const getAptogotchiAddressPayload = {
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_address`,
-      type_arguments: [],
-      arguments: [account.address],
-    };
-
-    const [aptogotchiResponse, aptogotchiAddressResponse] = await Promise.all([
-      provider.view(getAptogotchiPayload),
-      provider.view(getAptogotchiAddressPayload),
-    ]);
+    const aptogotchiResponse = await provider.view(getAptogotchiPayload);
 
     const noPet = ["", "0", "0", "0x"];
 
@@ -42,9 +34,24 @@ export function Connected() {
           .split("0")
           .slice(2)
           .map(Number),
-        address: aptogotchiAddressResponse[0] as unknown as string,
       });
     }
+  }, [account?.address]);
+
+  const fetchCollectionID = useCallback(async () => {
+    if (!account?.address) return;
+
+    const getAptogotchiCollectionIDPayload = {
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_collection_id`,
+      type_arguments: [],
+      arguments: [],
+    };
+
+    const aptogotchiCollectionIDResponse = await provider.view(
+      getAptogotchiCollectionIDPayload
+    );
+
+    setCollectionID(aptogotchiCollectionIDResponse as unknown as string);
   }, [account?.address]);
 
   useEffect(() => {
@@ -53,9 +60,21 @@ export function Connected() {
     fetchPet();
   }, [account?.address, fetchPet, network]);
 
+  useEffect(() => {
+    if (!account?.address || !network) return;
+
+    fetchCollectionID();
+  }, [fetchCollectionID, network]);
+
   return (
     <div className="flex flex-col gap-3 p-3">
-      {pet ? <Pet pet={pet} setPet={setPet} /> : <Mint fetchPet={fetchPet} />}
+      {collectionID ? (
+        pet ? (
+          <Pet pet={pet} setPet={setPet} collectionID={collectionID} />
+        ) : (
+          <Mint fetchPet={fetchPet} />
+        )
+      ) : null}
     </div>
   );
 }
