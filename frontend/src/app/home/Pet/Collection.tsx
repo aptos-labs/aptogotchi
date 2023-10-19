@@ -3,6 +3,7 @@
 import { useCallback, useState, useEffect } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
+import { padAddressIfNeeded } from "@/utils/address";
 
 export const provider = new Provider(Network.TESTNET);
 
@@ -22,6 +23,11 @@ export type CollectionHolder = {
   owner_address: string;
 };
 
+export type CollectionResponse = {
+  current_collections_v2: Collection[];
+  current_collection_ownership_v2_view: CollectionHolder[];
+};
+
 export function Collection({ collectionID }: CollectionProps) {
   const { account, network } = useWallet();
   const [collection, setCollection] = useState<Collection>();
@@ -34,6 +40,24 @@ export function Collection({ collectionID }: CollectionProps) {
     const getCollectionDataGql = {
       query: `
         query MyQuery($collection_id: String) {
+          current_collections_v2(
+            where: { collection_id: { _eq: $collection_id } }
+          ) {
+            collection_id
+            collection_name
+            current_supply
+            description
+            creator_address
+            last_transaction_timestamp
+            max_supply
+            last_transaction_version
+            mutable_description
+            mutable_uri
+            token_standard
+            table_handle_v1
+            total_minted_v2
+            uri
+          }
           current_collection_ownership_v2_view(
             where: { collection_id: { _eq: $collection_id } }
           ) {
@@ -42,54 +66,17 @@ export function Collection({ collectionID }: CollectionProps) {
         }
       `,
       variables: {
-        collection_id: collectionID,
+        collection_id: padAddressIfNeeded(collectionID),
       },
     };
 
-    // const tokenDataResponse = await provider.
+    const collectionResponse: CollectionResponse =
+      await provider.indexerClient.queryIndexer(getCollectionDataGql);
 
-    const collectionResponse = await provider.indexerClient.queryIndexer(
-      getCollectionDataGql
+    setCollection(collectionResponse.current_collections_v2[0]);
+    setCollectionHolders(
+      collectionResponse.current_collection_ownership_v2_view
     );
-
-    // const getAllCollectionHoldersGql = {
-    //   query: `
-    //     query MyQuery($collection_id: String) {
-    //       current_collection_ownership_v2_view(
-    //         where: { collection_id: { _eq: $collection_id } }
-    //       ) {
-    //         owner_address
-    //       }
-    //     }
-    //   `,
-    //   variables: {
-    //     collection_id: collectionID,
-    //   },
-    // };
-    // const collectionHolderResponse = await provider.indexerClient.queryIndexer(
-    //   getAllCollectionHoldersGql
-    // );
-
-    console.log(JSON.stringify(collectionResponse, null, 2));
-    // console.log(
-    //   JSON.stringify(
-    //     // @ts-ignore
-    //     collectionHolderResponse,
-    //     null,
-    //     2
-    //   )
-    // );
-
-    //   setCollection(collectionResponse);
-
-    //   setCollectionHolders(
-    //     collectionHolderResponse
-    //     // // @ts-ignore
-    //     // collectionHolderResponse.current_collection_ownership_v2_view.map(
-    //     //   // @ts-ignore
-    //     //   (d) => d.owner_address
-    //     // )
-    //   );
   }, [account?.address]);
 
   useEffect(() => {

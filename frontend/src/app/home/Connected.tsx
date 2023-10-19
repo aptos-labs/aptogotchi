@@ -47,11 +47,11 @@ export function Connected() {
       arguments: [],
     };
 
-    const aptogotchiCollectionIDResponse = await provider.view(
+    const aptogotchiCollectionIDResponse = (await provider.view(
       getAptogotchiCollectionIDPayload
-    );
+    )) as string[];
 
-    setCollectionID(aptogotchiCollectionIDResponse as unknown as string);
+    setCollectionID(aptogotchiCollectionIDResponse[0]);
   }, [account?.address]);
 
   useEffect(() => {
