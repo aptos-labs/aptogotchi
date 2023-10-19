@@ -15,23 +15,34 @@ export function Connected() {
   const fetchPet = useCallback(async () => {
     if (!account?.address) return;
 
-    const payload = {
+    const getAptogotchiPayload = {
       function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
       type_arguments: [],
       arguments: [account.address],
     };
 
-    const response = await provider.view(payload);
+    const getAptogotchiAddressPayload = {
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_address`,
+      type_arguments: [],
+      arguments: [account.address],
+    };
+
+    const [aptogotchiResponse, aptogotchiAddressResponse] = await Promise.all([
+      provider.view(getAptogotchiPayload),
+      provider.view(getAptogotchiAddressPayload),
+    ]);
+
     const noPet = ["", "0", "0", "0x"];
 
-    if (JSON.stringify(response) !== JSON.stringify(noPet)) {
+    if (JSON.stringify(aptogotchiResponse) !== JSON.stringify(noPet)) {
       setPet({
-        name: response[0] as unknown as string,
-        energy_points: parseInt(response[2] as unknown as string),
-        parts: (response[3] as unknown as string)
+        name: aptogotchiResponse[0] as unknown as string,
+        energy_points: parseInt(aptogotchiResponse[2] as unknown as string),
+        parts: (aptogotchiResponse[3] as unknown as string)
           .split("0")
           .slice(2)
           .map(Number),
+        address: aptogotchiAddressResponse[0] as unknown as string,
       });
     }
   }, [account?.address]);

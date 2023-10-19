@@ -91,7 +91,11 @@ module aptogotchi::main {
     }
 
     // Create an Aptogotchi token object
-    public entry fun create_aptogotchi(user: &signer, name: String, parts: vector<u8>) acquires CollectionCapability, MintAptogotchiEvents {
+    public entry fun create_aptogotchi(
+        user: &signer,
+        name: String,
+        parts: vector<u8>
+    ) acquires CollectionCapability, MintAptogotchiEvents {
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
         let token_name = to_string(&address_of(user));
@@ -135,9 +139,10 @@ module aptogotchi::main {
     }
 
     // Get reference to Aptogotchi token object (CAN'T modify the reference)
-    fun get_aptogotchi_address(creator_addr: &address): (address) acquires CollectionCapability {
+    #[view]
+    public fun get_aptogotchi_address(creator_addr: address): (address) acquires CollectionCapability {
         let collection = string::utf8(APTOGOTCHI_COLLECTION_NAME);
-        let token_name = to_string(creator_addr);
+        let token_name = to_string(&creator_addr);
         let creator = &get_token_signer();
         let token_address = token::create_token_address(
             &signer::address_of(creator),
@@ -151,7 +156,7 @@ module aptogotchi::main {
     // Returns true if this address owns an Aptogotchi
     #[view]
     public fun has_aptogotchi(owner_addr: address): (bool) acquires CollectionCapability {
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let has_gotchi = exists<AptoGotchi>(token_address);
 
         has_gotchi
@@ -159,13 +164,15 @@ module aptogotchi::main {
 
     // Returns all fields for this Aptogotchi (if found)
     #[view]
-    public fun get_aptogotchi(owner_addr: address): (String, u64, u64, vector<u8>) acquires AptoGotchi, CollectionCapability {
+    public fun get_aptogotchi(
+        owner_addr: address
+    ): (String, u64, u64, vector<u8>) acquires AptoGotchi, CollectionCapability {
         // if this address doesn't have an Aptogotchi, throw error
         if (has_aptogotchi(owner_addr) == false) {
             assert!(false, error::unavailable(ENOT_AVAILABLE));
         };
 
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
 
         // view function can only return primitive types.
@@ -175,7 +182,7 @@ module aptogotchi::main {
     // Returns Aptogotchi's name
     #[view]
     public fun get_name(owner_addr: address): String acquires AptoGotchi, CollectionCapability {
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let gotchi = borrow_global<AptoGotchi>(token_address);
 
         gotchi.name
@@ -184,7 +191,7 @@ module aptogotchi::main {
     // Sets Aptogotchi's name
     public entry fun set_name(owner: signer, name: String) acquires AptoGotchi, CollectionCapability {
         let owner_addr = signer::address_of(&owner);
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
         gotchi.name = name;
 
@@ -197,7 +204,7 @@ module aptogotchi::main {
             assert!(false, error::unavailable(ENOT_AVAILABLE));
         };
 
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let gotchi = borrow_global<AptoGotchi>(token_address);
 
         gotchi.energy_points
@@ -205,7 +212,7 @@ module aptogotchi::main {
 
     public entry fun feed(owner: &signer, points: u64) acquires AptoGotchi, CollectionCapability {
         let owner_addr = signer::address_of(owner);
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
 
         gotchi.energy_points = if (gotchi.energy_points + points > ENERGY_UPPER_BOUND) {
@@ -215,12 +222,11 @@ module aptogotchi::main {
         };
 
         gotchi.energy_points;
-
     }
 
     public entry fun play(owner: &signer, points: u64) acquires AptoGotchi, CollectionCapability {
         let owner_addr = signer::address_of(owner);
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
 
         gotchi.energy_points = if (gotchi.energy_points < points) {
@@ -230,7 +236,6 @@ module aptogotchi::main {
         };
 
         gotchi.energy_points;
-
     }
 
     // Returns Aptogotchi's body parts
@@ -240,7 +245,7 @@ module aptogotchi::main {
             assert!(false, error::unavailable(ENOT_AVAILABLE));
         };
 
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let gotchi = borrow_global<AptoGotchi>(token_address);
 
         gotchi.parts
@@ -249,7 +254,7 @@ module aptogotchi::main {
     // Sets Aptogotchi's body parts
     public entry fun set_parts(owner: &signer, parts: vector<u8>) acquires AptoGotchi, CollectionCapability {
         let owner_addr = signer::address_of(owner);
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
         gotchi.parts = parts;
 
@@ -260,10 +265,11 @@ module aptogotchi::main {
     // Setup testing environment
     #[test_only]
     use aptos_framework::account::create_account_for_test;
+    #[test_only]
     use std::string::utf8;
 
     #[test_only]
-    fun setup_test(aptos: &signer, account: &signer, creator: &signer){
+    fun setup_test(aptos: &signer, account: &signer, creator: &signer) {
         // create a fake account (only for testing purposes)
         create_account_for_test(signer::address_of(creator));
         create_account_for_test(signer::address_of(account));
@@ -274,7 +280,11 @@ module aptogotchi::main {
 
     // Test creating an Aptogotchi
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    fun test_create_aptogotchi(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents {
+    fun test_create_aptogotchi(
+        aptos: &signer,
+        account: &signer,
+        creator: &signer
+    ) acquires CollectionCapability, MintAptogotchiEvents {
         setup_test(aptos, account, creator);
 
         create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);
@@ -286,7 +296,11 @@ module aptogotchi::main {
     // Test getting an Aptogotchi, when user has not minted
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
     #[expected_failure(abort_code = 851969, location = aptogotchi::main)]
-    fun test_get_aptogotchi_without_creation(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, AptoGotchi {
+    fun test_get_aptogotchi_without_creation(
+        aptos: &signer,
+        account: &signer,
+        creator: &signer
+    ) acquires CollectionCapability, AptoGotchi {
         setup_test(aptos, account, creator);
 
         // get aptogotchi without creating it
@@ -295,7 +309,11 @@ module aptogotchi::main {
 
     // Test getting an Aptogotchi, when user has not minted
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    fun test_feed_and_play(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents, AptoGotchi {
+    fun test_feed_and_play(
+        aptos: &signer,
+        account: &signer,
+        creator: &signer
+    ) acquires CollectionCapability, MintAptogotchiEvents, AptoGotchi {
         setup_test(aptos, account, creator);
 
         create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);

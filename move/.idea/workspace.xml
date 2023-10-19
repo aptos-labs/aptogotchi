@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d57f203a-fd03-49e8-82f0-84eb30e11a49" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../frontend/src/app/home/Pet/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../frontend/src/app/home/Pet/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Move.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Move.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sources/aptogotchi.move" beforeDir="false" afterPath="$PROJECT_DIR$/sources/aptogotchi.move" afterDir="false" />
     </list>
@@ -16,9 +18,38 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="GitToolBoxStore">
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="j/demo-indexer" />
+                    <option name="lastUsedInstant" value="1697674167" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="main" />
+                    <option name="lastUsedInstant" value="1697583708" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="j/fix-set-name" />
+                    <option name="lastUsedInstant" value="1697581905" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$/.." />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2Wap6UOf2ZAQRh3W9b8Zj0UktoN" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -28,8 +59,8 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "darren/rebase",
-    "last_opened_file_path": "/Users/darren/Desktop/Projects/aptogotchi/move"
+    "git-widget-placeholder": "j/demo-indexer",
+    "last_opened_file_path": "/Users/jianyishi/go/src/github.com/aptos-labs/aptogotchi/move"
   }
 }]]></component>
   <component name="RunManager">

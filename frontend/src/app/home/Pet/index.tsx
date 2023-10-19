@@ -5,11 +5,13 @@ import { Actions, PetAction } from "./Actions";
 import { PetDetails } from "./Details";
 import { PetImage, bodies, ears, faces } from "./Image";
 import { Summary } from "./Summary";
+import { Collection } from "./Collection";
 
 export interface Pet {
   name: string;
   energy_points: number;
   parts: number[];
+  address: string;
 }
 
 interface PetProps {
@@ -34,6 +36,7 @@ export function Pet({ pet, setPet }: PetProps) {
           avatarStyle
         />
         <PetDetails pet={pet} setPet={setPet} />
+        <Collection pet={pet} />
       </div>
       <div className="flex flex-col gap-8 w-[680px] h-full">
         <Actions
