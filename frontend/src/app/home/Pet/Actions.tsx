@@ -3,8 +3,13 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Pet } from ".";
-import { getAptosClient } from "../../../utils/aptosClient";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS, NEXT_PUBLIC_ENERGY_CAP, NEXT_PUBLIC_ENERGY_DECREASE, NEXT_PUBLIC_ENERGY_INCREASE } from "../../../utils/env";
+import { getAptosClient } from "@/utils/aptosClient";
+import {
+  NEXT_PUBLIC_CONTRACT_ADDRESS,
+  NEXT_PUBLIC_ENERGY_CAP,
+  NEXT_PUBLIC_ENERGY_DECREASE,
+  NEXT_PUBLIC_ENERGY_INCREASE,
+} from "@/utils/env";
 
 const aptosClient = getAptosClient();
 
@@ -91,9 +96,7 @@ export function Actions({
 
       setPet((pet) => {
         if (!pet) return pet;
-        if (
-          pet.energy_points <= Number(NEXT_PUBLIC_ENERGY_DECREASE)
-        )
+        if (pet.energy_points <= Number(NEXT_PUBLIC_ENERGY_DECREASE))
           return pet;
 
         return {

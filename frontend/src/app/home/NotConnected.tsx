@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { useTypingEffect } from "../../utils/useTypingEffect";
+import { useTypingEffect } from "@/utils/useTypingEffect";
 import { Pet } from "./Pet";
 import { PetImage, bodies, ears, faces } from "./Pet/Image";
-import { ShuffleButton } from "../../components/ShuffleButton";
+import { ShuffleButton } from "@/components/ShuffleButton";
 import {
   NEXT_PUBLIC_BODY_OPTIONS,
   NEXT_PUBLIC_EAR_OPTIONS,
   NEXT_PUBLIC_FACE_OPTIONS,
-} from "../../utils/env";
+} from "@/utils/env";
 
 const defaultPet: Pet = {
   name: "Unknown",

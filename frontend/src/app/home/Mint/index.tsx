@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { PetImage, bodies, ears, faces } from "../Pet/Image";
 import { Pet } from "../Pet";
-import { ShuffleButton } from "../../../components/ShuffleButton";
+import { ShuffleButton } from "@/components/ShuffleButton";
 import {
   NEXT_PUBLIC_BODY_OPTIONS,
   NEXT_PUBLIC_CONTRACT_ADDRESS,
   NEXT_PUBLIC_EAR_OPTIONS,
   NEXT_PUBLIC_FACE_OPTIONS,
-} from "../../../utils/env";
-import { getAptosClient } from "../../../utils/aptosClient";
+} from "@/utils/env";
+import { getAptosClient } from "@/utils/aptosClient";
 
 const aptosClient = getAptosClient();
 
