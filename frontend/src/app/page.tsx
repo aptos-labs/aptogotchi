@@ -46,7 +46,7 @@ function Header() {
 
 const WalletButtons = dynamic(
   async () => {
-    const { WalletButtons } = await import("@/components/WalletButtons");
+    const { WalletButtons } = await import("../components/WalletButtons");
     return { default: WalletButtons };
   },
   {

@@ -1,4 +1,4 @@
-import { WalletProvider } from "@/context/WalletProvider";
+import { WalletProvider } from "../context/WalletProvider";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { PropsWithChildren } from "react";

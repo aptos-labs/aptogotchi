@@ -2,16 +2,12 @@
 
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-// import { Aptos } from "@aptos-labs/ts-sdk";
 import { Pet } from ".";
+import { getAptosClient } from "../../../utils/aptosClient";
+import { NEXT_PUBLIC_CONTRACT_ADDRESS, NEXT_PUBLIC_ENERGY_CAP, NEXT_PUBLIC_ENERGY_DECREASE, NEXT_PUBLIC_ENERGY_INCREASE } from "../../../utils/env";
 
-import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
-const config = new AptosConfig({ network: "devnet" });
-// const aptos = new Aptos(config);
+const aptosClient = getAptosClient();
 
-// const aptos = new Aptos();
-
-export const provider = new Provider(Network.TESTNET);
 export type PetAction = "feed" | "play";
 
 export interface ActionsProps {
@@ -48,27 +44,27 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::feed`,
+      function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::feed`,
       type_arguments: [],
-      arguments: [process.env.NEXT_PUBLIC_ENERGY_INCREASE],
+      arguments: [NEXT_PUBLIC_ENERGY_INCREASE],
     };
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction(response.hash);
 
       setPet((pet) => {
         if (!pet) return pet;
         if (
-          pet.energy_points + Number(process.env.NEXT_PUBLIC_ENERGY_INCREASE) >
-          Number(process.env.NEXT_PUBLIC_ENERGY_CAP)
+          pet.energy_points + Number(NEXT_PUBLIC_ENERGY_INCREASE) >
+          Number(NEXT_PUBLIC_ENERGY_CAP)
         )
           return pet;
 
         return {
           ...pet,
           energy_points:
-            pet.energy_points + Number(process.env.NEXT_PUBLIC_ENERGY_INCREASE),
+            pet.energy_points + Number(NEXT_PUBLIC_ENERGY_INCREASE),
         };
       });
     } catch (error: any) {
@@ -84,26 +80,26 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::play`,
+      function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::play`,
       type_arguments: [],
-      arguments: [process.env.NEXT_PUBLIC_ENERGY_DECREASE],
+      arguments: [NEXT_PUBLIC_ENERGY_DECREASE],
     };
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction(response.hash);
 
       setPet((pet) => {
         if (!pet) return pet;
         if (
-          pet.energy_points <= Number(process.env.NEXT_PUBLIC_ENERGY_DECREASE)
+          pet.energy_points <= Number(NEXT_PUBLIC_ENERGY_DECREASE)
         )
           return pet;
 
         return {
           ...pet,
           energy_points:
-            pet.energy_points - Number(process.env.NEXT_PUBLIC_ENERGY_DECREASE),
+            pet.energy_points - Number(NEXT_PUBLIC_ENERGY_DECREASE),
         };
       });
     } catch (error: any) {
@@ -115,7 +111,7 @@ export function Actions({
 
   const feedDisabled =
     selectedAction === "feed" &&
-    pet.energy_points === Number(process.env.NEXT_PUBLIC_ENERGY_CAP);
+    pet.energy_points === Number(NEXT_PUBLIC_ENERGY_CAP);
   const playDisabled =
     selectedAction === "play" && pet.energy_points === Number(0);
 

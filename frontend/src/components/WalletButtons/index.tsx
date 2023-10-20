@@ -7,7 +7,7 @@ import {
   isRedirectable,
   WalletName,
 } from "@aptos-labs/wallet-adapter-react";
-import { cn } from "@/utils/styling";
+import { cn } from "../../utils/styling";
 
 const buttonStyles = "nes-btn is-primary";
 
