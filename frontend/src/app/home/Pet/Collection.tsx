@@ -105,11 +105,15 @@ export function Collection() {
   const collectionComponent = (
     <div className="nes-field">
       <label htmlFor="owner_field">
-        Aptogotchi Minted: {collection?.current_supply}
+        Total Aptogotchi Minted: {collection?.current_supply}
       </label>
-      <label htmlFor="owner_field">Fellow aptogotchis</label>
+      <label htmlFor="owner_field">Fellow Aptogotchis:</label>
       <ul className="nes-list is-disc">
-        <label>{`${firstFewAptogotchiName?.join(", ")}}... and more `}</label>
+        <label>{`${firstFewAptogotchiName?.join(", ")}${
+          (firstFewAptogotchiName?.length || 0) < collection?.current_supply
+            ? "... and more"
+            : ""
+        } `}</label>
       </ul>
     </div>
   );
