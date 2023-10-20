@@ -91,7 +91,11 @@ module aptogotchi::main {
     }
 
     // Create an Aptogotchi token object
-    public entry fun create_aptogotchi(user: &signer, name: String, parts: vector<u8>) acquires CollectionCapability, MintAptogotchiEvents {
+    public entry fun create_aptogotchi(
+        user: &signer,
+        name: String,
+        parts: vector<u8>
+    ) acquires CollectionCapability, MintAptogotchiEvents {
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
         let token_name = to_string(&address_of(user));
@@ -148,6 +152,15 @@ module aptogotchi::main {
         token_address
     }
 
+    // Get collection ID of aptogotchi collection
+    #[view]
+    public fun get_aptogotchi_collection_id(): (address) acquires CollectionCapability {
+        let collection_name = string::utf8(APTOGOTCHI_COLLECTION_NAME);
+        let creator = &get_token_signer();
+        let creator_addr = signer::address_of(creator);
+        collection::create_collection_address(&creator_addr, &collection_name)
+    }
+
     // Returns true if this address owns an Aptogotchi
     #[view]
     public fun has_aptogotchi(owner_addr: address): (bool) acquires CollectionCapability {
@@ -159,7 +172,9 @@ module aptogotchi::main {
 
     // Returns all fields for this Aptogotchi (if found)
     #[view]
-    public fun get_aptogotchi(owner_addr: address): (String, u64, u64, vector<u8>) acquires AptoGotchi, CollectionCapability {
+    public fun get_aptogotchi(
+        owner_addr: address
+    ): (String, u64, u64, vector<u8>) acquires AptoGotchi, CollectionCapability {
         // if this address doesn't have an Aptogotchi, throw error
         if (has_aptogotchi(owner_addr) == false) {
             assert!(false, error::unavailable(ENOT_AVAILABLE));
@@ -215,7 +230,6 @@ module aptogotchi::main {
         };
 
         gotchi.energy_points;
-
     }
 
     public entry fun play(owner: &signer, points: u64) acquires AptoGotchi, CollectionCapability {
@@ -230,7 +244,6 @@ module aptogotchi::main {
         };
 
         gotchi.energy_points;
-
     }
 
     // Returns Aptogotchi's body parts
@@ -260,10 +273,11 @@ module aptogotchi::main {
     // Setup testing environment
     #[test_only]
     use aptos_framework::account::create_account_for_test;
+    #[test_only]
     use std::string::utf8;
 
     #[test_only]
-    fun setup_test(aptos: &signer, account: &signer, creator: &signer){
+    fun setup_test(aptos: &signer, account: &signer, creator: &signer) {
         // create a fake account (only for testing purposes)
         create_account_for_test(signer::address_of(creator));
         create_account_for_test(signer::address_of(account));
@@ -274,7 +288,11 @@ module aptogotchi::main {
 
     // Test creating an Aptogotchi
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    fun test_create_aptogotchi(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents {
+    fun test_create_aptogotchi(
+        aptos: &signer,
+        account: &signer,
+        creator: &signer
+    ) acquires CollectionCapability, MintAptogotchiEvents {
         setup_test(aptos, account, creator);
 
         create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);
@@ -286,7 +304,11 @@ module aptogotchi::main {
     // Test getting an Aptogotchi, when user has not minted
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
     #[expected_failure(abort_code = 851969, location = aptogotchi::main)]
-    fun test_get_aptogotchi_without_creation(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, AptoGotchi {
+    fun test_get_aptogotchi_without_creation(
+        aptos: &signer,
+        account: &signer,
+        creator: &signer
+    ) acquires CollectionCapability, AptoGotchi {
         setup_test(aptos, account, creator);
 
         // get aptogotchi without creating it
@@ -295,7 +317,11 @@ module aptogotchi::main {
 
     // Test getting an Aptogotchi, when user has not minted
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    fun test_feed_and_play(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents, AptoGotchi {
+    fun test_feed_and_play(
+        aptos: &signer,
+        account: &signer,
+        creator: &signer
+    ) acquires CollectionCapability, MintAptogotchiEvents, AptoGotchi {
         setup_test(aptos, account, creator);
 
         create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);

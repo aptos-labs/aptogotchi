@@ -15,23 +15,18 @@ export function Connected() {
   const fetchPet = useCallback(async () => {
     if (!account?.address) return;
 
-    const payload = {
+    const [name, _, energyPoints, parts] = await provider.view({
       function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
       type_arguments: [],
       arguments: [account.address],
-    };
+    });
 
-    const response = await provider.view(payload);
-    const noPet = ["", "0", "0", "0x"];
-
-    if (JSON.stringify(response) !== JSON.stringify(noPet)) {
+    const noPet = { name: "", birthday: 0, energyPoints: 0, parts: "0x" };
+    if (name !== noPet.name) {
       setPet({
-        name: response[0] as unknown as string,
-        energy_points: parseInt(response[2] as unknown as string),
-        parts: (response[3] as unknown as string)
-          .split("0")
-          .slice(2)
-          .map(Number),
+        name: name as string,
+        energy_points: parseInt(energyPoints as string),
+        parts: (parts as string).split("0").slice(2).map(Number),
       });
     }
   }, [account?.address]);
