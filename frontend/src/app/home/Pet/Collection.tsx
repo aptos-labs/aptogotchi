@@ -80,8 +80,6 @@ export function Collection() {
         },
       });
 
-    console.log(collectionResponse);
-
     const firstFewAptogotchi = await Promise.all(
       collectionResponse.current_collection_ownership_v2_view
         // TODO: change to limit 3 in gql after indexer fix limit
