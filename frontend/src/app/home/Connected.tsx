@@ -4,8 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Pet } from "./Pet";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Mint } from "./Mint";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "../../utils/env";
-import { getAptosClient } from "../../utils/aptosClient";
+import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
+import { getAptosClient } from "@/utils/aptosClient";
 
 const aptosClient = getAptosClient();
 

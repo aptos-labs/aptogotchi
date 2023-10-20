@@ -2,9 +2,9 @@
 
 import { useCallback, useState, useEffect } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { padAddressIfNeeded } from "../../../utils/address";
-import { getAptosClient } from "../../../utils/aptosClient";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "../../../utils/env";
+import { padAddressIfNeeded } from "@/utils/address";
+import { getAptosClient } from "@/utils/aptosClient";
+import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 
 const aptosClient = getAptosClient();
 

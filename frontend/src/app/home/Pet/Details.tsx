@@ -2,12 +2,12 @@
 
 import { AiFillSave } from "react-icons/ai";
 import { FaCopy } from "react-icons/fa";
-import { HealthBar } from "../../../components/HealthBar";
+import { HealthBar } from "@/components/HealthBar";
 import { Pet } from ".";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "../../../utils/env";
-import { getAptosClient } from "../../../utils/aptosClient";
+import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
+import { getAptosClient } from "@/utils/aptosClient";
 
 export interface PetDetailsProps {
   pet: Pet;
