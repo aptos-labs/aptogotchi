@@ -109,10 +109,7 @@ export function Collection() {
       </label>
       <label htmlFor="owner_field">Fellow aptogotchis</label>
       <ul className="nes-list is-disc">
-        <label>
-          {/* we should paginate this if there are lots of holders */}
-          {JSON.stringify(firstFewAptogotchiName)}
-        </label>
+        <label>{`${firstFewAptogotchiName?.join(", ")}}... and more `}</label>
       </ul>
     </div>
   );
