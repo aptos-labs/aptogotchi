@@ -27,8 +27,8 @@ export type CollectionResponse = {
 export function Collection() {
   const { account, network } = useWallet();
   const [collection, setCollection] = useState<Collection>();
-  const [collectionHolders, setCollectionHolders] =
-    useState<CollectionHolder[]>();
+  const [firstFewAptogotchiName, setFirstFewAptogotchiName] =
+    useState<string[]>();
 
   const fetchCollection = useCallback(async () => {
     if (!account?.address) return;
@@ -49,6 +49,7 @@ export function Collection() {
       query: `
         query MyQuery($collection_id: String) {
           current_collections_v2(
+            limit: 3
             where: { collection_id: { _eq: $collection_id } }
           ) {
             collection_id
@@ -81,10 +82,18 @@ export function Collection() {
     const collectionResponse: CollectionResponse =
       await provider.indexerClient.queryIndexer(getCollectionDataGql);
 
-    setCollection(collectionResponse.current_collections_v2[0]);
-    setCollectionHolders(
-      collectionResponse.current_collection_ownership_v2_view
+    const firstFewAptogotchi = await Promise.all(
+      collectionResponse.current_collection_ownership_v2_view.map((holder) =>
+        provider.view({
+          function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+          type_arguments: [],
+          arguments: [holder.owner_address],
+        })
+      )
     );
+
+    setCollection(collectionResponse.current_collections_v2[0]);
+    setFirstFewAptogotchiName(firstFewAptogotchi.map((x) => x[0] as string));
   }, [account?.address]);
 
   useEffect(() => {
@@ -98,15 +107,11 @@ export function Collection() {
       <label htmlFor="owner_field">
         Aptogotchi Minted: {collection?.current_supply}
       </label>
-      <label htmlFor="owner_field">All Holders</label>
+      <label htmlFor="owner_field">Fellow aptogotchis</label>
       <ul className="nes-list is-disc">
         <label>
           {/* we should paginate this if there are lots of holders */}
-          {JSON.stringify(
-            collectionHolders?.map(
-              (holder) => holder.owner_address.substring(0, 5) + "..."
-            )
-          )}
+          {JSON.stringify(firstFewAptogotchiName)}
         </label>
       </ul>
     </div>
