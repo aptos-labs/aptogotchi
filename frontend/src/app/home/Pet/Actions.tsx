@@ -2,8 +2,14 @@
 
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Network, Provider } from "aptos";
+// import { Aptos } from "@aptos-labs/ts-sdk";
 import { Pet } from ".";
+
+import { Account, Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+const config = new AptosConfig({ network: "devnet" });
+// const aptos = new Aptos(config);
+
+// const aptos = new Aptos();
 
 export const provider = new Provider(Network.TESTNET);
 export type PetAction = "feed" | "play";
