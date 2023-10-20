@@ -56,7 +56,7 @@ export function Actions({
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await aptosClient.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction({ transactionHash: response.hash });
 
       setPet((pet) => {
         if (!pet) return pet;
@@ -92,7 +92,9 @@ export function Actions({
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await aptosClient.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction({
+        transactionHash: response.hash,
+      });
 
       setPet((pet) => {
         if (!pet) return pet;

@@ -61,7 +61,9 @@ export function Mint({ fetchPet }: MintProps) {
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await aptosClient.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction({
+        transactionHash: response.hash,
+      });
     } catch (error: any) {
       console.error(error);
     } finally {

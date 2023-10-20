@@ -37,7 +37,6 @@ export function Collection() {
     const aptogotchiCollectionIDResponse = (await aptosClient.view({
       payload: {
         function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_collection_id`,
-        typeArguments: [],
         arguments: [],
       },
     })) as [`0x${string}`];
@@ -88,7 +87,6 @@ export function Collection() {
           aptosClient.view({
             payload: {
               function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
-              typeArguments: [],
               arguments: [holder.owner_address],
             },
           })

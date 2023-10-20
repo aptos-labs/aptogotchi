@@ -19,7 +19,6 @@ export function Connected() {
     const [name, _, energyPoints, parts] = await aptosClient.view({
       payload: {
         function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
-        typeArguments: [],
         arguments: [account.address],
       },
     });
