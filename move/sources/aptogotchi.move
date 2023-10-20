@@ -35,6 +35,11 @@ module aptogotchi::main {
         burn_ref: token::BurnRef,
     }
 
+    struct Accessory has key {
+        category: String,
+        id: u64,
+    }
+
     // Tokens require a signer to create, so this is the signer for the collection
     struct CollectionCapability has key, drop {
         capability: SignerCapability,
@@ -45,7 +50,13 @@ module aptogotchi::main {
     const BURN_SIGNER_CAPABILITY_SEED: vector<u8> = b"BURN_SIGNER_CAPABILITY";
     const APTOGOTCHI_COLLECTION_NAME: vector<u8> = b"Aptogotchi Collection";
     const APTOGOTCHI_COLLECTION_DESCRIPTION: vector<u8> = b"Aptogotchi Collection Description";
-    const APTOGOTCHI_COLLECTION_URI: vector<u8> = b"https://aptogotchi.collection.uri/";
+    const APTOGOTCHI_COLLECTION_URI: vector<u8> = b"https://otjbxblyfunmfblzdegw.supabase.co/storage/v1/object/public/aptogotchi/aptogotchi.png";
+
+    const ACCESSORY_COLLECTION_NAME: vector<u8> = b"Aptogotchi Accessory Collection";
+    const ACCESSORY_COLLECTION_DESCRIPTION: vector<u8> = b"Aptogotchi Accessories";
+    const ACCESSORY_COLLECTION_URI: vector<u8> = b"https://otjbxblyfunmfblzdegw.supabase.co/storage/v1/object/public/aptogotchi/bowtie.png";
+
+    const ACCESSORY_CATEGORY_BOWTIE: vector<u8> = b"bowtie";
 
     // This function is only callable during publishing
     fun init_module(account: &signer) {
@@ -68,9 +79,9 @@ module aptogotchi::main {
         });
 
         create_aptogotchi_collection(&token_resource);
+        create_accessory_collection(&token_resource);
     }
 
-    // 
     fun get_token_signer(): signer acquires CollectionCapability {
         account::create_signer_with_capability(&borrow_global<CollectionCapability>(@aptogotchi).capability)
     }
@@ -80,6 +91,21 @@ module aptogotchi::main {
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
         let name = string::utf8(APTOGOTCHI_COLLECTION_NAME);
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
+
+        collection::create_unlimited_collection(
+            creator,
+            description,
+            name,
+            option::none(),
+            uri,
+        );
+    }
+
+    // Create the collection that will hold all the accessories
+    fun create_accessory_collection(creator: &signer) {
+        let description = string::utf8(ACCESSORY_COLLECTION_DESCRIPTION);
+        let name = string::utf8(ACCESSORY_COLLECTION_NAME);
+        let uri = string::utf8(ACCESSORY_COLLECTION_URI);
 
         collection::create_unlimited_collection(
             creator,
@@ -256,6 +282,70 @@ module aptogotchi::main {
         gotchi.parts;
     }
 
+    // ==== ACCESSORIES ====
+    // Create an Aptogotchi token object
+    public entry fun create_accessory(user: &signer, category: String) acquires CollectionCapability {
+        let uri = string::utf8(ACCESSORY_COLLECTION_URI);
+        let description = string::utf8(ACCESSORY_COLLECTION_DESCRIPTION);
+
+        let constructor_ref = token::create_named_token(
+            &get_token_signer(),
+            string::utf8(ACCESSORY_COLLECTION_NAME),
+            description,
+            get_accessory_name(&address_of(user), category),
+            option::none(),
+            uri,
+        );
+
+        let token_signer = object::generate_signer(&constructor_ref);
+        let transfer_ref = object::generate_transfer_ref(&constructor_ref);
+        let category = string::utf8(ACCESSORY_CATEGORY_BOWTIE);
+        let id = 1;
+
+        let accessory = Accessory {
+            category,
+            id,
+        };
+
+        move_to(&token_signer, accessory);
+        object::transfer_with_ref(object::generate_linear_transfer_ref(&transfer_ref), address_of(user));
+    }
+
+    public entry fun wear_accessory(owner: &signer, category: String) acquires CollectionCapability {
+        let owner_addr = &address_of(owner);
+        // retrieve the aptogotchi object
+        let token_address = get_aptogotchi_address(owner_addr);
+        let gotchi = object::address_to_object<AptoGotchi>(token_address);
+
+        // retrieve the accessory object by category
+        let accessory_address = get_accessory_address(owner_addr, category);
+        let accessory = object::address_to_object<Accessory>(accessory_address);
+
+        object::transfer_to_object(owner, accessory, gotchi);
+    }
+
+    fun get_accessory_name(owner_addr: &address, category: String): String {
+        let token_name = category;
+        string::append(&mut token_name, to_string(owner_addr));
+
+        token_name
+    }
+
+    fun get_accessory_address(creator_addr: &address, category: String): (address) acquires CollectionCapability {
+        let collection = string::utf8(ACCESSORY_COLLECTION_NAME);
+        let token_name = category;
+        string::append(&mut token_name, to_string(creator_addr));
+        let creator = &get_token_signer();
+
+        let token_address = token::create_token_address(
+            &signer::address_of(creator),
+            &collection,
+            &get_accessory_name(creator_addr, category),
+        );
+
+        token_address
+    }
+
     // ==== TESTS ====
     // Setup testing environment
     #[test_only]
@@ -306,5 +396,37 @@ module aptogotchi::main {
 
         feed(creator, 3);
         assert!(get_energy_points(signer::address_of(creator)) == ENERGY_UPPER_BOUND - 2, 1);
+    }
+
+    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    fun test_create_accessory(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents, Accessory {
+        setup_test(aptos, account, creator);
+        let creator_address = &address_of(creator);
+
+        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);
+        create_accessory(creator, utf8(ACCESSORY_CATEGORY_BOWTIE));
+        let accessory_address = get_accessory_address(creator_address, utf8(ACCESSORY_CATEGORY_BOWTIE));
+        let aptogotchi_address = get_aptogotchi_address(creator_address);
+
+        let accessory = borrow_global<Accessory>(accessory_address);
+
+        assert!(accessory.category == utf8(ACCESSORY_CATEGORY_BOWTIE), 1);
+    }
+
+    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    fun test_wear_accessory(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents, Accessory {
+        setup_test(aptos, account, creator);
+        let creator_address = &address_of(creator);
+
+        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);
+        create_accessory(creator, utf8(ACCESSORY_CATEGORY_BOWTIE));
+        let accessory_address = get_accessory_address(creator_address, utf8(ACCESSORY_CATEGORY_BOWTIE));
+        let aptogotchi_address = get_aptogotchi_address(creator_address);
+
+        let accessory_obj = object::address_to_object<Accessory>(accessory_address);
+        assert!(object::is_owner(accessory_obj, address_of(creator)), 2);
+
+        wear_accessory(creator, utf8(ACCESSORY_CATEGORY_BOWTIE));
+        assert!(object::is_owner(accessory_obj, aptogotchi_address), 3);
     }
 }
