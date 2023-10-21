@@ -3,10 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Pet } from "./Pet";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Network, Provider } from "aptos";
 import { Mint } from "./Mint";
+import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
+import { getAptosClient } from "@/utils/aptosClient";
 
-export const provider = new Provider(Network.TESTNET);
+const aptosClient = getAptosClient();
 
 export function Connected() {
   const [pet, setPet] = useState<Pet>();
@@ -15,10 +16,11 @@ export function Connected() {
   const fetchPet = useCallback(async () => {
     if (!account?.address) return;
 
-    const [name, _, energyPoints, parts] = await provider.view({
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
-      type_arguments: [],
-      arguments: [account.address],
+    const [name, _, energyPoints, parts] = await aptosClient.view({
+      payload: {
+        function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+        arguments: [account.address],
+      },
     });
 
     const noPet = { name: "", birthday: 0, energyPoints: 0, parts: "0x" };

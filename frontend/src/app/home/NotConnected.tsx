@@ -5,6 +5,11 @@ import { useTypingEffect } from "@/utils/useTypingEffect";
 import { Pet } from "./Pet";
 import { PetImage, bodies, ears, faces } from "./Pet/Image";
 import { ShuffleButton } from "@/components/ShuffleButton";
+import {
+  NEXT_PUBLIC_BODY_OPTIONS,
+  NEXT_PUBLIC_EAR_OPTIONS,
+  NEXT_PUBLIC_FACE_OPTIONS,
+} from "@/utils/env";
 
 const defaultPet: Pet = {
   name: "Unknown",
@@ -22,9 +27,9 @@ export function NotConnected() {
 
   const handleShuffle = () => {
     const randomPet = [
-      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_BODY_OPTIONS)),
-      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_EAR_OPTIONS)),
-      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_FACE_OPTIONS)),
+      Math.floor(Math.random() * Number(NEXT_PUBLIC_BODY_OPTIONS)),
+      Math.floor(Math.random() * Number(NEXT_PUBLIC_EAR_OPTIONS)),
+      Math.floor(Math.random() * Number(NEXT_PUBLIC_FACE_OPTIONS)),
     ];
     setActivePet(randomPet);
 

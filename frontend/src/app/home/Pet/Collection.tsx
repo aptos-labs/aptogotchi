@@ -2,10 +2,11 @@
 
 import { useCallback, useState, useEffect } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Network, Provider } from "aptos";
 import { padAddressIfNeeded } from "@/utils/address";
+import { getAptosClient } from "@/utils/aptosClient";
+import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 
-export const provider = new Provider(Network.TESTNET);
+const aptosClient = getAptosClient();
 
 export type Collection = {
   collection_id: string;
@@ -33,63 +34,63 @@ export function Collection() {
   const fetchCollection = useCallback(async () => {
     if (!account?.address) return;
 
-    const getAptogotchiCollectionIDPayload = {
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_collection_id`,
-      type_arguments: [],
-      arguments: [],
-    };
-
-    const aptogotchiCollectionIDResponse = (await provider.view(
-      getAptogotchiCollectionIDPayload
-    )) as [`0x${string}`];
-
-    const collectionID = aptogotchiCollectionIDResponse[0];
-
-    const getCollectionDataGql = {
-      query: `
-        query MyQuery($collection_id: String) {
-          current_collections_v2(
-            limit: 3
-            where: { collection_id: { _eq: $collection_id } }
-          ) {
-            collection_id
-            collection_name
-            current_supply
-            description
-            creator_address
-            last_transaction_timestamp
-            max_supply
-            last_transaction_version
-            mutable_description
-            mutable_uri
-            token_standard
-            table_handle_v1
-            total_minted_v2
-            uri
-          }
-          current_collection_ownership_v2_view(
-            where: { collection_id: { _eq: $collection_id } }
-          ) {
-            owner_address
-          }
-        }
-      `,
-      variables: {
-        collection_id: padAddressIfNeeded(collectionID),
+    const aptogotchiCollectionIDResponse = (await aptosClient.view({
+      payload: {
+        function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_collection_id`,
+        arguments: [],
       },
-    };
+    })) as [`0x${string}`];
 
     const collectionResponse: CollectionResponse =
-      await provider.indexerClient.queryIndexer(getCollectionDataGql);
+      await aptosClient.queryIndexer({
+        query: {
+          query: `
+            query MyQuery($collection_id: String) {
+              current_collections_v2(
+                where: { collection_id: { _eq: $collection_id } }
+              ) {
+                collection_id
+                collection_name
+                current_supply
+                description
+                creator_address
+                last_transaction_timestamp
+                max_supply
+                last_transaction_version
+                mutable_description
+                mutable_uri
+                token_standard
+                table_handle_v1
+                total_minted_v2
+                uri
+              }
+              current_collection_ownership_v2_view(
+                where: { collection_id: { _eq: $collection_id } }
+              ) {
+                owner_address
+              }
+            }
+          `,
+          variables: {
+            collection_id: padAddressIfNeeded(
+              aptogotchiCollectionIDResponse[0]
+            ),
+          },
+        },
+      });
 
     const firstFewAptogotchi = await Promise.all(
-      collectionResponse.current_collection_ownership_v2_view.map((holder) =>
-        provider.view({
-          function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
-          type_arguments: [],
-          arguments: [holder.owner_address],
-        })
-      )
+      collectionResponse.current_collection_ownership_v2_view
+        // TODO: change to limit 3 in gql after indexer fix limit
+        .slice(0, 3)
+        .map((holder) =>
+          aptosClient.view({
+            payload: {
+              function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+              arguments: [holder.owner_address],
+            },
+          })
+        )
     );
 
     setCollection(collectionResponse.current_collections_v2[0]);

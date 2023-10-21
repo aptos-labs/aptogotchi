@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Network, Provider } from "aptos";
 import { PetImage, bodies, ears, faces } from "../Pet/Image";
 import { Pet } from "../Pet";
 import { ShuffleButton } from "@/components/ShuffleButton";
+import {
+  NEXT_PUBLIC_BODY_OPTIONS,
+  NEXT_PUBLIC_CONTRACT_ADDRESS,
+  NEXT_PUBLIC_EAR_OPTIONS,
+  NEXT_PUBLIC_FACE_OPTIONS,
+} from "@/utils/env";
+import { getAptosClient } from "@/utils/aptosClient";
 
-export const provider = new Provider(Network.TESTNET);
+const aptosClient = getAptosClient();
 
 export interface MintProps {
   fetchPet: () => Promise<void>;
@@ -28,9 +34,9 @@ export function Mint({ fetchPet }: MintProps) {
 
   const handleShuffle = () => {
     const randomParts = [
-      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_BODY_OPTIONS)),
-      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_EAR_OPTIONS)),
-      Math.floor(Math.random() * Number(process.env.NEXT_PUBLIC_FACE_OPTIONS)),
+      Math.floor(Math.random() * Number(NEXT_PUBLIC_BODY_OPTIONS)),
+      Math.floor(Math.random() * Number(NEXT_PUBLIC_EAR_OPTIONS)),
+      Math.floor(Math.random() * Number(NEXT_PUBLIC_FACE_OPTIONS)),
     ];
     setParts(randomParts);
 
@@ -48,14 +54,16 @@ export function Mint({ fetchPet }: MintProps) {
     console.log("MINT PET: ", newName, parts);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
+      function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
       type_arguments: [],
       arguments: [newName, parts],
     };
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction({
+        transactionHash: response.hash,
+      });
     } catch (error: any) {
       console.error(error);
     } finally {
