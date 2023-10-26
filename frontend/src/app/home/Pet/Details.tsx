@@ -6,14 +6,15 @@ import { HealthBar } from "@/components/HealthBar";
 import { Pet } from ".";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Network, Provider } from "aptos";
+import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
+import { getAptosClient } from "@/utils/aptosClient";
 
 export interface PetDetailsProps {
   pet: Pet;
   setPet: Dispatch<SetStateAction<Pet | undefined>>;
 }
 
-export const provider = new Provider(Network.TESTNET);
+const aptosClient = getAptosClient();
 
 export function PetDetails({ pet, setPet }: PetDetailsProps) {
   const [newName, setNewName] = useState(pet.name);
@@ -36,7 +37,7 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction({ transactionHash: response.hash });
 
       setPet((pet) => {
         if (!pet) return pet;
