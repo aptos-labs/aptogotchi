@@ -6,7 +6,7 @@ import { PetAction } from "./Actions";
 
 export interface PetImageProps {
   pet: Pet;
-  selectedAction: PetAction;
+  selectedAction?: PetAction;
   petParts: {
     body: string;
     ears: string;
@@ -25,7 +25,7 @@ export function PetImage(props: PetImageProps) {
   const imgClass = "absolute top-0 left-0 w-full h-full object-contain";
 
   const animation =
-    selectedAction === "play" ? "animate-hop" : "animate-wiggle";
+    selectedAction === "play" ? "animate-wiggle" : "animate-hop";
 
   return (
     <div
