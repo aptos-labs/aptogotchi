@@ -19,7 +19,7 @@ interface PetProps {
 }
 
 export function Pet({ pet, setPet }: PetProps) {
-  const [selectedAction, setSelectedAction] = useState<PetAction>("feed");
+  const [selectedAction, setSelectedAction] = useState<PetAction>("play");
 
   return (
     <div className="flex flex-row self-center gap-12 m-8">
