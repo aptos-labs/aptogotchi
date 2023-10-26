@@ -44,20 +44,25 @@ export function useGetAptogotchiCollection() {
         },
       })) as [`0x${string}`];
 
+      const collectionIDAddr = padAddressIfNeeded(
+        aptogotchiCollectionIDResponse[0]
+      );
+
+      console.log("collectionIDAddr: ", collectionIDAddr);
+
       const collectionResponse: CollectionResponse =
         await aptosClient.queryIndexer({
           query: {
             query: queryAptogotchiCollection,
             variables: {
-              collection_id: padAddressIfNeeded(
-                aptogotchiCollectionIDResponse[0]
-              ),
+              collection_id: collectionIDAddr,
             },
           },
         });
 
       const firstFewAptogotchi = await Promise.all(
         collectionResponse.current_collection_ownership_v2_view
+          .filter((holder) => holder.owner_address !== account.address)
           // TODO: change to limit 3 in gql after indexer fix limit
           .slice(0, 3)
           .map((holder) =>
