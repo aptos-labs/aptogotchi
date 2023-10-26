@@ -123,20 +123,20 @@ export function Actions({
               type="radio"
               className="nes-radio"
               name="action"
-              checked={selectedAction === "feed"}
-              onChange={() => setSelectedAction("feed")}
+              checked={selectedAction === "play"}
+              onChange={() => setSelectedAction("play")}
             />
-            <span>Feed</span>
+            <span>Play</span>
           </label>
           <label>
             <input
               type="radio"
               className="nes-radio"
               name="action"
-              checked={selectedAction === "play"}
-              onChange={() => setSelectedAction("play")}
+              checked={selectedAction === "feed"}
+              onChange={() => setSelectedAction("feed")}
             />
-            <span>Play</span>
+            <span>Feed</span>
           </label>
         </div>
         <div className="flex flex-col gap-4 justify-between">
