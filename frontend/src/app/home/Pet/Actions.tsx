@@ -147,6 +147,7 @@ export function Actions({
       setTransactionInProgress(false);
     }
   };
+
   const handleWear = async () => {
     if (!account || !network) return;
 
@@ -176,6 +177,7 @@ export function Actions({
       setTransactionInProgress(false);
     }
   };
+
   const handleUnwear = async () => {
     if (!account || !network) return;
 
