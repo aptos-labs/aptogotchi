@@ -282,6 +282,16 @@ module aptogotchi::main {
         object::transfer_to_object(owner, accessory, gotchi);
     }
 
+    #[view]
+    public fun has_accessory(owner: &signer, category: String): bool acquires CollectionCapability {
+        let owner_addr = &address_of(owner);
+        // retrieve the accessory object by category
+        let accessory_address = get_accessory_address(owner_addr, category);
+
+        exists<Accessory>(accessory_address)
+
+    }
+
     public entry fun unwear_accessory(owner: &signer, category: String) acquires CollectionCapability {
         let owner_addr = &address_of(owner);
 

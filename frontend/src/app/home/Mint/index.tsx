@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
-import { PetImage, bodies, ears, faces } from "../Pet/Image";
-import { Pet } from "../Pet";
-import { ShuffleButton } from "@/components/ShuffleButton";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
-import { getAptosClient } from "@/utils/aptosClient";
 import { ShufflePetImage } from "../Pet/ShufflePetImage";
 
 export const provider = new Provider(Network.TESTNET);
