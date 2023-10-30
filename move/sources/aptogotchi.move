@@ -1,4 +1,5 @@
 module aptogotchi::main {
+    use aptogotchi::food;
     use aptos_framework::account::{Self, SignerCapability};
     use aptos_framework::event;
     use aptos_framework::object;
@@ -210,10 +211,17 @@ module aptogotchi::main {
         gotchi.energy_points
     }
 
+    public entry fun buy_food(owner: &signer, amount: u64) {
+        // add price logic here
+        food::mint_food(owner, amount);
+    }
+
     public entry fun feed(owner: &signer, points: u64) acquires AptoGotchi, CollectionCapability {
         let owner_addr = signer::address_of(owner);
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
+
+        food::burn_food(owner, points);
 
         gotchi.energy_points = if (gotchi.energy_points + points > ENERGY_UPPER_BOUND) {
             ENERGY_UPPER_BOUND
@@ -372,10 +380,27 @@ module aptogotchi::main {
         get_aptogotchi(signer::address_of(creator));
     }
 
-    // Test getting an Aptogotchi, when user has not minted
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
     fun test_feed_and_play(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents, AptoGotchi {
         setup_test(aptos, account, creator);
+        food::init_module_for_test(account);
+
+        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);
+        assert!(get_energy_points(signer::address_of(creator)) == ENERGY_UPPER_BOUND, 1);
+
+        play(creator, 5);
+        assert!(get_energy_points(signer::address_of(creator)) == ENERGY_UPPER_BOUND - 5, 1);
+
+        buy_food(creator, 3);
+        feed(creator, 3);
+        assert!(get_energy_points(signer::address_of(creator)) == ENERGY_UPPER_BOUND - 2, 1);
+    }
+
+    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[expected_failure(abort_code = 393218, location = 0x1::object)]
+    fun test_feed_with_no_food(aptos: &signer, account: &signer, creator: &signer) acquires CollectionCapability, MintAptogotchiEvents, AptoGotchi {
+        setup_test(aptos, account, creator);
+        food::init_module_for_test(account);
 
         create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1, 1]);
         assert!(get_energy_points(signer::address_of(creator)) == ENERGY_UPPER_BOUND, 1);
