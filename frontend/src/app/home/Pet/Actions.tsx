@@ -14,7 +14,6 @@ import {
 
 const aptosClient = getAptosClient();
 
-
 export const provider = new Provider(Network.TESTNET);
 export type PetAction = "feed" | "play" | "buy" | "wear" | "unwear";
 
@@ -167,7 +166,7 @@ export function Actions({
         if (!pet) return pet;
         return {
           ...pet,
-          accessories: "bowtie"
+          accessories: "bowtie",
         };
       });
     } catch (error: any) {
@@ -196,7 +195,7 @@ export function Actions({
         if (!pet) return pet;
         return {
           ...pet,
-          accessories: null
+          accessories: null,
         };
       });
     } catch (error: any) {
@@ -211,10 +210,8 @@ export function Actions({
     pet.energy_points === Number(NEXT_PUBLIC_ENERGY_CAP);
   const playDisabled =
     selectedAction === "play" && pet.energy_points === Number(0);
-  const wearDisabled =
-    selectedAction === "wear" && pet.accessories;
-  const unwearDisabled =
-    selectedAction === "unwear" && pet.accessories == null;
+  const wearDisabled = selectedAction === "wear" && pet.accessories;
+  const unwearDisabled = selectedAction === "unwear" && pet.accessories == null;
 
   return (
     <div className="nes-container with-title flex-1 bg-white h-[320px]">
@@ -277,10 +274,17 @@ export function Actions({
           <button
             type="button"
             className={`nes-btn is-success ${
-              feedDisabled || playDisabled || wearDisabled || unwearDisabled ? "is-disabled" : ""
+              feedDisabled || playDisabled || wearDisabled || unwearDisabled
+                ? "is-disabled"
+                : ""
             }`}
             onClick={handleStart}
-            disabled={transactionInProgress || feedDisabled || playDisabled || wearDisabled}
+            disabled={
+              transactionInProgress ||
+              feedDisabled ||
+              playDisabled ||
+              wearDisabled
+            }
           >
             {transactionInProgress ? "Processing..." : "Start"}
           </button>
