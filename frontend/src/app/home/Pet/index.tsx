@@ -10,6 +10,7 @@ export interface Pet {
   name: string;
   energy_points: number;
   parts: number[];
+  accessories: string | null | undefined;
 }
 
 interface PetProps {
@@ -32,6 +33,7 @@ export function Pet({ pet, setPet }: PetProps) {
             face: faces[pet.parts[2]],
           }}
           avatarStyle
+          accessory_style={pet.accessories}
         />
         <PetDetails pet={pet} setPet={setPet} />
       </div>

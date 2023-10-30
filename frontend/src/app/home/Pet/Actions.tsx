@@ -4,9 +4,19 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 import { Pet } from ".";
+import { getAptosClient } from "@/utils/aptosClient";
+import {
+  NEXT_PUBLIC_CONTRACT_ADDRESS,
+  NEXT_PUBLIC_ENERGY_CAP,
+  NEXT_PUBLIC_ENERGY_DECREASE,
+  NEXT_PUBLIC_ENERGY_INCREASE,
+} from "@/utils/env";
+
+const aptosClient = getAptosClient();
+
 
 export const provider = new Provider(Network.TESTNET);
-export type PetAction = "feed" | "play";
+export type PetAction = "feed" | "play" | "buy" | "wear" | "unwear";
 
 export interface ActionsProps {
   pet: Pet;
@@ -33,6 +43,15 @@ export function Actions({
       case "play":
         handlePlay();
         break;
+      case "buy":
+        handleBuy();
+        break;
+      case "wear":
+        handleWear();
+        break;
+      case "unwear":
+        handleUnwear();
+        break;
     }
   };
 
@@ -42,27 +61,27 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::feed`,
+      function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::feed`,
       type_arguments: [],
-      arguments: [process.env.NEXT_PUBLIC_ENERGY_INCREASE],
+      arguments: [NEXT_PUBLIC_ENERGY_INCREASE],
     };
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction({ transactionHash: response.hash });
 
       setPet((pet) => {
         if (!pet) return pet;
         if (
-          pet.energy_points + Number(process.env.NEXT_PUBLIC_ENERGY_INCREASE) >
-          Number(process.env.NEXT_PUBLIC_ENERGY_CAP)
+          pet.energy_points + Number(NEXT_PUBLIC_ENERGY_INCREASE) >
+          Number(NEXT_PUBLIC_ENERGY_CAP)
         )
           return pet;
 
         return {
           ...pet,
           energy_points:
-            pet.energy_points + Number(process.env.NEXT_PUBLIC_ENERGY_INCREASE),
+            pet.energy_points + Number(NEXT_PUBLIC_ENERGY_INCREASE),
         };
       });
     } catch (error: any) {
@@ -78,9 +97,66 @@ export function Actions({
     setTransactionInProgress(true);
     const payload = {
       type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::play`,
+      function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::play`,
       type_arguments: [],
-      arguments: [process.env.NEXT_PUBLIC_ENERGY_DECREASE],
+      arguments: [NEXT_PUBLIC_ENERGY_DECREASE],
+    };
+
+    try {
+      const response = await signAndSubmitTransaction(payload);
+      await aptosClient.waitForTransaction({
+        transactionHash: response.hash,
+      });
+
+      setPet((pet) => {
+        if (!pet) return pet;
+        if (pet.energy_points <= Number(NEXT_PUBLIC_ENERGY_DECREASE))
+          return pet;
+
+        return {
+          ...pet,
+          energy_points:
+            pet.energy_points - Number(NEXT_PUBLIC_ENERGY_DECREASE),
+        };
+      });
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setTransactionInProgress(false);
+    }
+  };
+
+  const handleBuy = async () => {
+    if (!account || !network) return;
+
+    setTransactionInProgress(true);
+    const payload = {
+      type: "entry_function_payload",
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_accessory`,
+      type_arguments: [],
+      arguments: ["bowtie"],
+    };
+
+    try {
+      // show accessory in inventory
+      const response = await signAndSubmitTransaction(payload);
+      await provider.waitForTransaction(response.hash);
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setTransactionInProgress(false);
+    }
+  };
+  const handleWear = async () => {
+    if (!account || !network) return;
+
+    setTransactionInProgress(true);
+
+    const payload = {
+      type: "entry_function_payload",
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::wear_accessory`,
+      type_arguments: [],
+      arguments: ["bowtie"],
     };
 
     try {
@@ -89,15 +165,38 @@ export function Actions({
 
       setPet((pet) => {
         if (!pet) return pet;
-        if (
-          pet.energy_points <= Number(process.env.NEXT_PUBLIC_ENERGY_DECREASE)
-        )
-          return pet;
-
         return {
           ...pet,
-          energy_points:
-            pet.energy_points - Number(process.env.NEXT_PUBLIC_ENERGY_DECREASE),
+          accessories: "bowtie"
+        };
+      });
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setTransactionInProgress(false);
+    }
+  };
+  const handleUnwear = async () => {
+    if (!account || !network) return;
+
+    setTransactionInProgress(true);
+
+    const payload = {
+      type: "entry_function_payload",
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::unwear_accessory`,
+      type_arguments: [],
+      arguments: ["bowtie"],
+    };
+
+    try {
+      const response = await signAndSubmitTransaction(payload);
+      await provider.waitForTransaction(response.hash);
+
+      setPet((pet) => {
+        if (!pet) return pet;
+        return {
+          ...pet,
+          accessories: null
         };
       });
     } catch (error: any) {
@@ -109,9 +208,13 @@ export function Actions({
 
   const feedDisabled =
     selectedAction === "feed" &&
-    pet.energy_points === Number(process.env.NEXT_PUBLIC_ENERGY_CAP);
+    pet.energy_points === Number(NEXT_PUBLIC_ENERGY_CAP);
   const playDisabled =
     selectedAction === "play" && pet.energy_points === Number(0);
+  const wearDisabled =
+    selectedAction === "wear" && pet.accessories;
+  const unwearDisabled =
+    selectedAction === "unwear" && pet.accessories == null;
 
   return (
     <div className="nes-container with-title flex-1 bg-white h-[320px]">
@@ -138,16 +241,46 @@ export function Actions({
             />
             <span>Feed</span>
           </label>
+          <label>
+            <input
+              type="radio"
+              className="nes-radio"
+              name="action"
+              checked={selectedAction === "buy"}
+              onChange={() => setSelectedAction("buy")}
+            />
+            <span>Buy Accessory</span>
+          </label>
+          <label>
+            <input
+              type="radio"
+              className="nes-radio"
+              name="action"
+              checked={selectedAction === "wear"}
+              onChange={() => setSelectedAction("wear")}
+            />
+            <span>Wear</span>
+          </label>
+          <label>
+            <input
+              type="radio"
+              className="nes-radio"
+              name="action"
+              checked={selectedAction === "unwear"}
+              onChange={() => setSelectedAction("unwear")}
+            />
+            <span>Unwear</span>
+          </label>
         </div>
         <div className="flex flex-col gap-4 justify-between">
           <p>{actionDescriptions[selectedAction]}</p>
           <button
             type="button"
             className={`nes-btn is-success ${
-              feedDisabled || playDisabled ? "is-disabled" : ""
+              feedDisabled || playDisabled || wearDisabled || unwearDisabled ? "is-disabled" : ""
             }`}
             onClick={handleStart}
-            disabled={transactionInProgress || feedDisabled || playDisabled}
+            disabled={transactionInProgress || feedDisabled || playDisabled || wearDisabled}
           >
             {transactionInProgress ? "Processing..." : "Start"}
           </button>
@@ -160,4 +293,7 @@ export function Actions({
 const actionDescriptions: Record<PetAction, string> = {
   feed: "Feeding your pet will boost its Energy Points...",
   play: "Playing with your pet will make it happy and consume its Energy Points...",
+  buy: "Buy an accessory for your pet...",
+  wear: "Wear an accessory for your pet...",
+  unwear: "Take off an accessory for your pet...",
 };

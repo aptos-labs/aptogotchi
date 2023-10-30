@@ -13,14 +13,16 @@ export interface PetImageProps {
     face: string;
   };
   avatarStyle?: boolean;
+  accessory_style?: string;
 }
 
 export function PetImage(props: PetImageProps) {
-  const { avatarStyle, petParts, selectedAction } = props;
+  const { avatarStyle, petParts, selectedAction, accessory_style } = props;
   const head = BASE_PATH + "head.png";
   const body = BASE_PATH + petParts.body;
   const ears = BASE_PATH + petParts.ears;
   const face = BASE_PATH + petParts.face;
+  const accessory = BASE_PATH + "bowtie.png";
 
   const imgClass = "absolute top-0 left-0 w-full h-full object-contain";
 
@@ -38,6 +40,7 @@ export function PetImage(props: PetImageProps) {
         <img src={body} className={imgClass} alt="pet body" />
         <img src={ears} className={imgClass} alt="pet ears" />
         <img src={face} className={imgClass} alt="pet face" />
+        {accessory_style ? <img src={accessory} className={imgClass} alt="pet accessory" />: null}
       </div>
     </div>
   );
@@ -63,3 +66,4 @@ export const ears = [
 ];
 
 export const faces = ["face1.png", "face2.png", "face3.png", "face4.png"];
+export const accessory = ["bowtie"]
