@@ -15,7 +15,7 @@ import {
 const aptosClient = getAptosClient();
 
 export const provider = new Provider(Network.TESTNET);
-export type PetAction = "feed" | "play" | "buy" | "wear" | "unwear";
+export type PetAction = "feed" | "play" | "buy_food" | "buy_accessory" | "wear" | "unwear";
 
 export interface ActionsProps {
   pet: Pet;
@@ -42,8 +42,11 @@ export function Actions({
       case "play":
         handlePlay();
         break;
-      case "buy":
-        handleBuy();
+      case "buy_food":
+        handleBuyFood();
+        break;
+      case "buy_accessory":
+        handleBuyAccessory();
         break;
       case "wear":
         handleWear();
@@ -125,7 +128,29 @@ export function Actions({
     }
   };
 
-  const handleBuy = async () => {
+  const handleBuyFood = async () => {
+    if (!account || !network) return;
+
+    setTransactionInProgress(true);
+    const payload = {
+      type: "entry_function_payload",
+      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::buy_food`,
+      type_arguments: [],
+      arguments: [NEXT_PUBLIC_ENERGY_INCREASE],
+    };
+
+    try {
+      // show accessory in inventory
+      const response = await signAndSubmitTransaction(payload);
+      await provider.waitForTransaction(response.hash);
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setTransactionInProgress(false);
+    }
+  };
+
+  const handleBuyAccessory = async () => {
     if (!account || !network) return;
 
     setTransactionInProgress(true);
@@ -245,8 +270,18 @@ export function Actions({
               type="radio"
               className="nes-radio"
               name="action"
-              checked={selectedAction === "buy"}
-              onChange={() => setSelectedAction("buy")}
+              checked={selectedAction === "buy_food"}
+              onChange={() => setSelectedAction("buy_food")}
+            />
+            <span>Buy Food</span>
+          </label>
+          <label>
+            <input
+              type="radio"
+              className="nes-radio"
+              name="action"
+              checked={selectedAction === "buy_accessory"}
+              onChange={() => setSelectedAction("buy_accessory")}
             />
             <span>Buy Accessory</span>
           </label>
@@ -285,7 +320,8 @@ export function Actions({
               transactionInProgress ||
               feedDisabled ||
               playDisabled ||
-              wearDisabled
+              wearDisabled ||
+              unwearDisabled
             }
           >
             {transactionInProgress ? "Processing..." : "Start"}
@@ -299,7 +335,8 @@ export function Actions({
 const actionDescriptions: Record<PetAction, string> = {
   feed: "Feeding your pet will boost its Energy Points...",
   play: "Playing with your pet will make it happy and consume its Energy Points...",
-  buy: "Buy an accessory for your pet...",
+  buy_food: "Buying food for your pet...",
+  buy_accessory: "Buying an accessory for your pet...",
   wear: "Wear an accessory for your pet...",
   unwear: "Take off an accessory for your pet...",
 };
