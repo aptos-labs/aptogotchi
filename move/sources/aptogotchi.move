@@ -12,6 +12,8 @@ module aptogotchi::main {
     use std::signer::address_of;
     use std::signer;
     use std::string::{Self, String};
+    use aptos_framework::coin;
+    use aptos_framework::aptos_coin::AptosCoin;
 
     /// aptogotchi not available
     const ENOT_AVAILABLE: u64 = 1;
@@ -19,6 +21,7 @@ module aptogotchi::main {
     const EACCESSORY_NOT_AVAILABLE: u64 = 1;
     // maximum health points: 5 hearts * 2 HP/heart = 10 HP
     const ENERGY_UPPER_BOUND: u64 = 10;
+    const UNIT_PRICE: u64 = 100000000;
 
     struct MintAptogotchiEvents has key {
         mint_aptogotchi_events: event::EventHandle<MintAptogotchiEvent>,
@@ -212,7 +215,9 @@ module aptogotchi::main {
     }
 
     public entry fun buy_food(owner: &signer, amount: u64) {
-        // add price logic here
+        // charge price for food
+        coin::transfer<AptosCoin>(owner, @aptogotchi, UNIT_PRICE * amount);
+
         food::mint_food(owner, amount);
     }
 
