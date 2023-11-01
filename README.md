@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+# Aptogotchi (Intermediate)
+This repo is a forked version of [Aptogotchi](https://github.com/aptos-labs/aptogotchi). 
+
+While it shares most of the code base of the beginner one, we added more feature including token composition and fungible tokens 
+to showcase more advanced concepts.
+This dapp will be ussing as an educational demo hosted on [Builder Hub](https://github.com/aptos-labs/aptos-builder-hub).
+
+---
+
 ## Getting Started
 
 First, run the development server:
