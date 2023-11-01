@@ -1,3 +1,13 @@
+# Aptogotchi (Beginner)
+
+This is the beginner-level dApp for the Aptogotchi Tutorial demos hosted on [Builder Hub](https://github.com/aptos-labs/aptos-builder-hub).
+
+Aptogotchi is an educational and discovery surface of the demos we build. The goal is removing the barriers for developers to start building on Aptos.
+
+Read more about Aptogotchi [here](https://www.notion.so/aptoslabs/Aptogotchi-MVP-bf4b85dc2a3b4a65b8dccf01c385ec57).
+
+---
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
