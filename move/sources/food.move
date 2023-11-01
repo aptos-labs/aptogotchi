@@ -114,7 +114,16 @@ module aptogotchi::food {
     #[view]
     /// Returns the balance of the food token of the owner
     public fun food_balance(owner_addr: address, food: Object<FoodToken>): u64 {
+        // should remove this function when re-publish the contract to the final address
+        // this function is replaced by get_food_balance
         primary_fungible_store::balance(owner_addr, food)
+    }
+
+    #[view]
+    /// Returns the balance of the food token of the owner
+    public fun get_food_balance(owner_addr: address): u64 {
+        let food_token = object::address_to_object<FoodToken>(get_food_token_address());
+        primary_fungible_store::balance(owner_addr, food_token)
     }
 
     public fun mint_food(user: &signer, amount: u64) acquires FoodToken {
@@ -145,11 +154,10 @@ module aptogotchi::food {
         create_account_for_test(signer::address_of(creator));
 
         mint_food(creator, 1);
-        let food_token = object::address_to_object<FoodToken>(get_food_token_address());
-        assert!(food_balance(signer::address_of(creator), food_token) == 1, 0);
+        assert!(get_food_balance(signer::address_of(creator)) == 1, 0);
 
         burn_food(creator, 1);
-        assert!(food_balance(signer::address_of(creator), food_token) == 0, 0);
+        assert!(get_food_balance(signer::address_of(creator)) == 0, 0);
 
     }
 }

@@ -1,6 +1,8 @@
 module aptogotchi::main {
     use aptogotchi::food;
     use aptos_framework::account::{Self, SignerCapability};
+    use aptos_framework::aptos_coin::AptosCoin;
+    use aptos_framework::coin;
     use aptos_framework::event;
     use aptos_framework::object;
     use aptos_framework::timestamp;
@@ -12,8 +14,6 @@ module aptogotchi::main {
     use std::signer::address_of;
     use std::signer;
     use std::string::{Self, String};
-    use aptos_framework::coin;
-    use aptos_framework::aptos_coin::AptosCoin;
 
     /// aptogotchi not available
     const ENOT_AVAILABLE: u64 = 1;
