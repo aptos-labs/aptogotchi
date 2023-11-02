@@ -17,15 +17,15 @@ export function HealthBar({
 
   return (
     <div className="flex flex-wrap gap-1">
-        {range(fullIcons).map((i) => (
-          <i key={i} className={`nes-icon ${icon}`} />
-        ))}
-        {range(halfIcons).map((i) => (
-          <i key={i} className={`nes-icon is-half ${icon}`} />
-        ))}
-        {range(emptyIcons).map((i) => (
-          <i key={i} className={`nes-icon is-empty ${icon}`} />
-        ))}
+      {range(fullIcons).map((i) => (
+        <i key={i} className={`nes-icon ${icon}`} />
+      ))}
+      {range(halfIcons).map((i) => (
+        <i key={i} className={`nes-icon is-half ${icon}`} />
+      ))}
+      {range(emptyIcons).map((i) => (
+        <i key={i} className={`nes-icon is-empty ${icon}`} />
+      ))}
     </div>
   );
 }
