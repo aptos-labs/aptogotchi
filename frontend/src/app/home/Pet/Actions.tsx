@@ -7,28 +7,42 @@ import { Pet } from ".";
 import { getAptosClient } from "@/utils/aptosClient";
 import {
   NEXT_PUBLIC_CONTRACT_ADDRESS,
+  NEXT_PUBLIC_FOOD_CAP,
   NEXT_PUBLIC_ENERGY_CAP,
+  NEXT_PUBLIC_FOOD_INCREASE,
   NEXT_PUBLIC_ENERGY_DECREASE,
   NEXT_PUBLIC_ENERGY_INCREASE,
+  NEXT_PUBLIC_FOOD_DECREASE,
 } from "@/utils/env";
+import { Food } from "../Food";
 
 const aptosClient = getAptosClient();
 
 export const provider = new Provider(Network.TESTNET);
-export type PetAction = "feed" | "play" | "buy_food" | "buy_accessory" | "wear" | "unwear";
+export type Action =
+  | "feed"
+  | "play"
+  | "buy_accessory"
+  | "buy_food"
+  | "wear"
+  | "unwear";
 
 export interface ActionsProps {
   pet: Pet;
-  selectedAction: PetAction;
-  setSelectedAction: (action: PetAction) => void;
+  food: Food;
+  selectedAction: Action;
+  setSelectedAction: (action: Action) => void;
   setPet: Dispatch<SetStateAction<Pet | undefined>>;
+  setFood: Dispatch<SetStateAction<Food | undefined>>;
 }
 
 export function Actions({
   selectedAction,
   setSelectedAction,
   setPet,
+  setFood,
   pet,
+  food,
 }: ActionsProps) {
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
@@ -42,11 +56,11 @@ export function Actions({
       case "play":
         handlePlay();
         break;
-      case "buy_food":
-        handleBuyFood();
-        break;
       case "buy_accessory":
         handleBuyAccessory();
+        break;
+      case "buy_food":
+        handleBuyFood();
         break;
       case "wear":
         handleWear();
@@ -84,6 +98,14 @@ export function Actions({
           ...pet,
           energy_points:
             pet.energy_points + Number(NEXT_PUBLIC_ENERGY_INCREASE),
+        };
+      });
+      setFood((food) => {
+        if (!food) return food;
+
+        return {
+          ...food,
+          number: food.number - Number(NEXT_PUBLIC_ENERGY_DECREASE),
         };
       });
     } catch (error: any) {
@@ -136,13 +158,27 @@ export function Actions({
       type: "entry_function_payload",
       function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::buy_food`,
       type_arguments: [],
-      arguments: [NEXT_PUBLIC_ENERGY_INCREASE],
+      arguments: [NEXT_PUBLIC_FOOD_INCREASE],
     };
 
     try {
-      // show accessory in inventory
+      // Add food
       const response = await signAndSubmitTransaction(payload);
       await provider.waitForTransaction(response.hash);
+
+      setFood((food) => {
+        if (!food) return food;
+        if (
+          food.number + Number(NEXT_PUBLIC_ENERGY_INCREASE) >
+          Number(NEXT_PUBLIC_FOOD_CAP)
+        )
+          return food;
+
+        return {
+          ...food,
+          number: food.number + Number(NEXT_PUBLIC_ENERGY_INCREASE),
+        };
+      });
     } catch (error: any) {
       console.error(error);
     } finally {
@@ -332,7 +368,7 @@ export function Actions({
   );
 }
 
-const actionDescriptions: Record<PetAction, string> = {
+const actionDescriptions: Record<Action, string> = {
   feed: "Feeding your pet will boost its Energy Points...",
   play: "Playing with your pet will make it happy and consume its Energy Points...",
   buy_food: "Buying food for your pet...",

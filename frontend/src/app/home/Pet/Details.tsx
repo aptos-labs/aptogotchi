@@ -3,20 +3,24 @@
 import { AiFillSave } from "react-icons/ai";
 import { FaCopy } from "react-icons/fa";
 import { HealthBar } from "@/components/HealthBar";
+import { FoodBar } from "@/components/FoodBar";
 import { Pet } from ".";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
+import { Food } from "../Food";
 
-export interface PetDetailsProps {
+export interface DetailsProps {
   pet: Pet;
+  food: Food;
   setPet: Dispatch<SetStateAction<Pet | undefined>>;
+  setFood?: Dispatch<SetStateAction<Food | undefined>>;
 }
 
 const aptosClient = getAptosClient();
 
-export function PetDetails({ pet, setPet }: PetDetailsProps) {
+export function Details({ pet, food, setPet, setFood }: DetailsProps) {
   const [newName, setNewName] = useState(pet.name);
   const { account, network, signAndSubmitTransaction } = useWallet();
   const owner = account?.ansName
@@ -104,6 +108,10 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
           currentHealth={pet.energy_points}
           icon="star"
         />
+      </div>
+      <div className="flex flex-col">
+        <label>Food</label>
+        <Food food={food} setFood={setFood} />
       </div>
       <div className="flex flex-col gap-2">
         {nameFieldComponent}
