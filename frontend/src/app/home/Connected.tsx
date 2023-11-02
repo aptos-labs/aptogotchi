@@ -27,7 +27,6 @@ export function Connected() {
 
     const response = await provider.view(payload);
     const noPet = ["", "0", "0", "0x"];
-    console.log("response: ", response);
 
     if (JSON.stringify(response) !== JSON.stringify(noPet)) {
       setPet({
@@ -53,7 +52,6 @@ export function Connected() {
 
     const response = await provider.view(payload);
     const noFood = ["", "0", "0", "0x"];
-    console.log("response food: ", response);
 
     if (JSON.stringify(response) !== JSON.stringify(noFood)) {
       setFood({
