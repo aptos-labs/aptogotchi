@@ -23,7 +23,6 @@ export function Mint({ fetchPet }: MintProps) {
     if (!account || !network) return;
 
     setTransactionInProgress(true);
-    console.log("MINT PET: ", newName, petParts);
     const payload = {
       type: "entry_function_payload",
       function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
