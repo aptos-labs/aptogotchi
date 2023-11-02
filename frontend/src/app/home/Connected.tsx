@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Aptogotchi } from "./Aptogotchi";
-// import { Food } from "@/components/FoodBar";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Network, Provider } from "aptos";
 import { Mint } from "./Mint";
