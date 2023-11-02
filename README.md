@@ -1,5 +1,19 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+
+# Aptogotchi (Beginner)
+Aptogotchi is a full-stack dApp to demonstrate the basics of how to build a dApp using Move. 
+
+We want to introduce the following concepts:
+1. how to create a full-stack dApp 
+2. how to talk to the smart contracts on blockchain
+2. how to integrate with wallet/explorer/ANS and other services.
+2. how to create events and using indexer to get the off-chain data.
+3. how to write unit tests for the smart contracts.
+
+This dapp will be ussing as an educational demo hosted on [Builder Hub](https://github.com/aptos-labs/aptos-builder-hub).
+
+---
 ## Getting Started
 
 First, run the development server:
