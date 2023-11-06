@@ -3,11 +3,9 @@
 import { AiFillSave } from "react-icons/ai";
 import { FaCopy } from "react-icons/fa";
 import { HealthBar } from "@/components/HealthBar";
-import { FoodBar } from "@/components/FoodBar";
 import { Pet } from ".";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
 import { Food } from "../Food";
 
@@ -23,9 +21,7 @@ const aptosClient = getAptosClient();
 export function Details({ pet, food, setPet, setFood }: DetailsProps) {
   const [newName, setNewName] = useState(pet.name);
   const { account, network, signAndSubmitTransaction } = useWallet();
-  const owner = account?.ansName
-    ? `${account?.ansName}.apt`
-    : account?.address || "";
+  const owner = account?.ansName ? `${account?.ansName}.apt` : account?.address || "";
 
   const canSave = newName !== pet.name;
 
@@ -82,13 +78,7 @@ export function Details({ pet, food, setPet, setFood }: DetailsProps) {
     <div className="nes-field">
       <label htmlFor="owner_field">Owner</label>
       <div className="relative">
-        <input
-          type="text"
-          id="owner_field"
-          className="nes-input pr-12"
-          disabled
-          value={owner}
-        />
+        <input type="text" id="owner_field" className="nes-input pr-12" disabled value={owner} />
         <button
           className="absolute right-4 top-1/2 -translate-y-1/2 nes-pointer disabled:cursor-not-allowed text-gray-400 disabled:text-gray-400"
           onClick={handleCopyOwnerAddrOrName}
@@ -103,11 +93,7 @@ export function Details({ pet, food, setPet, setFood }: DetailsProps) {
     <div className="flex flex-col gap-8">
       <div className="flex flex-col">
         <label>Energy Points</label>
-        <HealthBar
-          totalHealth={10}
-          currentHealth={pet.energy_points}
-          icon="star"
-        />
+        <HealthBar totalHealth={10} currentHealth={pet.energy_points} icon="star" />
       </div>
       <div className="flex flex-col">
         <label>Food</label>

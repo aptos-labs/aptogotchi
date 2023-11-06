@@ -30,7 +30,7 @@ export function Pet({ pet, setPet }: PetProps) {
           face: faces[pet.parts[2]],
         }}
         avatarStyle
-        accessory_style={pet.accessories}
+        accessory_style={pet.accessories || undefined}
       />
     </div>
   );

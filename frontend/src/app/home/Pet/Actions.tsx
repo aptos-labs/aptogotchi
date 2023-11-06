@@ -12,20 +12,13 @@ import {
   NEXT_PUBLIC_FOOD_INCREASE,
   NEXT_PUBLIC_ENERGY_DECREASE,
   NEXT_PUBLIC_ENERGY_INCREASE,
-  NEXT_PUBLIC_FOOD_DECREASE,
 } from "@/utils/env";
 import { Food } from "../Food";
 
 const aptosClient = getAptosClient();
 
 export const provider = new Provider(Network.TESTNET);
-export type Action =
-  | "feed"
-  | "play"
-  | "buy_accessory"
-  | "buy_food"
-  | "wear"
-  | "unwear";
+export type Action = "feed" | "play" | "buy_accessory" | "buy_food" | "wear" | "unwear";
 
 export interface ActionsProps {
   pet: Pet;
@@ -36,16 +29,8 @@ export interface ActionsProps {
   setFood: Dispatch<SetStateAction<Food | undefined>>;
 }
 
-export function Actions({
-  selectedAction,
-  setSelectedAction,
-  setPet,
-  setFood,
-  pet,
-  food,
-}: ActionsProps) {
-  const [transactionInProgress, setTransactionInProgress] =
-    useState<boolean>(false);
+export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pet }: ActionsProps) {
+  const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
 
   const handleStart = () => {
@@ -96,8 +81,7 @@ export function Actions({
 
         return {
           ...pet,
-          energy_points:
-            pet.energy_points + Number(NEXT_PUBLIC_ENERGY_INCREASE),
+          energy_points: pet.energy_points + Number(NEXT_PUBLIC_ENERGY_INCREASE),
         };
       });
       setFood((food) => {
@@ -134,13 +118,11 @@ export function Actions({
 
       setPet((pet) => {
         if (!pet) return pet;
-        if (pet.energy_points <= Number(NEXT_PUBLIC_ENERGY_DECREASE))
-          return pet;
+        if (pet.energy_points <= Number(NEXT_PUBLIC_ENERGY_DECREASE)) return pet;
 
         return {
           ...pet,
-          energy_points:
-            pet.energy_points - Number(NEXT_PUBLIC_ENERGY_DECREASE),
+          energy_points: pet.energy_points - Number(NEXT_PUBLIC_ENERGY_DECREASE),
         };
       });
     } catch (error: any) {
@@ -168,10 +150,7 @@ export function Actions({
 
       setFood((food) => {
         if (!food) return food;
-        if (
-          food.number + Number(NEXT_PUBLIC_ENERGY_INCREASE) >
-          Number(NEXT_PUBLIC_FOOD_CAP)
-        )
+        if (food.number + Number(NEXT_PUBLIC_ENERGY_INCREASE) > Number(NEXT_PUBLIC_FOOD_CAP))
           return food;
 
         return {
@@ -269,12 +248,10 @@ export function Actions({
   };
 
   const feedDisabled =
-    selectedAction === "feed" &&
-    pet.energy_points === Number(NEXT_PUBLIC_ENERGY_CAP);
-  const playDisabled =
-    selectedAction === "play" && pet.energy_points === Number(0);
-  const wearDisabled = selectedAction === "wear" && pet.accessories;
-  const unwearDisabled = selectedAction === "unwear" && pet.accessories == null;
+    selectedAction === "feed" && pet.energy_points === Number(NEXT_PUBLIC_ENERGY_CAP);
+  const playDisabled = selectedAction === "play" && pet.energy_points === Number(0);
+  const wearDisabled = Boolean(selectedAction === "wear" && pet.accessories);
+  const unwearDisabled = Boolean(selectedAction === "unwear" && pet.accessories == null);
 
   return (
     <div className="nes-container with-title flex-1 bg-white h-[320px]">
@@ -347,9 +324,7 @@ export function Actions({
           <button
             type="button"
             className={`nes-btn is-success ${
-              feedDisabled || playDisabled || wearDisabled || unwearDisabled
-                ? "is-disabled"
-                : ""
+              feedDisabled || playDisabled || wearDisabled || unwearDisabled ? "is-disabled" : ""
             }`}
             onClick={handleStart}
             disabled={

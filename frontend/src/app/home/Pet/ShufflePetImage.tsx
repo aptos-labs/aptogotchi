@@ -13,7 +13,8 @@ import {
 const defaultPet: Pet = {
   name: "Unknown",
   energy_points: 0,
-  parts: [],
+  parts: [] as number[],
+  accessories: "",
 };
 
 export function ShufflePetImage({

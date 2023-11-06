@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { FoodBar } from "@/components/FoodBar";
 
 export interface Food {
@@ -9,9 +9,10 @@ export interface Food {
 
 interface FoodProps {
   food: Food;
+  setFood?: Dispatch<SetStateAction<Food | undefined>>;
 }
 
-export function Food({ food }: FoodProps) {
+export function Food({ food, setFood }: FoodProps) {
   return (
     <div>
       <FoodBar totalFood={10} currentFood={food?.number} icon={"heart"} />

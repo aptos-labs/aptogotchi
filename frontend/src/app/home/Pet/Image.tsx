@@ -2,11 +2,11 @@
 "use client";
 
 import { Pet } from ".";
-import { PetAction } from "./Actions";
+import { Action } from "./Actions";
 
 export interface PetImageProps {
   pet: Pet;
-  selectedAction?: PetAction;
+  selectedAction?: Action;
   petParts: {
     body: string;
     ears: string;
@@ -26,8 +26,7 @@ export function PetImage(props: PetImageProps) {
 
   const imgClass = "absolute top-0 left-0 w-full h-full object-contain";
 
-  const animation =
-    selectedAction === "play" ? "animate-wiggle" : "animate-hop";
+  const animation = selectedAction === "play" ? "animate-wiggle" : "animate-hop";
 
   return (
     <div
@@ -40,7 +39,7 @@ export function PetImage(props: PetImageProps) {
         <img src={body} className={imgClass} alt="pet body" />
         <img src={ears} className={imgClass} alt="pet ears" />
         <img src={face} className={imgClass} alt="pet face" />
-        {accessory_style ? <img src={accessory} className={imgClass} alt="pet accessory" />: null}
+        {accessory_style ? <img src={accessory} className={imgClass} alt="pet accessory" /> : null}
       </div>
     </div>
   );
@@ -48,22 +47,9 @@ export function PetImage(props: PetImageProps) {
 
 export const BASE_PATH = "/pet-parts/";
 
-export const bodies = [
-  "body1.png",
-  "body2.png",
-  "body3.png",
-  "body4.png",
-  "body5.png",
-];
+export const bodies = ["body1.png", "body2.png", "body3.png", "body4.png", "body5.png"];
 
-export const ears = [
-  "ear1.png",
-  "ear2.png",
-  "ear3.png",
-  "ear4.png",
-  "ear5.png",
-  "ear6.png",
-];
+export const ears = ["ear1.png", "ear2.png", "ear3.png", "ear4.png", "ear5.png", "ear6.png"];
 
 export const faces = ["face1.png", "face2.png", "face3.png", "face4.png"];
-export const accessory = ["bowtie"]
+export const accessory = ["bowtie"];
