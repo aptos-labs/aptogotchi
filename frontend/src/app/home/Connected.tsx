@@ -31,7 +31,7 @@ export function Connected() {
       setPet({
         name: response[0] as unknown as string,
         energy_points: parseInt(response[2] as unknown as string),
-        parts: (response[3] as unknown as string).split("0").map(Number),
+        parts: (response[3] as unknown as string).split("0").slice(2).map(Number),
         accessories: response[4] as unknown as string,
       });
     }

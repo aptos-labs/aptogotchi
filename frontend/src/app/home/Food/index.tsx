@@ -15,7 +15,7 @@ interface FoodProps {
 export function Food({ food, setFood }: FoodProps) {
   return (
     <div>
-      <FoodBar totalFood={10} currentFood={food?.number} icon={"heart"} />
+      <FoodBar currentFood={food?.number} icon={"heart"} />
     </div>
   );
 }

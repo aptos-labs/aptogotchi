@@ -29,7 +29,7 @@ export interface ActionsProps {
   setFood: Dispatch<SetStateAction<Food | undefined>>;
 }
 
-export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pet }: ActionsProps) {
+export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pet, food }: ActionsProps) {
   const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
 
@@ -150,8 +150,6 @@ export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pe
 
       setFood((food) => {
         if (!food) return food;
-        if (food.number + Number(NEXT_PUBLIC_ENERGY_INCREASE) > Number(NEXT_PUBLIC_FOOD_CAP))
-          return food;
 
         return {
           ...food,
