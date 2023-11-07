@@ -1,8 +1,9 @@
-import { Food } from "@/app/home/Food";
 import { range } from "@/utils/range";
+import {
+  NEXT_PUBLIC_FOOD_CAP,
+} from "@/utils/env";
 
 export interface FoodBarProps {
-  totalFood: number;
   currentFood: number
   icon: "heart";
 }
@@ -10,13 +11,14 @@ export interface FoodBarProps {
 export const BASE_PATH = "/assets/";
 
 export function FoodBar({
-  totalFood,
   currentFood,
   icon,
 }: FoodBarProps) {
-  const fullIcons = Math.floor(currentFood / 2);
-  const halfIcons = currentFood % 2;
-  const emptyIcons = Math.floor((totalFood - currentFood) / 2);
+  // We only display a maximum number of NEXT_PUBLIC_FOOD_CAP for food items
+  const foodNumber = currentFood >= Number(NEXT_PUBLIC_FOOD_CAP) ? Number(NEXT_PUBLIC_FOOD_CAP) : currentFood;
+  const fullIcons = Math.floor(foodNumber / 2);
+  const halfIcons = foodNumber % 2;
+  const emptyIcons = Math.floor((Number(NEXT_PUBLIC_FOOD_CAP) - foodNumber) / 2);
 
   return (
     <div className="flex flex-wrap gap-1">
