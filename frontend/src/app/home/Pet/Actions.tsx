@@ -29,7 +29,7 @@ export interface ActionsProps {
   setFood: Dispatch<SetStateAction<Food | undefined>>;
 }
 
-export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pet }: ActionsProps) {
+export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pet, food }: ActionsProps) {
   const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
 
@@ -249,6 +249,8 @@ export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pe
 
   const feedDisabled =
     selectedAction === "feed" && pet.energy_points === Number(NEXT_PUBLIC_ENERGY_CAP);
+  const buyFoodDisabled =
+    selectedAction === "buy_food" && food.number === Number(NEXT_PUBLIC_FOOD_CAP);
   const playDisabled = selectedAction === "play" && pet.energy_points === Number(0);
   const wearDisabled = Boolean(selectedAction === "wear" && pet.accessories);
   const unwearDisabled = Boolean(selectedAction === "unwear" && pet.accessories == null);
@@ -324,11 +326,12 @@ export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pe
           <button
             type="button"
             className={`nes-btn is-success ${
-              feedDisabled || playDisabled || wearDisabled || unwearDisabled ? "is-disabled" : ""
+              feedDisabled || buyFoodDisabled || playDisabled || wearDisabled || unwearDisabled ? "is-disabled" : ""
             }`}
             onClick={handleStart}
             disabled={
               transactionInProgress ||
+              buyFoodDisabled ||
               feedDisabled ||
               playDisabled ||
               wearDisabled ||
