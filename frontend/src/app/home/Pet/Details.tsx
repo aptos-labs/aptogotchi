@@ -1,12 +1,10 @@
 "use client";
 
-import { AiFillSave } from "react-icons/ai";
 import { FaCopy } from "react-icons/fa";
 import { HealthBar } from "@/components/HealthBar";
 import { Pet } from ".";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { getAptosClient } from "@/utils/aptosClient";
 import { Food } from "../Food";
 
 export interface DetailsProps {
@@ -16,37 +14,10 @@ export interface DetailsProps {
   setFood?: Dispatch<SetStateAction<Food | undefined>>;
 }
 
-const aptosClient = getAptosClient();
-
 export function Details({ pet, food, setPet, setFood }: DetailsProps) {
   const [newName, setNewName] = useState(pet.name);
   const { account, network, signAndSubmitTransaction } = useWallet();
   const owner = account?.ansName ? `${account?.ansName}.apt` : account?.address || "";
-
-  const canSave = newName !== pet.name;
-
-  const handleNameChange = async () => {
-    if (!account || !network) return;
-
-    const payload = {
-      type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::set_name`,
-      type_arguments: [],
-      arguments: [newName],
-    };
-
-    try {
-      const response = await signAndSubmitTransaction(payload);
-      await aptosClient.waitForTransaction({ transactionHash: response.hash });
-
-      setPet((pet) => {
-        if (!pet) return pet;
-        return { ...pet, name: newName };
-      });
-    } catch (error: any) {
-      console.error(error);
-    }
-  };
 
   const handleCopyOwnerAddrOrName = () => {
     navigator.clipboard.writeText(owner);
@@ -56,19 +27,12 @@ export function Details({ pet, food, setPet, setFood }: DetailsProps) {
     <div className="nes-field">
       <label htmlFor="name_field">Name</label>
       <div className="relative">
-        <input
-          type="text"
-          id="name_field"
-          className="nes-input"
-          value={newName}
-          onChange={(e) => setNewName(e.currentTarget.value)}
-        />
+        <input type="text" id="owner_field" className="nes-input pr-12" disabled value={newName} />
         <button
-          className="absolute right-4 top-1/2 -translate-y-1/2 nes-pointer disabled:cursor-not-allowed text-sky-500 disabled:text-gray-400"
-          disabled={!canSave}
-          onClick={handleNameChange}
+          className="absolute right-4 top-1/2 -translate-y-1/2 nes-pointer disabled:cursor-not-allowed text-gray-400 disabled:text-gray-400"
+          onClick={handleCopyOwnerAddrOrName}
         >
-          <AiFillSave className=" h-8 w-8 drop-shadow-sm" />
+          <FaCopy className="h-8 w-8 drop-shadow-sm" />
         </button>
       </div>
     </div>
