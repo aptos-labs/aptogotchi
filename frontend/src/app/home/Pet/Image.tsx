@@ -31,7 +31,7 @@ export function PetImage(props: PetImageProps) {
     <div
       className={`bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative ${
         avatarStyle ? "h-44 w-44" : "h-80 w-80"
-      }`}
+      }`} style={{"paddingTop": "1rem"}}
     >
       <div className={`relative h-full w-full ${animation}`}>
         <img src={head} className={imgClass} alt="pet head" />
