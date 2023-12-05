@@ -13,7 +13,6 @@ export interface MintProps {
 export function Mint({ fetchPet }: MintProps) {
   const [newName, setNewName] = useState<string>("");
   const [petParts, setPetParts] = useState<number[]>([0, 0, 0]);
-
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
 
@@ -23,7 +22,6 @@ export function Mint({ fetchPet }: MintProps) {
     if (!account || !network) return;
 
     setTransactionInProgress(true);
-    console.log("MINT PET: ", newName, petParts);
     const payload = {
       type: "entry_function_payload",
       function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,

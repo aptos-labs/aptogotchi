@@ -48,8 +48,6 @@ export function useGetAptogotchiCollection() {
         aptogotchiCollectionIDResponse[0]
       );
 
-      console.log("collectionIDAddr: ", collectionIDAddr);
-
       const collectionResponse: CollectionResponse =
         await aptosClient.queryIndexer({
           query: {
