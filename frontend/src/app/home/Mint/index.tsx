@@ -64,6 +64,7 @@ export function Mint({ fetchPet }: MintProps) {
       >
         {transactionInProgress ? "Loading..." : "Mint Pet"}
       </button>
+      <br />
     </div>
   );
 }
