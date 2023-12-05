@@ -14,8 +14,7 @@ export function Mint({ fetchPet }: MintProps) {
   const [newName, setNewName] = useState<string>("");
   const [petParts, setPetParts] = useState<number[]>([0, 0, 0]);
 
-  const [transactionInProgress, setTransactionInProgress] =
-    useState<boolean>(false);
+  const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
 
   const { account, network, signAndSubmitTransaction } = useWallet();
 
@@ -65,6 +64,7 @@ export function Mint({ fetchPet }: MintProps) {
       >
         {transactionInProgress ? "Loading..." : "Mint Pet"}
       </button>
+      <br />
     </div>
   );
 }

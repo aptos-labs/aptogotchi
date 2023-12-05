@@ -11,8 +11,8 @@ export function ShuffleButton({ handleShuffle }: ShuffleButtonProps) {
       className="nes-btn flex flex-row justify-center items-center"
       onClick={handleShuffle}
     >
-      <h2>Shuffle</h2>
-      <PiShuffleAngularFill className="h-8 w-12 drop-shadow-sm" />
+      <h2 style={{ flexShrink: 0 }}>Shuffle</h2>
+      <PiShuffleAngularFill className="h-8 w-12 drop-shadow-sm" style={{ flexShrink: 0 }} />
     </button>
   );
 }

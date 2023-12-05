@@ -7,6 +7,9 @@ import { Network, Provider } from "aptos";
 import { Mint } from "./Mint";
 import { Pet } from "./Pet";
 import { Food } from "./Food";
+import { Modal } from "@/components/Modal";
+
+const TESTNET_ID = "2";
 
 export const provider = new Provider(Network.TESTNET);
 
@@ -66,6 +69,7 @@ export function Connected() {
 
   return (
     <div className="flex flex-col gap-3 p-3">
+      {network?.chainId !== TESTNET_ID && <Modal />}
       {pet && food ? (
         <Aptogotchi food={food} pet={pet} setPet={setPet} setFood={setFood} />
       ) : (
