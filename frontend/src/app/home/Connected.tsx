@@ -8,6 +8,8 @@ import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
 import { Modal } from "@/components/Modal";
 
+const TESTNET_ID = "2";
+
 const aptosClient = getAptosClient();
 
 export function Connected() {
@@ -42,7 +44,7 @@ export function Connected() {
 
   return (
     <div className="flex flex-col gap-3 p-3">
-      {network?.chainId !== "2" && <Modal />}
+      {network?.chainId !== TESTNET_ID && <Modal />}
       {pet ? <Pet pet={pet} setPet={setPet} /> : <Mint fetchPet={fetchPet} />}
     </div>
   );
