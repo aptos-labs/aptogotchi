@@ -352,7 +352,7 @@ module aptogotchi::main {
         aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires CollectionCapability, MintAptogotchiEvents, AptoGotchi {
+    ) acquires CollectionCapability, MintAptogotchiEvents {
         setup_test(aptos, account, creator);
 
         create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1]);
