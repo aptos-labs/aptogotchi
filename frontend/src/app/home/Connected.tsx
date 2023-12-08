@@ -3,15 +3,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { Aptogotchi } from "./Aptogotchi";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Network, Provider } from "aptos";
 import { Mint } from "./Mint";
 import { Pet } from "./Pet";
 import { Food } from "./Food";
 import { Modal } from "@/components/Modal";
+import { getAptosClient } from "@/utils/aptosClient";
 
 const TESTNET_ID = "2";
 
-export const provider = new Provider(Network.TESTNET);
+const aptosClient = getAptosClient();
 
 export function Connected() {
   const [pet, setPet] = useState<Pet>();
@@ -21,13 +21,12 @@ export function Connected() {
   const fetchPet = useCallback(async () => {
     if (!account?.address) return;
 
-    const payload = {
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
-      type_arguments: [],
-      arguments: [account.address],
-    };
-
-    const response = await provider.view(payload);
+    const response = await aptosClient.view({
+      payload: {
+        function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+        functionArguments: [account.address],
+      },
+    });
     const noPet = ["", "0", "0", "0x"];
 
     if (JSON.stringify(response) !== JSON.stringify(noPet)) {
@@ -43,14 +42,12 @@ export function Connected() {
   const fetchFood = useCallback(async () => {
     if (!account?.address) return;
 
-    const payload = {
-      type: "entry_function_payload",
-      function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::food::get_food_balance`,
-      type_arguments: [],
-      arguments: [account.address],
-    };
-
-    const response = await provider.view(payload);
+    const response = await aptosClient.view({
+      payload: {
+        function: `${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}::food::get_food_balance`,
+        functionArguments: [account.address],
+      },
+    });
     const noFood = ["", "0", "0", "0x"];
 
     if (JSON.stringify(response) !== JSON.stringify(noFood)) {

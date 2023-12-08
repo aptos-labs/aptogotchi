@@ -2,12 +2,10 @@
 
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Network, Provider } from "aptos";
 import { Pet } from ".";
 import { getAptosClient } from "@/utils/aptosClient";
 import {
   NEXT_PUBLIC_CONTRACT_ADDRESS,
-  NEXT_PUBLIC_FOOD_CAP,
   NEXT_PUBLIC_ENERGY_CAP,
   NEXT_PUBLIC_FOOD_INCREASE,
   NEXT_PUBLIC_ENERGY_DECREASE,
@@ -17,7 +15,6 @@ import { Food } from "../Food";
 
 const aptosClient = getAptosClient();
 
-export const provider = new Provider(Network.TESTNET);
 export type Action = "feed" | "play" | "buy_accessory" | "buy_food" | "wear" | "unwear";
 
 export interface ActionsProps {
@@ -29,7 +26,14 @@ export interface ActionsProps {
   setFood: Dispatch<SetStateAction<Food | undefined>>;
 }
 
-export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pet, food }: ActionsProps) {
+export function Actions({
+  selectedAction,
+  setSelectedAction,
+  setPet,
+  setFood,
+  pet,
+  food,
+}: ActionsProps) {
   const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
 
@@ -146,7 +150,7 @@ export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pe
     try {
       // Add food
       const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction(response.hash);
 
       setFood((food) => {
         if (!food) return food;
@@ -177,7 +181,7 @@ export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pe
     try {
       // show accessory in inventory
       const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction(response.hash);
     } catch (error: any) {
       console.error(error);
     } finally {
@@ -199,7 +203,7 @@ export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pe
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction(response.hash);
 
       setPet((pet) => {
         if (!pet) return pet;
@@ -229,7 +233,7 @@ export function Actions({ selectedAction, setSelectedAction, setPet, setFood, pe
 
     try {
       const response = await signAndSubmitTransaction(payload);
-      await provider.waitForTransaction(response.hash);
+      await aptosClient.waitForTransaction(response.hash);
 
       setPet((pet) => {
         if (!pet) return pet;
