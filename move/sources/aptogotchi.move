@@ -14,13 +14,21 @@ module aptogotchi::main {
     use std::signer::address_of;
     use std::signer;
     use std::string::{Self, String};
+    use std::vector;
 
     /// aptogotchi not available
     const ENOT_AVAILABLE: u64 = 1;
     /// accessory not available
     const EACCESSORY_NOT_AVAILABLE: u64 = 1;
+    const EPARTS_LIMIT: u64 = 2;
+    const ENAME_LIMIT: u64 = 3;
+    const EUSER_ALREADY_HAS_APTOGOTCHI: u64 = 4;
+
+
     // maximum health points: 5 hearts * 2 HP/heart = 10 HP
     const ENERGY_UPPER_BOUND: u64 = 10;
+    const NAME_UPPER_BOUND: u64 = 40;
+    const PARTS_SIZE: u64 = 3;
     const UNIT_PRICE: u64 = 100000000;
 
     struct MintAptogotchiEvents has key {
@@ -47,7 +55,7 @@ module aptogotchi::main {
     }
 
     // Tokens require a signer to create, so this is the signer for the collection
-    struct CollectionCapability has key, drop {
+    struct CollectionCapability has key {
         capability: SignerCapability,
         burn_signer_capability: SignerCapability,
     }
@@ -124,8 +132,14 @@ module aptogotchi::main {
 
     // Create an Aptogotchi token object
     public entry fun create_aptogotchi(user: &signer, name: String, parts: vector<u8>) acquires CollectionCapability, MintAptogotchiEvents {
+        assert!(vector::length(&parts)==PARTS_SIZE,error::invalid_argument(EPARTS_LIMIT));
+        assert!(string::length(&name)<=NAME_UPPER_BOUND,error::invalid_argument(ENAME_LIMIT));
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
+        let user_addr = address_of(user);
+        let token_name = to_string(&user_addr);
+        assert!(!has_aptogotchi(user_addr), error::already_exists(EUSER_ALREADY_HAS_APTOGOTCHI));
+
 
         let constructor_ref = token::create_named_token(
             &get_token_signer(),
@@ -191,9 +205,7 @@ module aptogotchi::main {
     #[view]
     public fun get_aptogotchi(owner_addr: address): (String, u64, u64, vector<u8>) acquires AptoGotchi, CollectionCapability {
         // if this address doesn't have an Aptogotchi, throw error
-        if (has_aptogotchi(owner_addr) == false) {
-            assert!(false, error::unavailable(ENOT_AVAILABLE));
-        };
+        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
 
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
@@ -204,9 +216,7 @@ module aptogotchi::main {
 
     #[view]
     public fun get_energy_points(owner_addr: address): u64 acquires AptoGotchi, CollectionCapability {
-        if (has_aptogotchi(owner_addr) == false) {
-            assert!(false, error::unavailable(ENOT_AVAILABLE));
-        };
+        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
 
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global<AptoGotchi>(token_address);
@@ -223,6 +233,8 @@ module aptogotchi::main {
 
     public entry fun feed(owner: &signer, points: u64) acquires AptoGotchi, CollectionCapability {
         let owner_addr = signer::address_of(owner);
+        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
+
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
 
@@ -240,6 +252,8 @@ module aptogotchi::main {
 
     public entry fun play(owner: &signer, points: u64) acquires AptoGotchi, CollectionCapability {
         let owner_addr = signer::address_of(owner);
+        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
+
         let token_address = get_aptogotchi_address(&owner_addr);
         let gotchi = borrow_global_mut<AptoGotchi>(token_address);
 
@@ -449,5 +463,20 @@ module aptogotchi::main {
 
         unwear_accessory(creator, utf8(ACCESSORY_CATEGORY_BOWTIE));
         assert!(object::is_owner(accessory_obj, address_of(creator)), 4);
+    }
+
+    // Test getting an Aptogotchi, when user has not minted
+    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[expected_failure(abort_code = 524292, location = aptogotchi::main)]
+
+    fun test_create_aptogotchi_twice(
+        aptos: &signer,
+        account: &signer,
+        creator: &signer
+    ) acquires CollectionCapability, MintAptogotchiEvents {
+        setup_test(aptos, account, creator);
+
+        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1]);
+        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1]);
     }
 }
