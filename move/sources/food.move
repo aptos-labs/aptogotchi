@@ -126,6 +126,8 @@ module aptogotchi::food {
         primary_fungible_store::balance(owner_addr, food_token)
     }
 
+    // Warning: There is a vulnerability here where an attacker can directly invoke mint_food and mint any amount of token.
+    // To fix this issue, we advise modifying both the `burn_food` and `mint_food` functions to `public(friend)`, as well as adding `aptogotchi.move` as a `friend` module. 
     public fun mint_food(user: &signer, amount: u64) acquires FoodToken {
         let food_token = borrow_global<FoodToken>(get_food_token_address());
         let fungible_asset_mint_ref = &food_token.fungible_asset_mint_ref;
