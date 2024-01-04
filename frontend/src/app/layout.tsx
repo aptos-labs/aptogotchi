@@ -19,6 +19,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
+      <head>
+        <meta
+          name="google-site-verification"
+          content="g6FhXGZrANwOhvvKqpNJ-mlE0kgWxTj6KGMh9qfF9oo"
+        />
+      </head>
       <body className={kongtext.className}>
         <WalletProvider>{children}</WalletProvider>
         <GeoTargetly />
