@@ -167,7 +167,7 @@ module aptogotchi::main {
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
 
         let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<AptoGotchi>(token_address);
+        let gotchi = borrow_global<AptoGotchi>(token_address);
 
         let gotchi_signer_ref = &object::generate_signer_for_extending(&gotchi.extend_ref);
         move_to(
