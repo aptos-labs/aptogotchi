@@ -41,8 +41,14 @@ module aptogotchi::main {
         birthday: u64,
         energy_points: u64,
         parts: vector<u8>,
+        extend_ref: object::ExtendRef,
         mutator_ref: token::MutatorRef,
         burn_ref: token::BurnRef,
+    }
+
+    struct AptoGotchiFightExt has key {
+        attack_point: u64,
+        defense_point: u64
     }
 
     // Tokens require a signer to create, so this is the signer for the collection
@@ -112,7 +118,7 @@ module aptogotchi::main {
         let token_name = to_string(&user_addr);
         assert!(!has_aptogotchi(user_addr), error::already_exists(EUSER_ALREADY_HAS_APTOGOTCHI));
 
-        let constructor_ref = token::create_named_token(
+        let constructor_ref = &token::create_named_token(
             &get_app_signer(),
             string::utf8(APTOGOTCHI_COLLECTION_NAME),
             description,
@@ -121,10 +127,12 @@ module aptogotchi::main {
             uri,
         );
 
-        let token_signer = object::generate_signer(&constructor_ref);
-        let mutator_ref = token::generate_mutator_ref(&constructor_ref);
-        let burn_ref = token::generate_burn_ref(&constructor_ref);
-        let transfer_ref = object::generate_transfer_ref(&constructor_ref);
+        let token_signer = object::generate_signer(constructor_ref);
+        let extend_ref = object::generate_extend_ref(constructor_ref);
+
+        let mutator_ref = token::generate_mutator_ref(constructor_ref);
+        let burn_ref = token::generate_burn_ref(constructor_ref);
+        let transfer_ref = object::generate_transfer_ref(constructor_ref);
 
         // initialize/set default Aptogotchi struct values
         let gotchi = AptoGotchi {
@@ -132,6 +140,7 @@ module aptogotchi::main {
             birthday: timestamp::now_seconds(),
             energy_points: ENERGY_UPPER_BOUND,
             parts,
+            extend_ref,
             mutator_ref,
             burn_ref,
         };
@@ -148,6 +157,26 @@ module aptogotchi::main {
         );
 
         object::transfer_with_ref(object::generate_linear_transfer_ref(&transfer_ref), address_of(user));
+    }
+
+    // Gotchi owner calls this function to evolve its gotchi, adding AptoGotchiFightExt to the gotchi object.
+    entry fun evolve(owner: &signer) acquires AptoGotchi {
+        // get extend ref
+        let owner_addr = signer::address_of(owner);
+        // if this address doesn't have an Aptogotchi, throw error
+        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
+
+        let token_address = get_aptogotchi_address(&owner_addr);
+        let gotchi = borrow_global_mut<AptoGotchi>(token_address);
+
+        let gotchi_signer_ref = &object::generate_signer_for_extending(&gotchi.extend_ref);
+        move_to(
+            gotchi_signer_ref,
+            AptoGotchiFightExt {
+                attack_point: 1,
+                defense_point: 1
+            }
+        );
     }
 
     // Get reference to Aptogotchi token object (CAN'T modify the reference)
