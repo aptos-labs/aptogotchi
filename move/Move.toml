@@ -1,21 +1,15 @@
 [package]
-name = 'aptogotchi'
-version = '1.0.0'
+name = "aptogotchi"
+version = "1.0.0"
 upgrade_policy = "compatible"
 
 [addresses]
-aptogotchi = '_'
+aptogotchi = "_"
 
-# used for testing so you don't need to manually pass in the address in cli
+[dependencies]
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "main", subdir = "aptos-move/framework/aptos-framework"}
+AptosTokenObjects = {git = "https://github.com/aptos-labs/aptos-core.git", rev = "main", subdir = "aptos-move/framework/aptos-token-objects"}
+
+# For use when developing and testing this module
 [dev-addresses]
 aptogotchi = "0x100"
-
-[dependencies.AptosFramework]
-git = 'https://github.com/aptos-labs/aptos-core.git'
-rev = 'main'
-subdir = 'aptos-move/framework/aptos-framework'
-
-[dependencies.AptosTokenObjects]
-git = 'https://github.com/aptos-labs/aptos-core.git'
-rev = 'main'
-subdir = 'aptos-move/framework/aptos-token-objects'
