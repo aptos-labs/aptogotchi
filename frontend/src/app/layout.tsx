@@ -22,7 +22,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <head>
         <meta
           name="google-site-verification"
-          content="g6FhXGZrANwOhvvKqpNJ-mlE0kgWxTj6KGMh9qfF9oo"
+          content="Rnm3DL87HNmPncIFwBLXPhy-WGFDXIyplSL4fRtnFsA"
         />
       </head>
       <body className={kongtext.className}>
