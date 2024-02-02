@@ -4,6 +4,7 @@ module aptogotchi::main {
     use aptos_framework::object;
     use aptos_framework::timestamp;
     use aptos_framework::object::ExtendRef;
+    use aptos_framework::randomness;
     use aptos_std::string_utils::{to_string};
     use aptos_token_objects::collection;
     use aptos_token_objects::token;
@@ -120,9 +121,6 @@ module aptogotchi::main {
     public entry fun create_aptogotchi(
         user: &signer,
         name: String,
-        body: u8,
-        ear: u8,
-        face: u8,
     ) acquires CollectionCapability, MintAptogotchiEvents {
         assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
         assert!(
@@ -145,6 +143,8 @@ module aptogotchi::main {
             face,
         };
         assert!(!has_aptogotchi(user_addr), error::already_exists(EUSER_ALREADY_HAS_APTOGOTCHI));
+
+        let parts = vector[randomness::u8_range(0,)];
 
         let constructor_ref = token::create_named_token(
             &get_app_signer(),

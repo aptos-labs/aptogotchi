@@ -7,8 +7,8 @@ upgrade_policy = "compatible"
 aptogotchi = "_"
 
 [dependencies]
-AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "main", subdir = "aptos-move/framework/aptos-framework"}
-AptosTokenObjects = {git = "https://github.com/aptos-labs/aptos-core.git", rev = "main", subdir = "aptos-move/framework/aptos-token-objects"}
+AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "randomnet", subdir = "aptos-move/framework/aptos-framework" }
+AptosTokenObjects = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "randomnet", subdir = "aptos-move/framework/aptos-token-objects" }
 
 # For use when developing and testing this module
 [dev-addresses]
