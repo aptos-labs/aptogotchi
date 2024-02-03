@@ -12,35 +12,47 @@ module aptogotchi::main {
     use std::signer::address_of;
     use std::signer;
     use std::string::{Self, String};
-    use std::vector;
 
     /// aptogotchi not available
     const ENOT_AVAILABLE: u64 = 1;
-    const EPARTS_LIMIT: u64 = 2;
-    const ENAME_LIMIT: u64 = 3;
-    const EUSER_ALREADY_HAS_APTOGOTCHI: u64 = 4;
-
+    /// name length exceeded limit
+    const ENAME_LIMIT: u64 = 2;
+    /// user already has aptogotchi
+    const EUSER_ALREADY_HAS_APTOGOTCHI: u64 = 3;
+    /// invalid body value
+    const EBODY_VALUE_INVALID: u64 = 4;
+    /// invalid ear value
+    const EEAR_VALUE_INVALID: u64 = 5;
+    /// invalid face value
+    const EFACE_VALUE_INVALID: u64 = 6;
 
     // maximum health points: 5 hearts * 2 HP/heart = 10 HP
     const ENERGY_UPPER_BOUND: u64 = 10;
     const NAME_UPPER_BOUND: u64 = 40;
-    const PARTS_SIZE: u64 = 3;
-
 
     struct MintAptogotchiEvents has key {
         mint_aptogotchi_events: event::EventHandle<MintAptogotchiEvent>,
     }
 
     struct MintAptogotchiEvent has drop, store {
+        token_name: String,
         aptogotchi_name: String,
-        parts: vector<u8>,
+        body: u8,
+        ear: u8,
+        face: u8,
     }
 
-    struct AptoGotchi has key {
+    struct AptogotchiParts has key, store {
+        body: u8,
+        ear: u8,
+        face: u8,
+    }
+
+    struct Aptogotchi has key {
         name: String,
         birthday: u64,
         energy_points: u64,
-        parts: vector<u8>,
+        parts: AptogotchiParts,
         mutator_ref: token::MutatorRef,
         burn_ref: token::BurnRef,
     }
@@ -54,6 +66,13 @@ module aptogotchi::main {
     const APTOGOTCHI_COLLECTION_NAME: vector<u8> = b"Aptogotchi Collection";
     const APTOGOTCHI_COLLECTION_DESCRIPTION: vector<u8> = b"Aptogotchi Collection Description";
     const APTOGOTCHI_COLLECTION_URI: vector<u8> = b"https://otjbxblyfunmfblzdegw.supabase.co/storage/v1/object/public/aptogotchi/aptogotchi.png";
+    // Body value range is [0, 4] inslusive
+    const BODY_MAX_VALUE: u8 = 4;
+    // Ear value range is [0, 5] inslusive
+    const EAR_MAX_VALUE: u8 = 6;
+    // Face value range is [0, 3] inslusive
+    const FACE_MAX_VALUE: u8 = 3;
+
 
     // This function is only called once when the module is published for the first time.
     fun init_module(account: &signer) {
@@ -102,10 +121,21 @@ module aptogotchi::main {
     public entry fun create_aptogotchi(
         user: &signer,
         name: String,
-        parts: vector<u8>
+        body: u8,
+        ear: u8,
+        face: u8,
     ) acquires CollectionCapability, MintAptogotchiEvents {
-        assert!(vector::length(&parts) == PARTS_SIZE, error::invalid_argument(EPARTS_LIMIT));
         assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
+        assert!(
+            body >= 0 && body <= BODY_MAX_VALUE,
+            error::invalid_argument(EBODY_VALUE_INVALID)
+        );
+        assert!(ear >= 0 && ear <= EAR_MAX_VALUE, error::invalid_argument(EEAR_VALUE_INVALID));
+        assert!(
+            face >= 0 && face <= FACE_MAX_VALUE,
+            error::invalid_argument(EFACE_VALUE_INVALID)
+        );
+
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
         let user_addr = address_of(user);
@@ -127,11 +157,15 @@ module aptogotchi::main {
         let transfer_ref = object::generate_transfer_ref(&constructor_ref);
 
         // initialize/set default Aptogotchi struct values
-        let gotchi = AptoGotchi {
+        let gotchi = Aptogotchi {
             name,
             birthday: timestamp::now_seconds(),
             energy_points: ENERGY_UPPER_BOUND,
-            parts,
+            parts: AptogotchiParts {
+                body,
+                ear,
+                face,
+            },
             mutator_ref,
             burn_ref,
         };
@@ -142,8 +176,11 @@ module aptogotchi::main {
         event::emit_event<MintAptogotchiEvent>(
             &mut borrow_global_mut<MintAptogotchiEvents>(@aptogotchi).mint_aptogotchi_events,
             MintAptogotchiEvent {
+                token_name,
                 aptogotchi_name: name,
-                parts,
+                body,
+                ear,
+                face,
             },
         );
 
@@ -176,7 +213,7 @@ module aptogotchi::main {
     #[view]
     public fun has_aptogotchi(owner_addr: address): (bool) {
         let token_address = get_aptogotchi_address(&owner_addr);
-        let has_gotchi = exists<AptoGotchi>(token_address);
+        let has_gotchi = exists<Aptogotchi>(token_address);
 
         has_gotchi
     }
@@ -185,52 +222,32 @@ module aptogotchi::main {
     #[view]
     public fun get_aptogotchi(
         owner_addr: address
-    ): (String, u64, u64, vector<u8>) acquires AptoGotchi {
+    ): (String, u64, u64, u8, u8, u8) acquires Aptogotchi {
         // if this address doesn't have an Aptogotchi, throw error
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
 
         let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<AptoGotchi>(token_address);
+        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
 
         // view function can only return primitive types.
-        (gotchi.name, gotchi.birthday, gotchi.energy_points, gotchi.parts)
-    }
-
-    // Returns Aptogotchi's name
-    #[view]
-    public fun get_name(owner_addr: address): String acquires AptoGotchi {
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global<AptoGotchi>(token_address);
-
-        gotchi.name
+        (gotchi.name, gotchi.birthday, gotchi.energy_points, gotchi.parts.body, gotchi.parts.ear, gotchi.parts.face, )
     }
 
     // Sets Aptogotchi's name
-    public entry fun set_name(owner: signer, name: String) acquires AptoGotchi {
+    public entry fun set_name(owner: signer, name: String) acquires Aptogotchi {
         let owner_addr = signer::address_of(&owner);
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
         assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
         let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<AptoGotchi>(token_address);
+        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
         gotchi.name = name;
     }
 
-    #[view]
-    public fun get_energy_points(owner_addr: address): u64 acquires AptoGotchi {
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-
-        let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global<AptoGotchi>(token_address);
-
-        gotchi.energy_points
-    }
-
-    public entry fun feed(owner: &signer, points: u64) acquires AptoGotchi {
+    public entry fun feed(owner: &signer, points: u64) acquires Aptogotchi {
         let owner_addr = signer::address_of(owner);
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
         let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<AptoGotchi>(token_address);
+        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
 
         gotchi.energy_points = if (gotchi.energy_points + points > ENERGY_UPPER_BOUND) {
             ENERGY_UPPER_BOUND
@@ -239,11 +256,11 @@ module aptogotchi::main {
         };
     }
 
-    public entry fun play(owner: &signer, points: u64) acquires AptoGotchi {
+    public entry fun play(owner: &signer, points: u64) acquires Aptogotchi {
         let owner_addr = signer::address_of(owner);
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
         let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<AptoGotchi>(token_address);
+        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
 
         gotchi.energy_points = if (gotchi.energy_points < points) {
             0
@@ -252,26 +269,15 @@ module aptogotchi::main {
         };
     }
 
-    // Returns Aptogotchi's body parts
-    #[view]
-    public fun get_parts(owner_addr: address): vector<u8> acquires AptoGotchi {
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-
-
-        let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global<AptoGotchi>(token_address);
-
-        gotchi.parts
-    }
-
-    // Sets Aptogotchi's body parts
-    public entry fun set_parts(owner: &signer, parts: vector<u8>) acquires AptoGotchi {
+    // Sets Aptogotchi's parts
+    public entry fun set_parts(owner: &signer, body: u8, ear: u8, face: u8, ) acquires Aptogotchi {
         let owner_addr = signer::address_of(owner);
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        assert!(vector::length(&parts) == PARTS_SIZE, error::invalid_argument(EPARTS_LIMIT));
         let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<AptoGotchi>(token_address);
-        gotchi.parts = parts;
+        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
+        gotchi.parts.body = body;
+        gotchi.parts.ear = ear;
+        gotchi.parts.face = face;
     }
 
     // ==== TESTS ====
@@ -300,7 +306,7 @@ module aptogotchi::main {
     ) acquires CollectionCapability, MintAptogotchiEvents {
         setup_test(aptos, account, creator);
 
-        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1]);
+        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
 
         let has_aptogotchi = has_aptogotchi(signer::address_of(creator));
         assert!(has_aptogotchi, 1);
@@ -313,7 +319,7 @@ module aptogotchi::main {
         aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires AptoGotchi {
+    ) acquires Aptogotchi {
         setup_test(aptos, account, creator);
 
         // get aptogotchi without creating it
@@ -326,24 +332,26 @@ module aptogotchi::main {
         aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires CollectionCapability, MintAptogotchiEvents, AptoGotchi {
+    ) acquires CollectionCapability, MintAptogotchiEvents, Aptogotchi {
         setup_test(aptos, account, creator);
+        let creator_address = signer::address_of(creator);
+        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
 
-        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1]);
-
-        assert!(get_energy_points(signer::address_of(creator)) == ENERGY_UPPER_BOUND, 1);
+        let (_, _, energe_point_1, _, _, _) = get_aptogotchi(creator_address);
+        assert!(energe_point_1 == ENERGY_UPPER_BOUND, 1);
 
         play(creator, 5);
-        assert!(get_energy_points(signer::address_of(creator)) == ENERGY_UPPER_BOUND - 5, 1);
+        let (_, _, energe_point_2, _, _, _) = get_aptogotchi(creator_address);
+        assert!(energe_point_2 == ENERGY_UPPER_BOUND - 5, 1);
 
         feed(creator, 3);
-        assert!(get_energy_points(signer::address_of(creator)) == ENERGY_UPPER_BOUND - 2, 1);
+        let (_, _, energe_point_3, _, _, _) = get_aptogotchi(creator_address);
+        assert!(energe_point_3 == ENERGY_UPPER_BOUND - 2, 1);
     }
 
     // Test getting an Aptogotchi, when user has not minted
     #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    #[expected_failure(abort_code = 524292, location = aptogotchi::main)]
-
+    #[expected_failure(abort_code = 524291, location = aptogotchi::main)]
     fun test_create_aptogotchi_twice(
         aptos: &signer,
         account: &signer,
@@ -351,7 +359,7 @@ module aptogotchi::main {
     ) acquires CollectionCapability, MintAptogotchiEvents {
         setup_test(aptos, account, creator);
 
-        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1]);
-        create_aptogotchi(creator, utf8(b"test"), vector[1, 1, 1]);
+        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
+        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
     }
 }

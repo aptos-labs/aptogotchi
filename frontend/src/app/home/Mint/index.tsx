@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
-import { ShufflePetImage } from "../Pet/ShufflePetImage";
+import { ShufflePetImage } from "@/app/home/Pet/ShufflePetImage";
+import { DEFAULT_PET, PetParts } from "@/app/home/Pet";
 
 const aptosClient = getAptosClient();
 
@@ -12,7 +13,7 @@ export interface MintProps {
 
 export function Mint({ fetchPet }: MintProps) {
   const [newName, setNewName] = useState<string>("");
-  const [petParts, setPetParts] = useState<number[]>([0, 0, 0]);
+  const [petParts, setPetParts] = useState<PetParts>(DEFAULT_PET.parts);
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
 
@@ -22,15 +23,21 @@ export function Mint({ fetchPet }: MintProps) {
     if (!account || !network) return;
 
     setTransactionInProgress(true);
-    const payload = {
-      type: "entry_function_payload",
-      function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
-      type_arguments: [],
-      arguments: [newName, petParts],
-    };
 
     try {
-      const response = await signAndSubmitTransaction(payload);
+      const response = await signAndSubmitTransaction({
+        sender: account.address,
+        data: {
+          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
+          typeArguments: [],
+          functionArguments: [
+            newName,
+            petParts.body,
+            petParts.ear,
+            petParts.face,
+          ],
+        },
+      });
       await aptosClient.waitForTransaction({
         transactionHash: response.hash,
       });

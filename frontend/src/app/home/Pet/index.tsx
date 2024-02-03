@@ -10,8 +10,24 @@ import { AptogotchiCollection } from "@/components/AptogotchiCollection";
 export interface Pet {
   name: string;
   energy_points: number;
-  parts: number[];
+  parts: PetParts;
 }
+
+export interface PetParts {
+  body: number;
+  ear: number;
+  face: number;
+}
+
+export const DEFAULT_PET = {
+  name: "Unknown",
+  energy_points: 0,
+  parts: {
+    body: 0,
+    ear: 0,
+    face: 0,
+  },
+};
 
 interface PetProps {
   pet: Pet;
@@ -28,11 +44,7 @@ export function Pet({ pet, setPet }: PetProps) {
           <PetImage
             pet={pet}
             selectedAction={selectedAction}
-            petParts={{
-              body: bodies[pet.parts[0]],
-              ears: ears[pet.parts[1]],
-              face: faces[pet.parts[2]],
-            }}
+            petParts={pet.parts}
             avatarStyle
           />
           <PetDetails pet={pet} setPet={setPet} />

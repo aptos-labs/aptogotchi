@@ -19,19 +19,28 @@ export function Connected() {
   const fetchPet = useCallback(async () => {
     if (!account?.address) return;
 
-    const [name, _, energyPoints, parts] = await aptosClient.view({
+    const [hasPet] = await aptosClient.view({
       payload: {
-        function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+        function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::has_aptogotchi`,
         functionArguments: [account.address],
       },
     });
-
-    const noPet = { name: "", birthday: 0, energyPoints: 0, parts: "0x" };
-    if (name !== noPet.name) {
+    if (hasPet as boolean) {
+      const response = await aptosClient.view({
+        payload: {
+          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+          functionArguments: [account.address],
+        },
+      });
+      const [name, _, energyPoints, body, ear, face] = response;
       setPet({
         name: name as string,
         energy_points: parseInt(energyPoints as string),
-        parts: (parts as string).split("0").slice(2).map(Number),
+        parts: {
+          body: parseInt(body as string),
+          ear: parseInt(ear as string),
+          face: parseInt(face as string),
+        },
       });
     }
   }, [account?.address]);
