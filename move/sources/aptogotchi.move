@@ -30,19 +30,8 @@ module aptogotchi::main {
     const ENERGY_UPPER_BOUND: u64 = 10;
     const NAME_UPPER_BOUND: u64 = 40;
 
-    struct MintAptogotchiEvents has key {
-        mint_aptogotchi_events: event::EventHandle<MintAptogotchiEvent>,
-    }
 
-    struct MintAptogotchiEvent has drop, store {
-        token_name: String,
-        aptogotchi_name: String,
-        body: u8,
-        ear: u8,
-        face: u8,
-    }
-
-    struct AptogotchiParts has key, store {
+    struct AptogotchiParts has copy, drop, key, store {
         body: u8,
         ear: u8,
         face: u8,
@@ -55,6 +44,16 @@ module aptogotchi::main {
         parts: AptogotchiParts,
         mutator_ref: token::MutatorRef,
         burn_ref: token::BurnRef,
+    }
+
+    struct MintAptogotchiEvents has key {
+        mint_aptogotchi_events: event::EventHandle<MintAptogotchiEvent>,
+    }
+
+    struct MintAptogotchiEvent has drop, store {
+        token_name: String,
+        aptogotchi_name: String,
+        parts: AptogotchiParts,
     }
 
     // Tokens require a signer to create, so this is the signer for the collection
@@ -140,6 +139,11 @@ module aptogotchi::main {
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
         let user_addr = address_of(user);
         let token_name = to_string(&user_addr);
+        let parts = AptogotchiParts {
+            body,
+            ear,
+            face,
+        };
         assert!(!has_aptogotchi(user_addr), error::already_exists(EUSER_ALREADY_HAS_APTOGOTCHI));
 
         let constructor_ref = token::create_named_token(
@@ -161,11 +165,7 @@ module aptogotchi::main {
             name,
             birthday: timestamp::now_seconds(),
             energy_points: ENERGY_UPPER_BOUND,
-            parts: AptogotchiParts {
-                body,
-                ear,
-                face,
-            },
+            parts,
             mutator_ref,
             burn_ref,
         };
@@ -178,9 +178,7 @@ module aptogotchi::main {
             MintAptogotchiEvent {
                 token_name,
                 aptogotchi_name: name,
-                body,
-                ear,
-                face,
+                parts,
             },
         );
 
@@ -280,11 +278,7 @@ module aptogotchi::main {
         let gotchi = borrow_global<Aptogotchi>(token_address);
 
         // view function can only return primitive types.
-        (gotchi.name, gotchi.birthday, gotchi.energy_points, AptogotchiParts {
-            body: gotchi.parts.body,
-            ear: gotchi.parts.ear,
-            face: gotchi.parts.face,
-        })
+        (gotchi.name, gotchi.birthday, gotchi.energy_points, gotchi.parts)
     }
 
     // ==== TESTS ====
