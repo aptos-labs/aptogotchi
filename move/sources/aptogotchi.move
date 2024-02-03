@@ -187,10 +187,60 @@ module aptogotchi::main {
         object::transfer_with_ref(object::generate_linear_transfer_ref(&transfer_ref), address_of(user));
     }
 
+    // Sets aptogotchi's name
+    public entry fun set_name(owner: signer, name: String) acquires Aptogotchi {
+        let owner_addr = signer::address_of(&owner);
+        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
+        assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
+        let token_address = get_aptogotchi_address(owner_addr);
+        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
+        gotchi.name = name;
+    }
+
+    // Feeds aptogotchi to increase its energy points
+    public entry fun feed(owner: &signer, points: u64) acquires Aptogotchi {
+        let owner_addr = signer::address_of(owner);
+        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
+        let token_address = get_aptogotchi_address(owner_addr);
+        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
+
+        gotchi.energy_points = if (gotchi.energy_points + points > ENERGY_UPPER_BOUND) {
+            ENERGY_UPPER_BOUND
+        } else {
+            gotchi.energy_points + points
+        };
+    }
+
+    // Plays with aptogotchi to consume its energy points
+    public entry fun play(owner: &signer, points: u64) acquires Aptogotchi {
+        let owner_addr = signer::address_of(owner);
+        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
+        let token_address = get_aptogotchi_address(owner_addr);
+        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
+
+        gotchi.energy_points = if (gotchi.energy_points < points) {
+            0
+        } else {
+            gotchi.energy_points - points
+        };
+    }
+
+    // Sets Aptogotchi's parts
+    public entry fun set_parts(owner: &signer, body: u8, ear: u8, face: u8, ) acquires Aptogotchi {
+        let owner_addr = signer::address_of(owner);
+        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
+        let token_address = get_aptogotchi_address(owner_addr);
+        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
+        gotchi.parts.body = body;
+        gotchi.parts.ear = ear;
+        gotchi.parts.face = face;
+    }
+
     // Get reference to Aptogotchi token object (CAN'T modify the reference)
-    fun get_aptogotchi_address(creator_addr: &address): (address) {
+    #[view]
+    fun get_aptogotchi_address(creator_addr: address): (address) {
         let collection = string::utf8(APTOGOTCHI_COLLECTION_NAME);
-        let token_name = to_string(creator_addr);
+        let token_name = to_string(&creator_addr);
         let creator_addr = get_app_signer_addr();
         let token_address = token::create_token_address(
             &creator_addr,
@@ -212,7 +262,7 @@ module aptogotchi::main {
     // Returns true if this address owns an Aptogotchi
     #[view]
     public fun has_aptogotchi(owner_addr: address): (bool) {
-        let token_address = get_aptogotchi_address(&owner_addr);
+        let token_address = get_aptogotchi_address(owner_addr);
         let has_gotchi = exists<Aptogotchi>(token_address);
 
         has_gotchi
@@ -222,62 +272,19 @@ module aptogotchi::main {
     #[view]
     public fun get_aptogotchi(
         owner_addr: address
-    ): (String, u64, u64, u8, u8, u8) acquires Aptogotchi {
+    ): (String, u64, u64, AptogotchiParts) acquires Aptogotchi {
         // if this address doesn't have an Aptogotchi, throw error
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
 
-        let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
+        let token_address = get_aptogotchi_address(owner_addr);
+        let gotchi = borrow_global<Aptogotchi>(token_address);
 
         // view function can only return primitive types.
-        (gotchi.name, gotchi.birthday, gotchi.energy_points, gotchi.parts.body, gotchi.parts.ear, gotchi.parts.face, )
-    }
-
-    // Sets Aptogotchi's name
-    public entry fun set_name(owner: signer, name: String) acquires Aptogotchi {
-        let owner_addr = signer::address_of(&owner);
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
-        let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
-        gotchi.name = name;
-    }
-
-    public entry fun feed(owner: &signer, points: u64) acquires Aptogotchi {
-        let owner_addr = signer::address_of(owner);
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
-
-        gotchi.energy_points = if (gotchi.energy_points + points > ENERGY_UPPER_BOUND) {
-            ENERGY_UPPER_BOUND
-        } else {
-            gotchi.energy_points + points
-        };
-    }
-
-    public entry fun play(owner: &signer, points: u64) acquires Aptogotchi {
-        let owner_addr = signer::address_of(owner);
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
-
-        gotchi.energy_points = if (gotchi.energy_points < points) {
-            0
-        } else {
-            gotchi.energy_points - points
-        };
-    }
-
-    // Sets Aptogotchi's parts
-    public entry fun set_parts(owner: &signer, body: u8, ear: u8, face: u8, ) acquires Aptogotchi {
-        let owner_addr = signer::address_of(owner);
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        let token_address = get_aptogotchi_address(&owner_addr);
-        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
-        gotchi.parts.body = body;
-        gotchi.parts.ear = ear;
-        gotchi.parts.face = face;
+        (gotchi.name, gotchi.birthday, gotchi.energy_points, AptogotchiParts {
+            body: gotchi.parts.body,
+            ear: gotchi.parts.ear,
+            face: gotchi.parts.face,
+        })
     }
 
     // ==== TESTS ====
@@ -337,15 +344,15 @@ module aptogotchi::main {
         let creator_address = signer::address_of(creator);
         create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
 
-        let (_, _, energe_point_1, _, _, _) = get_aptogotchi(creator_address);
+        let (_, _, energe_point_1, _) = get_aptogotchi(creator_address);
         assert!(energe_point_1 == ENERGY_UPPER_BOUND, 1);
 
         play(creator, 5);
-        let (_, _, energe_point_2, _, _, _) = get_aptogotchi(creator_address);
+        let (_, _, energe_point_2, _) = get_aptogotchi(creator_address);
         assert!(energe_point_2 == ENERGY_UPPER_BOUND - 5, 1);
 
         feed(creator, 3);
-        let (_, _, energe_point_3, _, _, _) = get_aptogotchi(creator_address);
+        let (_, _, energe_point_3, _) = get_aptogotchi(creator_address);
         assert!(energe_point_3 == ENERGY_UPPER_BOUND - 2, 1);
     }
 
