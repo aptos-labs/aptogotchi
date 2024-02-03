@@ -3,13 +3,13 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { Actions, PetAction } from "./Actions";
 import { PetDetails } from "./Details";
-import { PetImage, bodies, ears, faces } from "./Image";
+import { PetImage } from "./Image";
 import { Summary } from "./Summary";
 import { AptogotchiCollection } from "@/components/AptogotchiCollection";
 
 export interface Pet {
   name: string;
-  birthday: string;
+  birthday: number;
   energy_points: number;
   parts: PetParts;
 }

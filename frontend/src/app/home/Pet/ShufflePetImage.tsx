@@ -12,6 +12,7 @@ import {
 
 const defaultPet: Pet = {
   name: "Unknown",
+  birthday: 0,
   energy_points: 0,
   parts: {
     body: 0,

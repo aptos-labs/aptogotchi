@@ -36,8 +36,8 @@ export function Connected() {
       const typedParts = parts as { body: number; ear: number; face: number };
       setPet({
         name: name as string,
-        birthday: birthday as string,
-        energy_points: parseInt(energyPoints as string),
+        birthday: birthday as number,
+        energy_points: energyPoints as number,
         parts: typedParts,
       });
     }
