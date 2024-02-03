@@ -224,7 +224,7 @@ module aptogotchi::main {
     }
 
     // Sets Aptogotchi's parts
-    public entry fun set_parts(owner: &signer, body: u8, ear: u8, face: u8, ) acquires Aptogotchi {
+    public entry fun set_parts(owner: &signer, body: u8, ear: u8, face: u8) acquires Aptogotchi {
         let owner_addr = signer::address_of(owner);
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
         let token_address = get_aptogotchi_address(owner_addr);

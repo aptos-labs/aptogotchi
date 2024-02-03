@@ -32,15 +32,13 @@ export function Connected() {
           functionArguments: [account.address],
         },
       });
-      const [name, _, energyPoints, body, ear, face] = response;
+      const [name, birthday, energyPoints, parts] = response;
+      const typedParts = parts as { body: number; ear: number; face: number };
       setPet({
         name: name as string,
+        birthday: birthday as string,
         energy_points: parseInt(energyPoints as string),
-        parts: {
-          body: parseInt(body as string),
-          ear: parseInt(ear as string),
-          face: parseInt(face as string),
-        },
+        parts: typedParts,
       });
     }
   }, [account?.address]);

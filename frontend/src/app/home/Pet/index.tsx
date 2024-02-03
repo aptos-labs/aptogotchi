@@ -9,6 +9,7 @@ import { AptogotchiCollection } from "@/components/AptogotchiCollection";
 
 export interface Pet {
   name: string;
+  birthday: string;
   energy_points: number;
   parts: PetParts;
 }
