@@ -10,17 +10,6 @@ import {
   NEXT_PUBLIC_FACE_OPTIONS,
 } from "@/utils/env";
 
-const defaultPet: Pet = {
-  name: "Unknown",
-  birthday: 0,
-  energy_points: 0,
-  parts: {
-    body: 0,
-    ear: 0,
-    face: 0,
-  },
-};
-
 export function ShufflePetImage({
   petParts,
   setPetParts,
@@ -39,7 +28,7 @@ export function ShufflePetImage({
 
   return (
     <div className="flex flex-col gap-6 self-center">
-      <PetImage pet={defaultPet} petParts={petParts} />
+      <PetImage petParts={petParts} />
       <ShuffleButton handleShuffle={handleShuffle} />
     </div>
   );

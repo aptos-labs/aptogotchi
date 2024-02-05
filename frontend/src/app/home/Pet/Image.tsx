@@ -1,11 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Pet, PetParts } from "@/app/home/Pet";
+import { PetParts } from "@/app/home/Pet";
 import { PetAction } from "@/app/home/Pet/Actions";
 
 export interface PetImageProps {
-  pet: Pet;
   selectedAction?: PetAction;
   petParts: PetParts;
   avatarStyle?: boolean;

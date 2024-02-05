@@ -43,7 +43,6 @@ export function Pet({ pet, setPet }: PetProps) {
       <div className="flex flex-row self-center gap-12">
         <div className="flex flex-col gap-4 w-[360px]">
           <PetImage
-            pet={pet}
             selectedAction={selectedAction}
             petParts={pet.parts}
             avatarStyle
