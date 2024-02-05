@@ -118,20 +118,16 @@ module aptogotchi::main {
     }
 
     // Create an Aptogotchi token object
-    public entry fun create_aptogotchi(
+    // Because this function calls random it must not be public so user can only call it from a transaction instead of another contract.
+    // This prevents users seeing the result of random and act on it, e.g. see the mint result and abort if they don't like it.
+    entry fun create_aptogotchi(
         user: &signer,
         name: String,
     ) acquires CollectionCapability, MintAptogotchiEvents {
         assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
-        assert!(
-            body >= 0 && body <= BODY_MAX_VALUE,
-            error::invalid_argument(EBODY_VALUE_INVALID)
-        );
-        assert!(ear >= 0 && ear <= EAR_MAX_VALUE, error::invalid_argument(EEAR_VALUE_INVALID));
-        assert!(
-            face >= 0 && face <= FACE_MAX_VALUE,
-            error::invalid_argument(EFACE_VALUE_INVALID)
-        );
+        let body = randomness::u8_range(0, BODY_MAX_VALUE + 1);
+        let ear = randomness::u8_range(0, EAR_MAX_VALUE + 1);
+        let face = randomness::u8_range(0, FACE_MAX_VALUE + 1);
 
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
@@ -143,8 +139,6 @@ module aptogotchi::main {
             face,
         };
         assert!(!has_aptogotchi(user_addr), error::already_exists(EUSER_ALREADY_HAS_APTOGOTCHI));
-
-        let parts = vector[randomness::u8_range(0,)];
 
         let constructor_ref = token::create_named_token(
             &get_app_signer(),
@@ -287,9 +281,20 @@ module aptogotchi::main {
     use aptos_framework::account::create_account_for_test;
     #[test_only]
     use std::string::utf8;
+    #[test_only]
+    use aptos_std::crypto_algebra::enable_cryptography_algebra_natives;
 
     #[test_only]
-    fun setup_test(aptos: &signer, account: &signer, creator: &signer) {
+    fun setup_test(
+        aptos: &signer,
+        fx: &signer,
+        account: &signer,
+        creator: &signer,
+    ) {
+        enable_cryptography_algebra_natives(fx);
+        randomness::initialize_for_testing(fx);
+        randomness::set_seed(x"0000000000000000000000000000000000000000000000000000000000000000");
+
         // create a fake account (only for testing purposes)
         create_account_for_test(signer::address_of(creator));
         create_account_for_test(signer::address_of(account));
@@ -299,44 +304,62 @@ module aptogotchi::main {
     }
 
     // Test creating an Aptogotchi
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[test(
+        aptos = @0x1,
+        fx = @aptos_framework,
+        account = @aptogotchi,
+        creator = @0x123
+    )]
     fun test_create_aptogotchi(
         aptos: &signer,
+        fx: &signer,
         account: &signer,
         creator: &signer
     ) acquires CollectionCapability, MintAptogotchiEvents {
-        setup_test(aptos, account, creator);
+        setup_test(aptos, fx, account, creator);
 
-        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
+        create_aptogotchi(creator, utf8(b"test"));
 
         let has_aptogotchi = has_aptogotchi(signer::address_of(creator));
         assert!(has_aptogotchi, 1);
     }
 
     // Test getting an Aptogotchi, when user has not minted
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[test(
+        aptos = @0x1,
+        fx = @aptos_framework,
+        account = @aptogotchi,
+        creator = @0x123
+    )]
     #[expected_failure(abort_code = 851969, location = aptogotchi::main)]
     fun test_get_aptogotchi_without_creation(
         aptos: &signer,
+        fx: &signer,
         account: &signer,
         creator: &signer
     ) acquires Aptogotchi {
-        setup_test(aptos, account, creator);
+        setup_test(aptos, fx, account, creator);
 
         // get aptogotchi without creating it
         get_aptogotchi(signer::address_of(creator));
     }
 
     // Test getting an Aptogotchi, when user has not minted
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[test(
+        aptos = @0x1,
+        fx = @aptos_framework,
+        account = @aptogotchi,
+        creator = @0x123
+    )]
     fun test_feed_and_play(
         aptos: &signer,
+        fx: &signer,
         account: &signer,
         creator: &signer
     ) acquires CollectionCapability, MintAptogotchiEvents, Aptogotchi {
-        setup_test(aptos, account, creator);
+        setup_test(aptos, fx, account, creator);
         let creator_address = signer::address_of(creator);
-        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
+        create_aptogotchi(creator, utf8(b"test"));
 
         let (_, _, energe_point_1, _) = get_aptogotchi(creator_address);
         assert!(energe_point_1 == ENERGY_UPPER_BOUND, 1);
@@ -351,16 +374,22 @@ module aptogotchi::main {
     }
 
     // Test getting an Aptogotchi, when user has not minted
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[test(
+        aptos = @0x1,
+        fx = @aptos_framework,
+        account = @aptogotchi,
+        creator = @0x123
+    )]
     #[expected_failure(abort_code = 524291, location = aptogotchi::main)]
     fun test_create_aptogotchi_twice(
         aptos: &signer,
+        fx: &signer,
         account: &signer,
         creator: &signer
     ) acquires CollectionCapability, MintAptogotchiEvents {
-        setup_test(aptos, account, creator);
+        setup_test(aptos, fx, account, creator);
 
-        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
-        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
+        create_aptogotchi(creator, utf8(b"test"));
+        create_aptogotchi(creator, utf8(b"test"));
     }
 }

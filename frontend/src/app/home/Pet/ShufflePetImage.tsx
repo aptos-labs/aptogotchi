@@ -27,9 +27,12 @@ export function ShufflePetImage({
   };
 
   return (
+    // <div className="flex flex-col gap-6 self-center">
+    //   <PetImage pet={defaultPet} petParts={petParts} />
+    //   <ShuffleButton handleShuffle={handleShuffle} />
+    // </div>
     <div className="flex flex-col gap-6 self-center">
       <PetImage petParts={petParts} />
-      <ShuffleButton handleShuffle={handleShuffle} />
     </div>
   );
 }

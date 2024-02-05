@@ -30,12 +30,7 @@ export function Mint({ fetchPet }: MintProps) {
         data: {
           function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
           typeArguments: [],
-          functionArguments: [
-            newName,
-            petParts.body,
-            petParts.ear,
-            petParts.face,
-          ],
+          functionArguments: [newName],
         },
       });
       await aptosClient.waitForTransaction({
