@@ -28,15 +28,15 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
   const handleNameChange = async () => {
     if (!account || !network) return;
 
-    const payload = {
-      type: "entry_function_payload",
-      function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::set_name`,
-      type_arguments: [],
-      arguments: [newName],
-    };
-
     try {
-      const response = await signAndSubmitTransaction(payload);
+      const response = await signAndSubmitTransaction({
+        sender: account.address,
+        data: {
+          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::set_name`,
+          typeArguments: [],
+          functionArguments: [newName],
+        }
+      });
       await aptosClient.waitForTransaction({ transactionHash: response.hash });
 
       setPet((pet) => {

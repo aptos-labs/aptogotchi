@@ -1,26 +1,22 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Pet } from ".";
-import { PetAction } from "./Actions";
+import { Pet, PetParts } from "@/app/home/Pet";
+import { PetAction } from "@/app/home/Pet/Actions";
 
 export interface PetImageProps {
   pet: Pet;
   selectedAction?: PetAction;
-  petParts: {
-    body: string;
-    ears: string;
-    face: string;
-  };
+  petParts: PetParts;
   avatarStyle?: boolean;
 }
 
 export function PetImage(props: PetImageProps) {
   const { avatarStyle, petParts, selectedAction } = props;
   const head = BASE_PATH + "head.png";
-  const body = BASE_PATH + petParts.body;
-  const ears = BASE_PATH + petParts.ears;
-  const face = BASE_PATH + petParts.face;
+  const body = BASE_PATH + bodies[petParts.body];
+  const ear = BASE_PATH + ears[petParts.ear];
+  const face = BASE_PATH + faces[petParts.face];
 
   const imgClass = "absolute top-0 left-0 w-full h-full object-contain";
 
@@ -31,12 +27,13 @@ export function PetImage(props: PetImageProps) {
     <div
       className={`bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative ${
         avatarStyle ? "h-44 w-44" : "h-80 w-80"
-      }`} style={{"paddingTop": "1rem"}}
+      }`}
+      style={{ paddingTop: "1rem" }}
     >
       <div className={`relative h-full w-full ${animation}`}>
         <img src={head} className={imgClass} alt="pet head" />
         <img src={body} className={imgClass} alt="pet body" />
-        <img src={ears} className={imgClass} alt="pet ears" />
+        <img src={ear} className={imgClass} alt="pet ears" />
         <img src={face} className={imgClass} alt="pet face" />
       </div>
     </div>
