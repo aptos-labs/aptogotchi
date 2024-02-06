@@ -14,14 +14,19 @@ export function AptogotchiCollection() {
 
   if (loading || !collection) return null;
 
+  console.log("firstFewAptogotchiName", firstFewAptogotchiName);
+  const firstFewAptogotchiCount = firstFewAptogotchiName?.length || 0;
+
   return (
     <div className="nes-container with-title h-[100px]">
-      <p>{`There are a total of ${collection.current_supply} Aptogotchis in existence.`}</p>
-      <p>{`Meet your fellow Aptogotchis: ${firstFewAptogotchiName?.join(", ")}${
-        (firstFewAptogotchiName?.length || 0) < collection.current_supply
-          ? "..."
-          : ""
-      }`}</p>
+      <p>{`In total there are ${collection.current_supply} Aptogotchis in existence.`}</p>
+      {firstFewAptogotchiCount > 0 && (
+        <p>{`Meet your fellow Aptogotchis: ${firstFewAptogotchiName?.join(
+          ", "
+        )}${
+          firstFewAptogotchiCount < collection.current_supply - 1 ? "..." : ""
+        }`}</p>
+      )}
     </div>
   );
 }

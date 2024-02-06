@@ -20,8 +20,10 @@ type CollectionHolder = {
 };
 
 type CollectionResponse = {
-  current_collections_v2: Collection[];
-  current_collection_ownership_v2_view: CollectionHolder[];
+  data: {
+    current_collections_v2: Collection[];
+    current_collection_ownership_v2_view: CollectionHolder[];
+  };
 };
 
 export function useGetAptogotchiCollection() {
@@ -58,7 +60,7 @@ export function useGetAptogotchiCollection() {
         });
 
       const firstFewAptogotchi = await Promise.all(
-        collectionResponse.current_collection_ownership_v2_view
+        collectionResponse.data.current_collection_ownership_v2_view
           .filter((holder) => holder.owner_address !== account.address)
           // TODO: change to limit 3 in gql after indexer fix limit
           .slice(0, 3)
@@ -72,7 +74,7 @@ export function useGetAptogotchiCollection() {
           )
       );
 
-      setCollection(collectionResponse.current_collections_v2[0]);
+      setCollection(collectionResponse.data.current_collections_v2[0]);
       setFirstFewAptogotchiName(firstFewAptogotchi.map((x) => x[0] as string));
     } catch (error) {
       console.error("Error fetching Aptogotchi collection:", error);

@@ -39,6 +39,24 @@ export function PetImage(props: PetImageProps) {
   );
 }
 
+export function MysteryBoxImage() {
+  return (
+    <div
+      className={
+        "bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative h-80 w-80"
+      }
+      style={{ paddingTop: "1rem" }}
+    >
+      <div className={`relative h-full w-full`}>
+        <img
+          src={BASE_PATH + "mystery_box.png"}
+          className={"absolute top-0 left-0 w-full h-full object-contain"}
+          alt="pet mystery box"
+        />
+      </div>
+    </div>
+  );
+}
 export const BASE_PATH = "/pet-parts/";
 
 export const bodies = [
