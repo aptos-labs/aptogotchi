@@ -1,12 +1,29 @@
-# Aptogotchi (Beginner)
-Aptogotchi is a simple and fun full-stack, end-to-end dApp demonstrating the basics of how to build a dApp using Move. 
+# Aptogotchi (Random mint)
+
+## Difference from main branch (aptogotchi beginner)
+
+Use on chain randomness to randomly get parts of aptogotchi during minting, preventing users from passing parts to the `create_aptogotchi` function.
+
+### Prerequisite
+
+You need to switch to [randomnet](https://explorer.aptoslabs.com/?network=randomnet), which is a standalone network different from mainnet and testnet. It has its own chain ID and you need to get randomnet APT.
+
+To add randomnet to your petra wallet, click add network in setting.
+Name enters `randomnet`.
+Node url enters `https://fullnode.random.aptoslabs.com/v1`.
+Faucet url enters `https://faucet.random.aptoslabs.com`.
+
+## Overview
+
+Aptogotchi is a simple and fun full-stack, end-to-end dApp demonstrating the basics of how to build a dApp using Move.
 
 We introduce the following concepts:
-1. how to create a full-stack dApp 
+
+1. how to create a full-stack dApp
 2. how to connect to smart contracts on the Aptos blockchain
-2. how to integrate with Petra Wallet/Explorer/ANS and other services.
-2. how to create events and use indexer to get off-chain data.
-3. how to write unit tests for the smart contracts.
+3. how to integrate with Petra Wallet/Explorer/ANS and other services.
+4. how to create events and use indexer to get off-chain data.
+5. how to write unit tests for the smart contracts.
 
 This dApp will be used as an educational demo hosted on [Builder Hub](https://github.com/aptos-labs/aptos-builder-hub).
 
