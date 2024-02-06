@@ -117,9 +117,10 @@ module aptogotchi::main {
         );
     }
 
-    // Create an Aptogotchi token object
-    // Because this function calls random it must not be public so user can only call it from a transaction instead of another contract.
-    // This prevents users seeing the result of random and act on it, e.g. see the mint result and abort if they don't like it.
+    // Create an Aptogotchi token object.
+    // Because this function calls random it must not be public.
+    // This ensures user can only call it from a transaction instead of another contract.
+    // This prevents users seeing the result of mint and act on it, e.g. see the result and abort the tx if they don't like it.
     entry fun create_aptogotchi(
         user: &signer,
         name: String,
