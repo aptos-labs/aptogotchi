@@ -46,9 +46,9 @@ export function Mint({ fetchPet }: MintProps) {
     <div className="flex flex-col gap-6 max-w-md self-center m-4">
       <h2 className="text-xl w-full text-center">Create your pet!</h2>
       <p className="w-full text-center">
-        We leverage on chain randomness to create a random look aptogotchi!
+        We leverage on chain randomness to create a random Aptogotchi!
       </p>
-      <div className="nes-field w-full max-w-xs mx-auto">
+      <div className="nes-field w-full max-w-md mx-auto">
         <label htmlFor="name_field">Name</label>
         <input
           type="text"
@@ -58,7 +58,7 @@ export function Mint({ fetchPet }: MintProps) {
           onChange={(e) => setNewName(e.currentTarget.value)}
         />
       </div>
-      <MysteryPetImage />
+      <MysteryPetImage width={300} height={300} />
       <button
         type="button"
         className={`nes-btn ${newName ? "is-success" : "is-disabled"}`}

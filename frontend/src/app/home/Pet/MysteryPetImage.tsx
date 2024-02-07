@@ -3,7 +3,13 @@
 import Lottie from "react-lottie";
 import animationData from "./mystery-box.json";
 
-export function MysteryPetImage() {
+export function MysteryPetImage({
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+}) {
   const defaultOptions = {
     loop: true,
     autoplay: true,
@@ -14,8 +20,8 @@ export function MysteryPetImage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 self-center">
-      <Lottie options={defaultOptions} height={400} width={400} />
+    <div className="flex flex-col gap-2 self-center">
+      <Lottie options={defaultOptions} height={height} width={width} />
     </div>
   );
 }

@@ -11,7 +11,7 @@ export function NotConnected() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <MysteryPetImage />
+      <MysteryPetImage width={500} height={500} />
       <div className="nes-container is-dark with-title">
         <p className="title">Welcome</p>
         <p>{text}</p>
