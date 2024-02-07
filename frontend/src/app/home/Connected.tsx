@@ -14,6 +14,7 @@ const aptosClient = getAptosClient();
 
 export function Connected() {
   const [pet, setPet] = useState<Pet>();
+  const [mintSuccess, setMintSuccess] = useState(false);
   const { account, network } = useWallet();
 
   const fetchPet = useCallback(async () => {
@@ -52,7 +53,11 @@ export function Connected() {
   return (
     <div className="flex flex-col gap-3 p-3">
       {network?.chainId !== RANDOMNET_ID && <Modal />}
-      {pet ? <Pet pet={pet} setPet={setPet} /> : <Mint fetchPet={fetchPet} />}
+      {pet ? (
+        <Pet pet={pet} setPet={setPet} mintSuccess={mintSuccess} />
+      ) : (
+        <Mint fetchPet={fetchPet} onMintSuccess={() => setMintSuccess(true)} />
+      )}
     </div>
   );
 }

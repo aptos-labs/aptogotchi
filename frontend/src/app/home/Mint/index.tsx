@@ -8,9 +8,10 @@ const aptosClient = getAptosClient();
 
 export interface MintProps {
   fetchPet: () => Promise<void>;
+  onMintSuccess: () => void;
 }
 
-export function Mint({ fetchPet }: MintProps) {
+export function Mint({ fetchPet, onMintSuccess }: MintProps) {
   const [newName, setNewName] = useState<string>("");
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
@@ -39,6 +40,7 @@ export function Mint({ fetchPet }: MintProps) {
     } finally {
       fetchPet();
       setTransactionInProgress(false);
+      onMintSuccess();
     }
   };
 
