@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
-import { MysteryPetImage } from "@/app/home/Pet/MysteryPetImage";
+import { MysteryBoxImage } from "@/components/Pet/Image";
 
 const aptosClient = getAptosClient();
 
@@ -58,7 +58,7 @@ export function Mint({ fetchPet }: MintProps) {
           onChange={(e) => setNewName(e.currentTarget.value)}
         />
       </div>
-      <MysteryPetImage />
+      <MysteryBoxImage />
       <button
         type="button"
         className={`nes-btn ${newName ? "is-success" : "is-disabled"}`}

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { PetParts } from "@/app/home/Pet";
+import { PetParts } from "@/components/Pet";
 
 export interface PetImageProps {
   petParts: PetParts;
@@ -36,18 +36,20 @@ export function PetImage(props: PetImageProps) {
 
 export function MysteryBoxImage() {
   return (
-    <div
-      className={
-        "bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative h-80 w-80"
-      }
-      style={{ paddingTop: "1rem" }}
-    >
-      <div className={`relative h-full w-full`}>
-        <img
-          src={BASE_PATH + "mystery_box.png"}
-          className={"absolute top-0 left-0 w-full h-full object-contain"}
-          alt="pet mystery box"
-        />
+    <div className="flex flex-col gap-6 self-center">
+      <div
+        className={
+          "bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative h-80 w-80"
+        }
+        style={{ paddingTop: "1rem" }}
+      >
+        <div className={`relative h-full w-full`}>
+          <img
+            src={BASE_PATH + "mystery_box.png"}
+            className={"absolute top-0 left-0 w-full h-full object-contain"}
+            alt="pet mystery box"
+          />
+        </div>
       </div>
     </div>
   );

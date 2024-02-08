@@ -3,8 +3,9 @@
 import dynamic from "next/dynamic";
 import { PropsWithChildren } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Connected } from "@/app/home/Connected";
-import { NotConnected } from "@/app/home/NotConnected";
+import { Connected } from "@/components/Home/Connected";
+import { NotConnected } from "@/components/Home/NotConnected";
+import { WalletButtons } from "@/components/WalletButtons";
 
 const FixedSizeWrapper = ({ children }: PropsWithChildren) => {
   const fixedStyle = {
@@ -45,14 +46,13 @@ function Header() {
   return (
     <header className="sticky top-0 z-10 flex justify-between items-center px-6 py-4 bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 shadow-md w-full gap-2">
       <h1 className="text-2xl">Aptogotchi</h1>
-      <WalletButtons />
+      <DynamicWalletButtons />
     </header>
   );
 }
 
-const WalletButtons = dynamic(
+const DynamicWalletButtons = dynamic(
   async () => {
-    const { WalletButtons } = await import("@/components/WalletButtons");
     return { default: WalletButtons };
   },
   {

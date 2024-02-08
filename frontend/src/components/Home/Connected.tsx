@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Pet, MyPets, PetParts } from "./Pet";
+import { Pet, MyPets, PetParts } from "../Pet";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Mint } from "./Mint";
+import { Mint } from "../Mint";
 import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
 import { Modal } from "@/components/Modal";
