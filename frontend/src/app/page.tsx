@@ -1,6 +1,10 @@
+"use client";
+
 import dynamic from "next/dynamic";
-import { Body } from "./home/Body";
 import { PropsWithChildren } from "react";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { Connected } from "@/app/home/Connected";
+import { NotConnected } from "@/app/home/NotConnected";
 
 const FixedSizeWrapper = ({ children }: PropsWithChildren) => {
   const fixedStyle = {
@@ -25,11 +29,13 @@ const FixedSizeWrapper = ({ children }: PropsWithChildren) => {
 };
 
 export default function Home() {
+  const { connected } = useWallet();
+
   return (
     <main className="flex flex-col">
       <FixedSizeWrapper>
         <Header />
-        <Body />
+        {connected ? <Connected /> : <NotConnected />}
       </FixedSizeWrapper>
     </main>
   );

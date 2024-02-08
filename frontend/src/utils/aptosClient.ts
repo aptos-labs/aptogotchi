@@ -2,9 +2,7 @@ import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 
 export function getAptosClient() {
   const config = new AptosConfig({
-    network: Network.CUSTOM,
-    fullnode: "https://fullnode.random.aptoslabs.com/v1",
-    indexer: "https://indexer-randomnet.hasura.app/v1/graphql",
+    network: Network.RANDOMNET,
   });
   return new Aptos(config);
 }

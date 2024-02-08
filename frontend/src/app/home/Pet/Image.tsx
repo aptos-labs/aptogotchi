@@ -2,25 +2,20 @@
 "use client";
 
 import { PetParts } from "@/app/home/Pet";
-import { PetAction } from "@/app/home/Pet/Actions";
 
 export interface PetImageProps {
-  selectedAction?: PetAction;
   petParts: PetParts;
   avatarStyle?: boolean;
 }
 
 export function PetImage(props: PetImageProps) {
-  const { avatarStyle, petParts, selectedAction } = props;
+  const { avatarStyle, petParts } = props;
   const head = BASE_PATH + "head.png";
   const body = BASE_PATH + bodies[petParts.body];
   const ear = BASE_PATH + ears[petParts.ear];
   const face = BASE_PATH + faces[petParts.face];
 
   const imgClass = "absolute top-0 left-0 w-full h-full object-contain";
-
-  const animation =
-    selectedAction === "play" ? "animate-wiggle" : "animate-hop";
 
   return (
     <div
@@ -29,7 +24,7 @@ export function PetImage(props: PetImageProps) {
       }`}
       style={{ paddingTop: "1rem" }}
     >
-      <div className={`relative h-full w-full ${animation}`}>
+      <div className="relative h-full w-full">
         <img src={head} className={imgClass} alt="pet head" />
         <img src={body} className={imgClass} alt="pet body" />
         <img src={ear} className={imgClass} alt="pet ears" />
