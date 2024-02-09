@@ -5,6 +5,7 @@ import { getAptosClient } from "@/utils/aptosClient";
 import { PetImage, QuestionMarkImage } from "@/components/Pet";
 import { Pet, PetParts } from "../Pet";
 import { padAddressIfNeeded } from "@/utils/address";
+import Confetti from "react-confetti";
 
 const aptosClient = getAptosClient();
 
@@ -25,6 +26,7 @@ const getAptogotchiByAddress = async (address: string): Promise<Pet> => {
 
 export function Mint() {
   const [myPet, setMyPet] = useState<Pet>();
+  const [mintSucceeded, setMintSucceeded] = useState<boolean>(false);
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
 
@@ -96,14 +98,18 @@ export function Mint() {
     } finally {
       fetchPet();
       setTransactionInProgress(false);
+      setMintSucceeded(true);
     }
   };
 
   return (
     <div className="flex flex-col gap-6 max-w-md self-center m-4">
+      {mintSucceeded && (
+        <Confetti recycle={false} numberOfPieces={3000} tweenDuration={15000} />
+      )}
       <h2 className="text-xl w-full text-center">Create your pet!</h2>
       <p className="w-full text-center">
-        Use on chain randomness to create a random look aptogotchi!
+        Use on chain randomness to create a random Aptogotchi!
       </p>
       <div className="flex flex-col gap-6 self-center">
         <div
