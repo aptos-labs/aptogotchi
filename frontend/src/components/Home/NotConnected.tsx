@@ -2,7 +2,7 @@
 
 import { useTypingEffect } from "@/utils/useTypingEffect";
 
-import { MysteryBoxImage } from "@/components/Pet/Image";
+import { QuestionMarkImage } from "@/components/Pet/Image";
 
 export function NotConnected() {
   const text = useTypingEffect(
@@ -11,7 +11,7 @@ export function NotConnected() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <MysteryBoxImage />
+      <QuestionMarkImage />
       <div className="nes-container is-dark with-title">
         <p className="title">Welcome</p>
         <p>{text}</p>

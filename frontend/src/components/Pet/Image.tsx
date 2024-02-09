@@ -34,7 +34,7 @@ export function PetImage(props: PetImageProps) {
   );
 }
 
-export function MysteryBoxImage() {
+export function QuestionMarkImage() {
   return (
     <div className="flex flex-col gap-6 self-center">
       <div
@@ -45,7 +45,7 @@ export function MysteryBoxImage() {
       >
         <div className={`relative h-full w-full`}>
           <img
-            src={BASE_PATH + "mystery_box.png"}
+            src={BASE_PATH + "question_mark.png"}
             className={"absolute top-0 left-0 w-full h-full object-contain"}
             alt="pet mystery box"
           />
