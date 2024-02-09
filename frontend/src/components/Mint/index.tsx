@@ -80,6 +80,7 @@ export function Mint() {
     if (!account || !network) return;
 
     setTransactionInProgress(true);
+    setMyPet(undefined);
 
     try {
       const response = await signAndSubmitTransaction({
