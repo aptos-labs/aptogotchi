@@ -4,7 +4,7 @@ Deployed at https://aptogotchi-random-mint.aptoslabs.com/.
 
 ## Difference from main branch (aptogotchi beginner)
 
-A simplified version that uses on chain randomness to randomly get parts of aptogotchi during minting instead of user manually passing in parts, and each user can mint as many Aptogotchis as possible.
+A simplified version that uses on chain randomness to determine the look of Aptogotchi at minting instead of manually passing in, and each address can mint as many Aptogotchis as possible instead of 1 per address.
 
 ### Prerequisite
 

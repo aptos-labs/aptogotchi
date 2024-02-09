@@ -110,7 +110,7 @@ export function Mint() {
       )}
       <h2 className="text-xl w-full text-center">Create your pet!</h2>
       <p className="w-full text-center">
-        Use on chain randomness to create a random Aptogotchi!
+        Use on chain randomness to create a random look Aptogotchi.
       </p>
       <div className="flex flex-col gap-6 self-center">
         <div
