@@ -2,7 +2,7 @@
 
 import { useTypingEffect } from "@/utils/useTypingEffect";
 
-import { QuestionMarkImage } from "@/components/Pet/Image";
+import { QuestionMarkImage } from "@/components/Pet";
 
 export function NotConnected() {
   const text = useTypingEffect(

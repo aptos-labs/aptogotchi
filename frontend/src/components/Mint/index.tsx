@@ -1,21 +1,78 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
-import { QuestionMarkImage } from "@/components/Pet/Image";
+import { PetImage, QuestionMarkImage } from "@/components/Pet";
+import { Pet, PetParts } from "../Pet";
+import { padAddressIfNeeded } from "@/utils/address";
 
 const aptosClient = getAptosClient();
 
-export interface MintProps {
-  fetchPet: () => Promise<void>;
-}
+const getAptogotchiByAddress = async (address: string): Promise<Pet> => {
+  return aptosClient
+    .view({
+      payload: {
+        function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+        functionArguments: [address],
+      },
+    })
+    .then((response) => {
+      return {
+        parts: response[0] as PetParts,
+      };
+    });
+};
 
-export function Mint({ fetchPet }: MintProps) {
-  const [newName, setNewName] = useState<string>("");
+export function Mint() {
+  const [myPet, setMyPet] = useState<Pet>();
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
 
   const { account, network, signAndSubmitTransaction } = useWallet();
+
+  const fetchPet = useCallback(async () => {
+    if (!account?.address) return;
+
+    const aptogotchiCollectionAddressResponse = (await aptosClient.view({
+      payload: {
+        function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_collection_address`,
+      },
+    })) as [`0x${string}`];
+
+    const collectionAddress = padAddressIfNeeded(
+      aptogotchiCollectionAddressResponse[0]
+    );
+
+    const myLatestAptogotchiResponse =
+      await aptosClient.getAccountOwnedTokensFromCollectionAddress({
+        collectionAddress,
+        accountAddress: account.address,
+        options: {
+          limit: 1,
+          orderBy: [
+            {
+              last_transaction_version: "desc",
+            },
+          ],
+        },
+      });
+
+    if (myLatestAptogotchiResponse.length === 0) {
+      setMyPet(undefined);
+    } else {
+      setMyPet(
+        await getAptogotchiByAddress(
+          myLatestAptogotchiResponse[0].token_data_id
+        )
+      );
+    }
+  }, [account?.address]);
+
+  useEffect(() => {
+    if (!account?.address || !network) return;
+
+    fetchPet();
+  }, [account?.address, fetchPet, network]);
 
   const handleMint = async () => {
     if (!account || !network) return;
@@ -28,7 +85,7 @@ export function Mint({ fetchPet }: MintProps) {
         data: {
           function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
           typeArguments: [],
-          functionArguments: [newName],
+          functionArguments: [],
         },
       });
       await aptosClient.waitForTransaction({
@@ -46,26 +103,33 @@ export function Mint({ fetchPet }: MintProps) {
     <div className="flex flex-col gap-6 max-w-md self-center m-4">
       <h2 className="text-xl w-full text-center">Create your pet!</h2>
       <p className="w-full text-center">
-        We leverage on chain randomness to create a random look aptogotchi!
+        Use on chain randomness to create a random look aptogotchi!
       </p>
-      <div className="nes-field w-full max-w-xs mx-auto">
-        <label htmlFor="name_field">Name</label>
-        <input
-          type="text"
-          id="name_field"
-          className="nes-input"
-          value={newName}
-          onChange={(e) => setNewName(e.currentTarget.value)}
-        />
+      <div className="flex flex-col gap-6 self-center">
+        <div
+          className={
+            "bg-[hsl(104,40%,75%)] border-double border-8 border-black p-2 relative h-80 w-80"
+          }
+          style={{ paddingTop: "1rem" }}
+        >
+          {myPet && !transactionInProgress ? (
+            <PetImage petParts={myPet.parts} />
+          ) : (
+            <QuestionMarkImage />
+          )}
+        </div>
       </div>
-      <QuestionMarkImage />
       <button
         type="button"
-        className={`nes-btn ${newName ? "is-success" : "is-disabled"}`}
-        disabled={!newName || transactionInProgress}
+        className="nes-btn"
+        disabled={transactionInProgress}
         onClick={handleMint}
       >
-        {transactionInProgress ? "Loading..." : "Mint Pet"}
+        {transactionInProgress
+          ? "Minting..."
+          : myPet
+            ? "Mint a new Aptogotchi!"
+            : "Mint your first Aptogotchi"}
       </button>
       <br />
     </div>

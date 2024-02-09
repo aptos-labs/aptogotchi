@@ -2,19 +2,14 @@ module aptogotchi::main{
     use aptos_framework::account;
     use aptos_framework::event;
     use aptos_framework::object;
-    use aptos_framework::timestamp;
     use aptos_framework::object::ExtendRef;
     use aptos_framework::randomness;
     use aptos_std::string_utils::{to_string};
     use aptos_token_objects::collection;
     use aptos_token_objects::token;
-    use std::error;
     use std::option;
     use std::signer::address_of;
-    use std::string::{Self, String};
-
-    /// name length exceeded limit
-    const ENAME_LIMIT: u64 = 1;
+    use std::string::{String, utf8};
 
     const APP_OBJECT_SEED: vector<u8> = b"APTOGOTCHI";
     const APTOGOTCHI_COLLECTION_NAME: vector<u8> = b"Aptogotchi Collection";
@@ -37,8 +32,6 @@ module aptogotchi::main{
     }
 
     struct Aptogotchi has key {
-        name: String,
-        birthday: u64,
         parts: AptogotchiParts,
         mutator_ref: token::MutatorRef,
         burn_ref: token::BurnRef,
@@ -50,7 +43,6 @@ module aptogotchi::main{
 
     struct MintAptogotchiEvent has drop, store {
         token_name: String,
-        aptogotchi_name: String,
         parts: AptogotchiParts,
     }
 
@@ -89,9 +81,9 @@ module aptogotchi::main{
 
     // Create the collection that will hold all the Aptogotchis
     fun create_aptogotchi_collection(creator: &signer) {
-        let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
-        let name = string::utf8(APTOGOTCHI_COLLECTION_NAME);
-        let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
+        let description = utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
+        let name = utf8(APTOGOTCHI_COLLECTION_NAME);
+        let uri = utf8(APTOGOTCHI_COLLECTION_URI);
 
         collection::create_unlimited_collection(
             creator,
@@ -108,15 +100,13 @@ module aptogotchi::main{
     // This prevents users seeing the result of mint and act on it, e.g. see the result and abort the tx if they don't like it.
     entry fun create_aptogotchi(
         user: &signer,
-        name: String,
     ) acquires CollectionCapability, MintAptogotchiEvents {
-        assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
         let body = randomness::u8_range(0, BODY_MAX_VALUE_EXCL);
         let ear = randomness::u8_range(0, EAR_MAX_VALUE_EXCL);
         let face = randomness::u8_range(0, FACE_MAX_VALUE_EXCL);
 
-        let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
-        let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
+        let uri = utf8(APTOGOTCHI_COLLECTION_URI);
+        let description = utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
         let user_addr = address_of(user);
         let token_name = to_string(&user_addr);
         let parts = AptogotchiParts {
@@ -127,7 +117,7 @@ module aptogotchi::main{
 
         let constructor_ref = &token::create(
             &get_app_signer(),
-            string::utf8(APTOGOTCHI_COLLECTION_NAME),
+            utf8(APTOGOTCHI_COLLECTION_NAME),
             description,
             token_name,
             option::none(),
@@ -141,8 +131,6 @@ module aptogotchi::main{
 
         // initialize/set default Aptogotchi struct values
         let gotchi = Aptogotchi {
-            name,
-            birthday: timestamp::now_seconds(),
             parts,
             mutator_ref,
             burn_ref,
@@ -155,7 +143,6 @@ module aptogotchi::main{
             &mut borrow_global_mut<MintAptogotchiEvents>(@aptogotchi).mint_aptogotchi_events,
             MintAptogotchiEvent {
                 token_name,
-                aptogotchi_name: name,
                 parts,
             },
         );
@@ -166,7 +153,7 @@ module aptogotchi::main{
     // Get collection name of aptogotchi collection
     #[view]
     public fun get_aptogotchi_collection_name(): (String) {
-        string::utf8(APTOGOTCHI_COLLECTION_NAME)
+        utf8(APTOGOTCHI_COLLECTION_NAME)
     }
 
     // Get creator address of aptogotchi collection
@@ -178,7 +165,7 @@ module aptogotchi::main{
     // Get collection ID of aptogotchi collection
     #[view]
     public fun get_aptogotchi_collection_address(): (address) {
-        let collection_name = string::utf8(APTOGOTCHI_COLLECTION_NAME);
+        let collection_name = utf8(APTOGOTCHI_COLLECTION_NAME);
         let creator_addr = get_app_signer_addr();
         collection::create_collection_address(&creator_addr, &collection_name)
     }
@@ -187,9 +174,9 @@ module aptogotchi::main{
     #[view]
     public fun get_aptogotchi(
         aptogotchi_addr: address
-    ): (String, u64, AptogotchiParts) acquires Aptogotchi {
+    ): (AptogotchiParts) acquires Aptogotchi {
         let gotchi = borrow_global<Aptogotchi>(aptogotchi_addr);
-        (gotchi.name, gotchi.birthday, gotchi.parts)
+        gotchi.parts
     }
 
     // ==== TESTS ====
@@ -197,13 +184,10 @@ module aptogotchi::main{
     #[test_only]
     use aptos_framework::account::create_account_for_test;
     #[test_only]
-    use std::string::utf8;
-    #[test_only]
     use aptos_std::crypto_algebra::enable_cryptography_algebra_natives;
 
     #[test_only]
     fun setup_test(
-        aptos: &signer,
         fx: &signer,
         account: &signer,
         creator: &signer,
@@ -216,24 +200,21 @@ module aptogotchi::main{
         create_account_for_test(address_of(creator));
         create_account_for_test(address_of(account));
 
-        timestamp::set_time_has_started_for_testing(aptos);
         init_module(account);
     }
 
     // Test creating an Aptogotchi
     #[test(
-        aptos = @0x1,
         fx = @aptos_framework,
         account = @aptogotchi,
         creator = @0x123
     )]
     fun test_create_aptogotchi(
-        aptos: &signer,
         fx: &signer,
         account: &signer,
         creator: &signer
     ) acquires CollectionCapability, MintAptogotchiEvents {
-        setup_test(aptos, fx, account, creator);
-        create_aptogotchi(creator, utf8(b"test"));
+        setup_test(fx, account, creator);
+        create_aptogotchi(creator);
     }
 }
