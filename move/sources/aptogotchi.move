@@ -15,8 +15,6 @@ module aptogotchi::main{
 
     /// name length exceeded limit
     const ENAME_LIMIT: u64 = 1;
-    /// address does not have an Aptogotchi
-    const EADDRESS_DOES_NOT_HAVE_APTOGOTCHI: u64 = 2;
 
     const APP_OBJECT_SEED: vector<u8> = b"APTOGOTCHI";
     const APTOGOTCHI_COLLECTION_NAME: vector<u8> = b"Aptogotchi Collection";
@@ -105,7 +103,6 @@ module aptogotchi::main{
     }
 
     // Create an Aptogotchi token object.
-    // Since each address can only have one Aptogotchi, we will delete the old one if it exists.
     // Because this function calls random it must not be public.
     // This ensures user can only call it from a transaction instead of another contract.
     // This prevents users seeing the result of mint and act on it, e.g. see the result and abort the tx if they don't like it.
@@ -128,7 +125,7 @@ module aptogotchi::main{
             face,
         };
 
-        let constructor_ref = &token::create_named_token(
+        let constructor_ref = &token::create(
             &get_app_signer(),
             string::utf8(APTOGOTCHI_COLLECTION_NAME),
             description,
@@ -186,40 +183,13 @@ module aptogotchi::main{
         collection::create_collection_address(&creator_addr, &collection_name)
     }
 
-    // Get address of Aptogotchi token for this creator
-    #[view]
-    public fun get_aptogotchi_address(owner_addr: address): (address) {
-        let collection = string::utf8(APTOGOTCHI_COLLECTION_NAME);
-        let token_name = to_string(&owner_addr);
-        let creator_addr = get_app_signer_addr();
-        let token_address = token::create_token_address(
-            &creator_addr,
-            &collection,
-            &token_name,
-        );
-
-        token_address
-    }
-
-    // Returns true if this address owns an Aptogotchi
-    #[view]
-    public fun has_aptogotchi(owner_addr: address): (bool) {
-        let token_address = get_aptogotchi_address(owner_addr);
-        exists<Aptogotchi>(token_address)
-    }
-
-    // Returns all fields for this Aptogotchi by owner address
-    // Returns an error if the owner address does not have an Aptogotchi
+    // Returns all fields for this Aptogotchi (if found)
     #[view]
     public fun get_aptogotchi(
-        owner_addr: address
-    ): (address, String, u64, AptogotchiParts) acquires Aptogotchi {
-        assert!(has_aptogotchi(owner_addr), error::unavailable(EADDRESS_DOES_NOT_HAVE_APTOGOTCHI));
-
-        let token_address = get_aptogotchi_address(owner_addr);
-        let gotchi = borrow_global<Aptogotchi>(token_address);
-
-        (token_address, gotchi.name, gotchi.birthday, gotchi.parts)
+        aptogotchi_addr: address
+    ): (String, u64, AptogotchiParts) acquires Aptogotchi {
+        let gotchi = borrow_global<Aptogotchi>(aptogotchi_addr);
+        (gotchi.name, gotchi.birthday, gotchi.parts)
     }
 
     // ==== TESTS ====
