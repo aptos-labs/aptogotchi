@@ -1,10 +1,10 @@
 # Aptogotchi (Random mint)
 
-## Difference from main branch (aptogotchi beginner)
-
 Deployed at https://aptogotchi-random-mint.aptoslabs.com/.
 
-Use on chain randomness to randomly get parts of aptogotchi during minting, preventing users from passing parts to the `create_aptogotchi` function.
+## Difference from main branch (aptogotchi beginner)
+
+A simplified version that uses on chain randomness to randomly get parts of aptogotchi during minting instead of user manually passing in parts, and each user can mint as many Aptogotchis as possible.
 
 ### Prerequisite
 
