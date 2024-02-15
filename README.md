@@ -8,7 +8,7 @@ We introduce the following concepts:
 2. how to create events and use indexer to get off-chain data.
 3. how to write unit tests for the smart contracts.
 
-This dApp will be used as an educational demo hosted on [Builder Hub](https://github.com/aptos-labs/aptos-builder-hub).
+This dApp will be used as an educational demo hosted on [Aptos Learn](https://learn.aptoslabs.com/).
 
 ---
 
