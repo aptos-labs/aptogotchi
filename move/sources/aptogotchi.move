@@ -236,7 +236,7 @@ module aptogotchi::main {
 
     // Get reference to Aptogotchi token object (CAN'T modify the reference)
     #[view]
-    fun get_aptogotchi_address(creator_addr: address): (address) {
+    public fun get_aptogotchi_address(creator_addr: address): (address) {
         let collection = string::utf8(APTOGOTCHI_COLLECTION_NAME);
         let token_name = to_string(&creator_addr);
         let creator_addr = get_app_signer_addr();
