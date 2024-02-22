@@ -13,7 +13,19 @@ const kongtext = localFont({
 
 export const metadata: Metadata = {
   title: "Aptogotchi",
-  description: "Your new favorite on-chain pet",
+  description: "Aptogotchi - Your new favorite on-chain pet!",
+  openGraph: {
+    title: "Aptogotchi",
+    description: "Aptogotchi - Your new favorite on-chain pet!",
+    images: ["/aptogotchi.png"],
+  },
+  twitter: {
+    card: "summary",
+    site: "@Aptos_Network",
+    title: "Aptogotchi",
+    description: "Aptogotchi - Your new favorite on-chain pet!",
+    images: ["/aptogotchi.png"],
+  },
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
