@@ -47,17 +47,17 @@ module aptogotchi::main {
             APP_OBJECT_SEED,
         );
         let extend_ref = object::generate_extend_ref(&constructor_ref);
-        let app_signer = &object::generate_signer(&constructor_ref);
+        let collection_signer = &object::generate_signer(&constructor_ref);
 
         move_to(account, MintAptogotchiEvents {
             mint_aptogotchi_events: account::new_event_handle<MintAptogotchiEvent>(account),
         });
 
-        move_to(app_signer, CollectionCapability {
+        move_to(collection_signer, CollectionCapability {
             extend_ref,
         });
 
-        create_aptogotchi_collection(app_signer);
+        create_aptogotchi_collection(collection_signer);
     }
 
     // Collection signer is the signer holds the collection object
