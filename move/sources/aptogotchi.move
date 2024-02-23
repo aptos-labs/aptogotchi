@@ -2,49 +2,20 @@ module aptogotchi::main {
     use aptos_framework::account;
     use aptos_framework::event;
     use aptos_framework::object;
-    use aptos_framework::timestamp;
-    use aptos_framework::object::ExtendRef;
+    use aptos_framework::object::{ExtendRef, Object};
     use aptos_std::string_utils::{to_string};
     use aptos_token_objects::collection;
     use aptos_token_objects::token;
     use std::error;
     use std::option;
     use std::signer::address_of;
-    use std::signer;
     use std::string::{Self, String};
+    use aptos_token_objects::token::Token;
 
     /// aptogotchi not available
     const ENOT_AVAILABLE: u64 = 1;
-    /// name length exceeded limit
-    const ENAME_LIMIT: u64 = 2;
     /// user already has aptogotchi
     const EUSER_ALREADY_HAS_APTOGOTCHI: u64 = 3;
-    /// invalid body value
-    const EBODY_VALUE_INVALID: u64 = 4;
-    /// invalid ear value
-    const EEAR_VALUE_INVALID: u64 = 5;
-    /// invalid face value
-    const EFACE_VALUE_INVALID: u64 = 6;
-
-    // maximum health points: 5 hearts * 2 HP/heart = 10 HP
-    const ENERGY_UPPER_BOUND: u64 = 10;
-    const NAME_UPPER_BOUND: u64 = 40;
-
-
-    struct AptogotchiParts has copy, drop, key, store {
-        body: u8,
-        ear: u8,
-        face: u8,
-    }
-
-    struct Aptogotchi has key {
-        name: String,
-        birthday: u64,
-        energy_points: u64,
-        parts: AptogotchiParts,
-        mutator_ref: token::MutatorRef,
-        burn_ref: token::BurnRef,
-    }
 
     struct MintAptogotchiEvents has key {
         mint_aptogotchi_events: event::EventHandle<MintAptogotchiEvent>,
@@ -52,8 +23,6 @@ module aptogotchi::main {
 
     struct MintAptogotchiEvent has drop, store {
         token_name: String,
-        aptogotchi_name: String,
-        parts: AptogotchiParts,
     }
 
     // Tokens require a signer to create, so this is the signer for the collection
@@ -93,12 +62,18 @@ module aptogotchi::main {
         create_aptogotchi_collection(app_signer);
     }
 
-    fun get_app_signer_addr(): address {
+    // Collection signer is the signer holds the collection object
+    // This is different from token signer of each Aptogotchi NFT token
+    // Each Aptogotchi token has its own signer which controls the token object
+    // Since each object has its own address, each Aptogotchi token also has its own address
+    // Technically you can store all Aptogotchi tokens under the collection object (cause object can own objects)
+    // But in this code we store each Aptogotchi token under the user creating it, see L129
+    fun get_collection_signer_addr(): address {
         object::create_object_address(&@aptogotchi, APP_OBJECT_SEED)
     }
 
-    fun get_app_signer(): signer acquires CollectionCapability {
-        object::generate_signer_for_extending(&borrow_global<CollectionCapability>(get_app_signer_addr()).extend_ref)
+    fun get_collection_signer(): signer acquires CollectionCapability {
+        object::generate_signer_for_extending(&borrow_global<CollectionCapability>(get_collection_signer_addr()).extend_ref)
     }
 
     // Create the collection that will hold all the Aptogotchis
@@ -119,119 +94,52 @@ module aptogotchi::main {
     // Create an Aptogotchi token object
     public entry fun create_aptogotchi(
         user: &signer,
-        name: String,
-        body: u8,
-        ear: u8,
-        face: u8,
     ) acquires CollectionCapability, MintAptogotchiEvents {
-        assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
-        assert!(
-            body >= 0 && body <= BODY_MAX_VALUE,
-            error::invalid_argument(EBODY_VALUE_INVALID)
-        );
-        assert!(ear >= 0 && ear <= EAR_MAX_VALUE, error::invalid_argument(EEAR_VALUE_INVALID));
-        assert!(
-            face >= 0 && face <= FACE_MAX_VALUE,
-            error::invalid_argument(EFACE_VALUE_INVALID)
-        );
-
-        let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
-        let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
         let user_addr = address_of(user);
-        let token_name = to_string(&user_addr);
-        let parts = AptogotchiParts {
-            body,
-            ear,
-            face,
-        };
         assert!(!has_aptogotchi(user_addr), error::already_exists(EUSER_ALREADY_HAS_APTOGOTCHI));
+        // We use creator address as token name, so when we check if a user has an Aptogotchi later
+        // We can easily construct the token address, token_addr = create_token_address(creator_addr, collection, token_name)
+        let token_name = to_string(&user_addr);
+
+        // In practice you probably want each token to have its own URI and description
+        // URI is usually collection_uri/token_name
+        // Description is usually collection_description + token_name
+        let token_uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
+        string::append_utf8(&mut token_uri, b"/");
+        string::append(&mut token_uri, token_name);
+        let token_description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
+        string::append_utf8(&mut token_description, b"/");
+        string::append(&mut token_description, token_name);
 
         let constructor_ref = token::create_named_token(
-            &get_app_signer(),
+            &get_collection_signer(),
             string::utf8(APTOGOTCHI_COLLECTION_NAME),
-            description,
+            token_description,
             token_name,
             option::none(),
-            uri,
+            token_uri,
         );
 
-        let token_signer = object::generate_signer(&constructor_ref);
-        let mutator_ref = token::generate_mutator_ref(&constructor_ref);
-        let burn_ref = token::generate_burn_ref(&constructor_ref);
         let transfer_ref = object::generate_transfer_ref(&constructor_ref);
-
-        // initialize/set default Aptogotchi struct values
-        let gotchi = Aptogotchi {
-            name,
-            birthday: timestamp::now_seconds(),
-            energy_points: ENERGY_UPPER_BOUND,
-            parts,
-            mutator_ref,
-            burn_ref,
-        };
-
-        move_to(&token_signer, gotchi);
 
         // Emit event for minting Aptogotchi token
         event::emit_event<MintAptogotchiEvent>(
             &mut borrow_global_mut<MintAptogotchiEvents>(@aptogotchi).mint_aptogotchi_events,
             MintAptogotchiEvent {
                 token_name,
-                aptogotchi_name: name,
-                parts,
             },
         );
 
+        // Transfer the token to the user
         object::transfer_with_ref(object::generate_linear_transfer_ref(&transfer_ref), address_of(user));
     }
 
-    // Sets aptogotchi's name
-    public entry fun set_name(owner: signer, name: String) acquires Aptogotchi {
-        let owner_addr = signer::address_of(&owner);
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
-        let token_address = get_aptogotchi_address(owner_addr);
-        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
-        gotchi.name = name;
-    }
-
-    // Feeds aptogotchi to increase its energy points
-    public entry fun feed(owner: &signer, points: u64) acquires Aptogotchi {
-        let owner_addr = signer::address_of(owner);
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        let token_address = get_aptogotchi_address(owner_addr);
-        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
-
-        gotchi.energy_points = if (gotchi.energy_points + points > ENERGY_UPPER_BOUND) {
-            ENERGY_UPPER_BOUND
-        } else {
-            gotchi.energy_points + points
-        };
-    }
-
-    // Plays with aptogotchi to consume its energy points
-    public entry fun play(owner: &signer, points: u64) acquires Aptogotchi {
-        let owner_addr = signer::address_of(owner);
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        let token_address = get_aptogotchi_address(owner_addr);
-        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
-
-        gotchi.energy_points = if (gotchi.energy_points < points) {
-            0
-        } else {
-            gotchi.energy_points - points
-        };
-    }
-
-    // Sets Aptogotchi's parts
-    public entry fun set_parts(owner: &signer, body: u8, ear: u8, face: u8) acquires Aptogotchi {
-        let owner_addr = signer::address_of(owner);
-        assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
-        let token_address = get_aptogotchi_address(owner_addr);
-        let gotchi = borrow_global_mut<Aptogotchi>(token_address);
-        gotchi.parts.body = body;
-        gotchi.parts.ear = ear;
-        gotchi.parts.face = face;
+    // Get collection ID of aptogotchi collection
+    #[view]
+    public fun get_aptogotchi_collection_id(): (address) {
+        let collection_name = string::utf8(APTOGOTCHI_COLLECTION_NAME);
+        let creator_addr = get_collection_signer_addr();
+        collection::create_collection_address(&creator_addr, &collection_name)
     }
 
     // Get reference to Aptogotchi token object (CAN'T modify the reference)
@@ -239,128 +147,90 @@ module aptogotchi::main {
     public fun get_aptogotchi_address(creator_addr: address): (address) {
         let collection = string::utf8(APTOGOTCHI_COLLECTION_NAME);
         let token_name = to_string(&creator_addr);
-        let creator_addr = get_app_signer_addr();
+        let creator_addr = get_collection_signer_addr();
         let token_address = token::create_token_address(
             &creator_addr,
             &collection,
             &token_name,
         );
-
         token_address
-    }
-
-    // Get collection ID of aptogotchi collection
-    #[view]
-    public fun get_aptogotchi_collection_id(): (address) {
-        let collection_name = string::utf8(APTOGOTCHI_COLLECTION_NAME);
-        let creator_addr = get_app_signer_addr();
-        collection::create_collection_address(&creator_addr, &collection_name)
     }
 
     // Returns true if this address owns an Aptogotchi
     #[view]
-    public fun has_aptogotchi(owner_addr: address): (bool) {
+    public fun has_aptogotchi<Token>(owner_addr: address): (bool) {
         let token_address = get_aptogotchi_address(owner_addr);
-        let has_gotchi = exists<Aptogotchi>(token_address);
-
+        let has_gotchi = exists<Token>(token_address);
         has_gotchi
     }
 
-    // Returns all fields for this Aptogotchi (if found)
+    // Returns all fields for this Aptogotchi NFT token
     #[view]
     public fun get_aptogotchi(
         owner_addr: address
-    ): (String, u64, u64, AptogotchiParts) acquires Aptogotchi {
+    ): (String, String, String) {
         // if this address doesn't have an Aptogotchi, throw error
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
 
         let token_address = get_aptogotchi_address(owner_addr);
-        let gotchi = borrow_global<Aptogotchi>(token_address);
+        let token_obj = object::address_to_object<>(token_address);
+        let uri = token::uri(token_obj);
+        let name = token::name(token_obj);
+        let description = token::description(token_obj);
 
-        // view function can only return primitive types.
-        (gotchi.name, gotchi.birthday, gotchi.energy_points, gotchi.parts)
+        (name, description, uri)
     }
 
     // ==== TESTS ====
     // Setup testing environment
     #[test_only]
     use aptos_framework::account::create_account_for_test;
-    #[test_only]
-    use std::string::utf8;
 
     #[test_only]
-    fun setup_test(aptos: &signer, account: &signer, creator: &signer) {
+    fun setup_test(account: &signer, creator: &signer) {
         // create a fake account (only for testing purposes)
-        create_account_for_test(signer::address_of(creator));
-        create_account_for_test(signer::address_of(account));
+        create_account_for_test(address_of(creator));
+        create_account_for_test(address_of(account));
 
-        timestamp::set_time_has_started_for_testing(aptos);
         init_module(account);
     }
 
     // Test creating an Aptogotchi
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[test(account = @aptogotchi, creator = @0x123)]
     fun test_create_aptogotchi(
-        aptos: &signer,
         account: &signer,
         creator: &signer
     ) acquires CollectionCapability, MintAptogotchiEvents {
-        setup_test(aptos, account, creator);
+        setup_test(account, creator);
 
-        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
-
-        let has_aptogotchi = has_aptogotchi(signer::address_of(creator));
+        create_aptogotchi(creator);
+        let has_aptogotchi = has_aptogotchi(address_of(creator));
         assert!(has_aptogotchi, 1);
     }
 
     // Test getting an Aptogotchi, when user has not minted
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[test(account = @aptogotchi, creator = @0x123)]
     #[expected_failure(abort_code = 851969, location = aptogotchi::main)]
     fun test_get_aptogotchi_without_creation(
-        aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires Aptogotchi {
-        setup_test(aptos, account, creator);
+    ) {
+        setup_test(account, creator);
 
         // get aptogotchi without creating it
-        get_aptogotchi(signer::address_of(creator));
+        get_aptogotchi(address_of(creator));
     }
 
     // Test getting an Aptogotchi, when user has not minted
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    fun test_feed_and_play(
-        aptos: &signer,
-        account: &signer,
-        creator: &signer
-    ) acquires CollectionCapability, MintAptogotchiEvents, Aptogotchi {
-        setup_test(aptos, account, creator);
-        let creator_address = signer::address_of(creator);
-        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
-
-        let (_, _, energe_point_1, _) = get_aptogotchi(creator_address);
-        assert!(energe_point_1 == ENERGY_UPPER_BOUND, 1);
-
-        play(creator, 5);
-        let (_, _, energe_point_2, _) = get_aptogotchi(creator_address);
-        assert!(energe_point_2 == ENERGY_UPPER_BOUND - 5, 1);
-
-        feed(creator, 3);
-        let (_, _, energe_point_3, _) = get_aptogotchi(creator_address);
-        assert!(energe_point_3 == ENERGY_UPPER_BOUND - 2, 1);
-    }
-
-    // Test getting an Aptogotchi, when user has not minted
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[test(account = @aptogotchi, creator = @0x123)]
     #[expected_failure(abort_code = 524291, location = aptogotchi::main)]
     fun test_create_aptogotchi_twice(
-        aptos: &signer,
         account: &signer,
         creator: &signer
     ) acquires CollectionCapability, MintAptogotchiEvents {
-        setup_test(aptos, account, creator);
+        setup_test(account, creator);
 
-        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
-        create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
+        create_aptogotchi(creator);
+        create_aptogotchi(creator);
     }
 }

@@ -4,6 +4,6 @@ set -e
 
 echo "##### Running tests #####"
 
-./aptos move test \
+aptos move test \
   --package-dir move \
   --dev
