@@ -2,7 +2,7 @@ module aptogotchi::main {
     use aptos_framework::account;
     use aptos_framework::event;
     use aptos_framework::object;
-    use aptos_framework::object::{ExtendRef, Object};
+    use aptos_framework::object::{ExtendRef, object_exists};
     use aptos_std::string_utils::{to_string};
     use aptos_token_objects::collection;
     use aptos_token_objects::token;
@@ -158,9 +158,9 @@ module aptogotchi::main {
 
     // Returns true if this address owns an Aptogotchi
     #[view]
-    public fun has_aptogotchi<Token>(owner_addr: address): (bool) {
+    public fun has_aptogotchi(owner_addr: address): (bool) {
         let token_address = get_aptogotchi_address(owner_addr);
-        let has_gotchi = exists<Token>(token_address);
+        let has_gotchi = object_exists<Token>(token_address);
         has_gotchi
     }
 
@@ -173,7 +173,7 @@ module aptogotchi::main {
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
 
         let token_address = get_aptogotchi_address(owner_addr);
-        let token_obj = object::address_to_object<>(token_address);
+        let token_obj = object::address_to_object<Token>(token_address);
         let uri = token::uri(token_obj);
         let name = token::name(token_obj);
         let description = token::description(token_obj);
