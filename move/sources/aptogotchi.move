@@ -1,16 +1,14 @@
 module aptogotchi::main {
     use aptos_framework::account;
     use aptos_framework::event;
-    use aptos_framework::object;
-    use aptos_framework::object::{ExtendRef, object_exists};
+    use aptos_framework::object::{Self, ExtendRef, object_exists};
     use aptos_std::string_utils::{to_string};
     use aptos_token_objects::collection;
-    use aptos_token_objects::token;
+    use aptos_token_objects::token::{Self, Token};
     use std::error;
     use std::option;
     use std::signer::address_of;
     use std::string::{Self, String};
-    use aptos_token_objects::token::Token;
 
     /// aptogotchi not available
     const ENOT_AVAILABLE: u64 = 1;
