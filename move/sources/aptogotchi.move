@@ -65,8 +65,8 @@ module aptogotchi::main {
     // Collection signer is the signer holds the collection object
     // This is different from token signer of each Aptogotchi NFT token
     // Each Aptogotchi token has its own signer which controls the token object
-    // Since each object has its own address, each Aptogotchi token also has its own address
-    // Technically you can store all Aptogotchi tokens under the collection object (cause object can own objects)
+    // Since each object has its own address, i.e. each Aptogotchi token has its own address
+    // Technically you can store all Aptogotchi tokens under the collection object because object can own objects
     // But in this code we store each Aptogotchi token under the user creating it, see L129
     fun get_collection_signer_addr(): address {
         object::create_object_address(&@aptogotchi, APP_OBJECT_SEED)
