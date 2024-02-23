@@ -73,7 +73,9 @@ module aptogotchi::main {
     }
 
     fun get_collection_signer(): signer acquires CollectionCapability {
-        object::generate_signer_for_extending(&borrow_global<CollectionCapability>(get_collection_signer_addr()).extend_ref)
+        object::generate_signer_for_extending(
+            &borrow_global<CollectionCapability>(get_collection_signer_addr()).extend_ref
+        )
     }
 
     // Create the collection that will hold all the Aptogotchis
@@ -185,6 +187,8 @@ module aptogotchi::main {
     // Setup testing environment
     #[test_only]
     use aptos_framework::account::create_account_for_test;
+    #[test_only]
+    use aptos_std::debug;
 
     #[test_only]
     fun setup_test(account: &signer, creator: &signer) {
@@ -206,6 +210,10 @@ module aptogotchi::main {
         create_aptogotchi(creator);
         let has_aptogotchi = has_aptogotchi(address_of(creator));
         assert!(has_aptogotchi, 1);
+        let (name, description, uri) = get_aptogotchi(address_of(creator));
+        debug::print(&name);
+        debug::print(&description);
+        debug::print(&uri);
     }
 
     // Test getting an Aptogotchi, when user has not minted
