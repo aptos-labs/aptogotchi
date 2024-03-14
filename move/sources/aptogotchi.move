@@ -1,5 +1,4 @@
 module aptogotchi::main {
-    use aptos_framework::account;
     use aptos_framework::event;
     use aptos_framework::object;
     use aptos_framework::timestamp;
@@ -46,19 +45,21 @@ module aptogotchi::main {
         burn_ref: token::BurnRef,
     }
 
-    struct MintAptogotchiEvents has key {
-        mint_aptogotchi_events: event::EventHandle<MintAptogotchiEvent>,
-    }
-
+    #[event]
     struct MintAptogotchiEvent has drop, store {
         token_name: String,
         aptogotchi_name: String,
         parts: AptogotchiParts,
     }
 
-    // Tokens require a signer to create, so this is the signer for the collection
-    struct CollectionCapability has key {
-        extend_ref: ExtendRef,
+    // We need a contract signer as the creator of the aptogotchi collection and aptogotchi token
+    // Otherwise we need admin to sign whenever a new aptogotchi token is minted which is inconvenient
+    struct Config has key {
+        // This is the extend_ref of the app object, not the extend_ref of collection object or token object
+        // config object is the creator and owner of aptogotchi collection object
+        // config object is also the creator of all aptogotchi token (NFT) objects
+        // but owner of each token object is aptogotchi owner (i.e. user who mints aptogotchi)
+        app_extend_ref: ExtendRef,
     }
 
     const APP_OBJECT_SEED: vector<u8> = b"APTOGOTCHI";
@@ -82,12 +83,8 @@ module aptogotchi::main {
         let extend_ref = object::generate_extend_ref(&constructor_ref);
         let app_signer = &object::generate_signer(&constructor_ref);
 
-        move_to(account, MintAptogotchiEvents {
-            mint_aptogotchi_events: account::new_event_handle<MintAptogotchiEvent>(account),
-        });
-
-        move_to(app_signer, CollectionCapability {
-            extend_ref,
+        move_to(app_signer, Config {
+            app_extend_ref: extend_ref,
         });
 
         create_aptogotchi_collection(app_signer);
@@ -97,8 +94,8 @@ module aptogotchi::main {
         object::create_object_address(&@aptogotchi, APP_OBJECT_SEED)
     }
 
-    fun get_app_signer(): signer acquires CollectionCapability {
-        object::generate_signer_for_extending(&borrow_global<CollectionCapability>(get_app_signer_addr()).extend_ref)
+    fun get_app_signer(): signer acquires Config {
+        object::generate_signer_for_extending(&borrow_global<Config>(get_app_signer_addr()).app_extend_ref)
     }
 
     // Create the collection that will hold all the Aptogotchis
@@ -123,7 +120,7 @@ module aptogotchi::main {
         body: u8,
         ear: u8,
         face: u8,
-    ) acquires CollectionCapability, MintAptogotchiEvents {
+    ) acquires Config {
         assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
         assert!(
             body >= 0 && body <= BODY_MAX_VALUE,
@@ -173,8 +170,7 @@ module aptogotchi::main {
         move_to(&token_signer, gotchi);
 
         // Emit event for minting Aptogotchi token
-        event::emit_event<MintAptogotchiEvent>(
-            &mut borrow_global_mut<MintAptogotchiEvents>(@aptogotchi).mint_aptogotchi_events,
+        event::emit<MintAptogotchiEvent>(
             MintAptogotchiEvent {
                 token_name,
                 aptogotchi_name: name,
@@ -249,9 +245,10 @@ module aptogotchi::main {
         token_address
     }
 
-    // Get collection ID of aptogotchi collection
+    // Get collection address (also known as collection ID) of aptogotchi collection
+    // Collection itself is an object, that's why it has an address
     #[view]
-    public fun get_aptogotchi_collection_id(): (address) {
+    public fun get_aptogotchi_collection_address(): (address) {
         let collection_name = string::utf8(APTOGOTCHI_COLLECTION_NAME);
         let creator_addr = get_app_signer_addr();
         collection::create_collection_address(&creator_addr, &collection_name)
@@ -261,9 +258,8 @@ module aptogotchi::main {
     #[view]
     public fun has_aptogotchi(owner_addr: address): (bool) {
         let token_address = get_aptogotchi_address(owner_addr);
-        let has_gotchi = exists<Aptogotchi>(token_address);
 
-        has_gotchi
+        exists<Aptogotchi>(token_address)
     }
 
     // Returns all fields for this Aptogotchi (if found)
@@ -304,7 +300,7 @@ module aptogotchi::main {
         aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires CollectionCapability, MintAptogotchiEvents {
+    ) acquires Config {
         setup_test(aptos, account, creator);
 
         create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
@@ -333,7 +329,7 @@ module aptogotchi::main {
         aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires CollectionCapability, MintAptogotchiEvents, Aptogotchi {
+    ) acquires Config, Aptogotchi {
         setup_test(aptos, account, creator);
         let creator_address = signer::address_of(creator);
         create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
@@ -357,7 +353,7 @@ module aptogotchi::main {
         aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires CollectionCapability, MintAptogotchiEvents {
+    ) acquires Config {
         setup_test(aptos, account, creator);
 
         create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);

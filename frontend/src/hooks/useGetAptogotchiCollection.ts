@@ -37,14 +37,14 @@ export function useGetAptogotchiCollection() {
     try {
       setLoading(true);
 
-      const aptogotchiCollectionIDResponse = (await aptosClient.view({
+      const aptogotchiCollectionAddressResponse = (await aptosClient.view({
         payload: {
-          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_collection_id`,
+          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_collection_address`,
         },
       })) as [`0x${string}`];
 
-      const collectionIDAddr = padAddressIfNeeded(
-        aptogotchiCollectionIDResponse[0]
+      const collectionAddress = padAddressIfNeeded(
+        aptogotchiCollectionAddressResponse[0]
       );
 
       const collectionResponse: CollectionResponse =
@@ -52,7 +52,7 @@ export function useGetAptogotchiCollection() {
           query: {
             query: queryAptogotchiCollection,
             variables: {
-              collection_id: collectionIDAddr,
+              collection_id: collectionAddress,
             },
           },
         });
