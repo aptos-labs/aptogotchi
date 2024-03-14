@@ -54,10 +54,10 @@ module aptogotchi::main {
 
     // We need a contract signer as the creator of the aptogotchi collection and aptogotchi token
     // Otherwise we need admin to sign whenever a new aptogotchi token is minted which is inconvenient
-    struct Config has key {
+    struct ObjectController has key {
         // This is the extend_ref of the app object, not the extend_ref of collection object or token object
-        // config object is the creator and owner of aptogotchi collection object
-        // config object is also the creator of all aptogotchi token (NFT) objects
+        // app object is the creator and owner of aptogotchi collection object
+        // app object is also the creator of all aptogotchi token (NFT) objects
         // but owner of each token object is aptogotchi owner (i.e. user who mints aptogotchi)
         app_extend_ref: ExtendRef,
     }
@@ -83,7 +83,7 @@ module aptogotchi::main {
         let extend_ref = object::generate_extend_ref(&constructor_ref);
         let app_signer = &object::generate_signer(&constructor_ref);
 
-        move_to(app_signer, Config {
+        move_to(app_signer, ObjectController {
             app_extend_ref: extend_ref,
         });
 
@@ -94,8 +94,8 @@ module aptogotchi::main {
         object::create_object_address(&@aptogotchi, APP_OBJECT_SEED)
     }
 
-    fun get_app_signer(): signer acquires Config {
-        object::generate_signer_for_extending(&borrow_global<Config>(get_app_signer_addr()).app_extend_ref)
+    fun get_app_signer(): signer acquires ObjectController {
+        object::generate_signer_for_extending(&borrow_global<ObjectController>(get_app_signer_addr()).app_extend_ref)
     }
 
     // Create the collection that will hold all the Aptogotchis
@@ -120,7 +120,7 @@ module aptogotchi::main {
         body: u8,
         ear: u8,
         face: u8,
-    ) acquires Config {
+    ) acquires ObjectController {
         assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
         assert!(
             body >= 0 && body <= BODY_MAX_VALUE,
@@ -300,7 +300,7 @@ module aptogotchi::main {
         aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires Config {
+    ) acquires ObjectController {
         setup_test(aptos, account, creator);
 
         create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
@@ -329,7 +329,7 @@ module aptogotchi::main {
         aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires Config, Aptogotchi {
+    ) acquires ObjectController, Aptogotchi {
         setup_test(aptos, account, creator);
         let creator_address = signer::address_of(creator);
         create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
@@ -353,7 +353,7 @@ module aptogotchi::main {
         aptos: &signer,
         account: &signer,
         creator: &signer
-    ) acquires Config {
+    ) acquires ObjectController {
         setup_test(aptos, account, creator);
 
         create_aptogotchi(creator, utf8(b"test"), 1, 1, 1);
