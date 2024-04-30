@@ -1,9 +1,23 @@
 # Aptogotchi
 
-## Publish Modules
+## Publish and Upgrade Module
 
 ```shell
+# publish module
 ./sh_scripts/move_publish.sh
+```
+
+After publishing, go to frontend directory to re-generate the ABI.
+
+```shell
+cd ../frontend
+pnpm generate
+```
+
+Upgrade published module, this only works when you don't have breaking change.
+If you have breaking change, you need to publish to a new address. 
+```shell
+./sh_scripts/move_upgrade.sh
 ```
 
 ## Run unit tests
@@ -12,7 +26,7 @@
 ./sh_scripts/move_test.sh
 ```
 
-## Run move scripts
+## Run Move scripts
 
 Create gotchi.
 ```shell

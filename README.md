@@ -10,6 +10,8 @@ We introduce the following concepts:
 
 This dApp will be used as an educational demo hosted on [Aptos Learn](https://learn.aptoslabs.com/).
 
+You can find more instructions about the Move contract in move/README.md.
+
 ---
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
@@ -21,10 +23,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+cd frontend
 pnpm dev
 ```
 
