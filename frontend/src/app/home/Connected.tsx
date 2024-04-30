@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Pet } from "./Pet";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Mint } from "./Mint";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
 import { Modal } from "@/components/Modal";
+import { ABI } from "@/utils/abi";
 
 const TESTNET_ID = "2";
 
@@ -21,14 +21,14 @@ export function Connected() {
 
     const [hasPet] = await aptosClient.view({
       payload: {
-        function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::has_aptogotchi`,
+        function: `${ABI.address}::main::has_aptogotchi`,
         functionArguments: [account.address],
       },
     });
     if (hasPet as boolean) {
       const response = await aptosClient.view({
         payload: {
-          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+          function: `${ABI.address}::main::get_aptogotchi`,
           functionArguments: [account.address],
         },
       });

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
 import { ShufflePetImage } from "@/app/home/Pet/ShufflePetImage";
 import { DEFAULT_PET, PetParts } from "@/app/home/Pet";
+import { ABI } from "@/utils/abi";
 
 const aptosClient = getAptosClient();
 
@@ -28,7 +28,7 @@ export function Mint({ fetchPet }: MintProps) {
       const response = await signAndSubmitTransaction({
         sender: account.address,
         data: {
-          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::create_aptogotchi`,
+          function: `${ABI.address}::main::create_aptogotchi`,
           typeArguments: [],
           functionArguments: [
             newName,

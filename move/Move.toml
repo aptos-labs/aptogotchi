@@ -4,7 +4,7 @@ version = "1.0.0"
 upgrade_policy = "compatible"
 
 [addresses]
-aptogotchi = "_"
+aptogotchi_addr = "_"
 
 [dependencies]
 AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", rev = "main", subdir = "aptos-move/framework/aptos-framework"}
@@ -12,4 +12,4 @@ AptosTokenObjects = {git = "https://github.com/aptos-labs/aptos-core.git", rev =
 
 # For use when developing and testing this module
 [dev-addresses]
-aptogotchi = "0x100"
+aptogotchi_addr = "0x100"

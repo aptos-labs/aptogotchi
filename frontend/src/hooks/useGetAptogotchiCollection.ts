@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { getAptosClient } from "@/utils/aptosClient";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { queryAptogotchiCollection } from "@/graphql/queryAptogotchiCollection";
 import { padAddressIfNeeded } from "@/utils/address";
+import { ABI } from "@/utils/abi";
 
 const aptosClient = getAptosClient();
 
@@ -39,7 +39,7 @@ export function useGetAptogotchiCollection() {
 
       const aptogotchiCollectionAddressResponse = (await aptosClient.view({
         payload: {
-          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi_collection_address`,
+          function: `${ABI.address}::main::get_aptogotchi_collection_address`,
         },
       })) as [`0x${string}`];
 
@@ -65,7 +65,7 @@ export function useGetAptogotchiCollection() {
           .map((holder) =>
             aptosClient.view({
               payload: {
-                function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::get_aptogotchi`,
+                function: `${ABI.address}::main::get_aptogotchi`,
                 functionArguments: [holder.owner_address],
               },
             })

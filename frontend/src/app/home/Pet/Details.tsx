@@ -6,8 +6,8 @@ import { HealthBar } from "@/components/HealthBar";
 import { Pet } from ".";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { NEXT_PUBLIC_CONTRACT_ADDRESS } from "@/utils/env";
 import { getAptosClient } from "@/utils/aptosClient";
+import { ABI } from "@/utils/abi";
 
 export interface PetDetailsProps {
   pet: Pet;
@@ -32,10 +32,10 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
       const response = await signAndSubmitTransaction({
         sender: account.address,
         data: {
-          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::set_name`,
+          function: `${ABI.address}::main::set_name`,
           typeArguments: [],
           functionArguments: [newName],
-        }
+        },
       });
       await aptosClient.waitForTransaction({ transactionHash: response.hash });
 

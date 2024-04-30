@@ -1,4 +1,4 @@
-module aptogotchi::main {
+module aptogotchi_addr::main {
     use aptos_framework::event;
     use aptos_framework::object;
     use aptos_framework::timestamp;
@@ -28,7 +28,6 @@ module aptogotchi::main {
     // maximum health points: 5 hearts * 2 HP/heart = 10 HP
     const ENERGY_UPPER_BOUND: u64 = 10;
     const NAME_UPPER_BOUND: u64 = 40;
-
 
     struct AptogotchiParts has copy, drop, key, store {
         body: u8,
@@ -73,7 +72,6 @@ module aptogotchi::main {
     // Face value range is [0, 3] inslusive
     const FACE_MAX_VALUE: u8 = 3;
 
-
     // This function is only called once when the module is published for the first time.
     fun init_module(account: &signer) {
         let constructor_ref = object::create_named_object(
@@ -90,8 +88,10 @@ module aptogotchi::main {
         create_aptogotchi_collection(app_signer);
     }
 
+    // ================================= Helper Functions ================================= //
+
     fun get_app_signer_addr(): address {
-        object::create_object_address(&@aptogotchi, APP_OBJECT_SEED)
+        object::create_object_address(&@aptogotchi_addr, APP_OBJECT_SEED)
     }
 
     fun get_app_signer(): signer acquires ObjectController {
@@ -112,6 +112,8 @@ module aptogotchi::main {
             uri,
         );
     }
+
+    // ================================= Entry Functions ================================= //
 
     // Create an Aptogotchi token object
     public entry fun create_aptogotchi(
@@ -230,6 +232,8 @@ module aptogotchi::main {
         gotchi.parts.face = face;
     }
 
+    // ================================= View Functions ================================== //
+
     // Get reference to Aptogotchi token object (CAN'T modify the reference)
     #[view]
     public fun get_aptogotchi_address(creator_addr: address): (address) {
@@ -277,7 +281,8 @@ module aptogotchi::main {
         (gotchi.name, gotchi.birthday, gotchi.energy_points, gotchi.parts)
     }
 
-    // ==== TESTS ====
+    // ================================= Unit Tests ================================== //
+
     // Setup testing environment
     #[test_only]
     use aptos_framework::account::create_account_for_test;
@@ -295,7 +300,7 @@ module aptogotchi::main {
     }
 
     // Test creating an Aptogotchi
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[test(aptos = @0x1, account = @aptogotchi_addr, creator = @0x123)]
     fun test_create_aptogotchi(
         aptos: &signer,
         account: &signer,
@@ -310,8 +315,8 @@ module aptogotchi::main {
     }
 
     // Test getting an Aptogotchi, when user has not minted
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    #[expected_failure(abort_code = 851969, location = aptogotchi::main)]
+    #[test(aptos = @0x1, account = @aptogotchi_addr, creator = @0x123)]
+    #[expected_failure(abort_code = 851969, location = aptogotchi_addr::main)]
     fun test_get_aptogotchi_without_creation(
         aptos: &signer,
         account: &signer,
@@ -324,7 +329,7 @@ module aptogotchi::main {
     }
 
     // Test getting an Aptogotchi, when user has not minted
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
+    #[test(aptos = @0x1, account = @aptogotchi_addr, creator = @0x123)]
     fun test_feed_and_play(
         aptos: &signer,
         account: &signer,
@@ -347,8 +352,8 @@ module aptogotchi::main {
     }
 
     // Test getting an Aptogotchi, when user has not minted
-    #[test(aptos = @0x1, account = @aptogotchi, creator = @0x123)]
-    #[expected_failure(abort_code = 524291, location = aptogotchi::main)]
+    #[test(aptos = @0x1, account = @aptogotchi_addr, creator = @0x123)]
+    #[expected_failure(abort_code = 524291, location = aptogotchi_addr::main)]
     fun test_create_aptogotchi_twice(
         aptos: &signer,
         account: &signer,
