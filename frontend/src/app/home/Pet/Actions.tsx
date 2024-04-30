@@ -5,11 +5,11 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { Pet } from ".";
 import { getAptosClient } from "@/utils/aptosClient";
 import {
-  NEXT_PUBLIC_CONTRACT_ADDRESS,
   NEXT_PUBLIC_ENERGY_CAP,
   NEXT_PUBLIC_ENERGY_DECREASE,
   NEXT_PUBLIC_ENERGY_INCREASE,
 } from "@/utils/env";
+import { ABI } from "@/utils/abi";
 
 const aptosClient = getAptosClient();
 
@@ -52,7 +52,7 @@ export function Actions({
       const response = await signAndSubmitTransaction({
         sender: account.address,
         data: {
-          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::feed`,
+          function: `${ABI.address}::main::feed`,
           typeArguments: [],
           functionArguments: [NEXT_PUBLIC_ENERGY_INCREASE],
         },
@@ -89,7 +89,7 @@ export function Actions({
       const response = await signAndSubmitTransaction({
         sender: account.address,
         data: {
-          function: `${NEXT_PUBLIC_CONTRACT_ADDRESS}::main::play`,
+          function: `${ABI.address}::main::play`,
           typeArguments: [],
           functionArguments: [NEXT_PUBLIC_ENERGY_DECREASE],
         },
