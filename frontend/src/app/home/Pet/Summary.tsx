@@ -1,13 +1,13 @@
 "use client";
 
 import { useTypingEffect } from "@/utils/useTypingEffect";
-import { Pet } from ".";
+import { usePet } from "@/context/PetContext";
 
-export interface SummaryProps {
-  pet: Pet;
-}
+export function Summary() {
+  const { pet } = usePet();
 
-export function Summary({ pet }: SummaryProps) {
+  if (!pet) return null;
+
   let text = `${pet.name} is doing great! 😄`;
 
   if (pet.energy_points >= 8) {

@@ -6,12 +6,15 @@ import { PetAction } from "@/app/home/Pet/Actions";
 
 export interface PetImageProps {
   selectedAction?: PetAction;
-  petParts: PetParts;
+  petParts: PetParts | undefined;
   avatarStyle?: boolean;
 }
 
 export function PetImage(props: PetImageProps) {
   const { avatarStyle, petParts, selectedAction } = props;
+
+  if (!petParts) return <div className="h-80 w-80 bg-gray-200"></div>;
+
   const head = BASE_PATH + "head.png";
   const body = BASE_PATH + bodies[petParts.body];
   const ear = BASE_PATH + ears[petParts.ear];

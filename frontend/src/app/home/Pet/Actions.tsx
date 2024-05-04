@@ -1,8 +1,7 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { Pet } from ".";
 import { getAptosClient } from "@/utils/aptosClient";
 import {
   NEXT_PUBLIC_ENERGY_CAP,
@@ -11,24 +10,20 @@ import {
 } from "@/utils/env";
 import { ABI } from "@/utils/abi";
 import { toast } from "sonner";
+import { usePet } from "@/context/PetContext";
 
 const aptosClient = getAptosClient();
 
 export type PetAction = "feed" | "play";
 
 export interface ActionsProps {
-  pet: Pet;
   selectedAction: PetAction;
   setSelectedAction: (action: PetAction) => void;
-  setPet: Dispatch<SetStateAction<Pet | undefined>>;
 }
 
-export function Actions({
-  selectedAction,
-  setSelectedAction,
-  setPet,
-  pet,
-}: ActionsProps) {
+export function Actions({ selectedAction, setSelectedAction }: ActionsProps) {
+  const { pet, setPet } = usePet();
+
   const [transactionInProgress, setTransactionInProgress] =
     useState<boolean>(false);
   const { account, network, signAndSubmitTransaction } = useWallet();
@@ -79,7 +74,7 @@ export function Actions({
       toast.error("Failed to feed your pet. Please try again.");
     } finally {
       setTransactionInProgress(false);
-      toast.success(`Thanks for feeding your pet, ${pet.name}!`);
+      toast.success(`Thanks for feeding your pet, ${pet?.name}!`);
     }
   };
 
@@ -117,15 +112,15 @@ export function Actions({
       toast.error("Failed to play with your pet. Please try again.");
     } finally {
       setTransactionInProgress(false);
-      toast.success(`Thanks for playing with your pet, ${pet.name}!`);
+      toast.success(`Thanks for playing with your pet, ${pet?.name}!`);
     }
   };
 
   const feedDisabled =
     selectedAction === "feed" &&
-    pet.energy_points === Number(NEXT_PUBLIC_ENERGY_CAP);
+    pet?.energy_points === Number(NEXT_PUBLIC_ENERGY_CAP);
   const playDisabled =
-    selectedAction === "play" && pet.energy_points === Number(0);
+    selectedAction === "play" && pet?.energy_points === Number(0);
 
   return (
     <div className="nes-container with-title flex-1 bg-white h-[320px]">

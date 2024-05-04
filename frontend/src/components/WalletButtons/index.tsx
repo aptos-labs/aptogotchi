@@ -10,7 +10,7 @@ import {
 import { cn } from "@/utils/styling";
 import { toast } from "sonner";
 
-const buttonStyles = "nes-btn is-primary";
+const buttonStyles = "nes-btn is-primary m-auto sm:m-0 sm:px-4";
 
 export const WalletButtons = () => {
   const { wallets, connected, disconnect, isLoading } = useWallet();

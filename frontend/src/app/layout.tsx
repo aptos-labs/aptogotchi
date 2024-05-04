@@ -5,6 +5,7 @@ import { PropsWithChildren } from "react";
 import { GeoTargetly } from "@/utils/GeoTargetly";
 import "nes.css/css/nes.min.css";
 import { Toaster } from "sonner";
+import { PetProvider } from "@/context/PetContext";
 import "./globals.css";
 
 const kongtext = localFont({
@@ -52,7 +53,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
           closeButton
           expand={true}
         />
-        <WalletProvider>{children}</WalletProvider>
+        <PetProvider>
+          <WalletProvider>{children}</WalletProvider>
+        </PetProvider>
         <GeoTargetly />
       </body>
     </html>

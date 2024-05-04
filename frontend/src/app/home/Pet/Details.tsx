@@ -3,28 +3,25 @@
 import { AiFillSave } from "react-icons/ai";
 import { FaCopy, FaExternalLinkAlt } from "react-icons/fa";
 import { HealthBar } from "@/components/HealthBar";
-import { Pet } from ".";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { getAptosClient } from "@/utils/aptosClient";
 import { ABI } from "@/utils/abi";
 import { toast } from "sonner";
-
-export interface PetDetailsProps {
-  pet: Pet;
-  setPet: Dispatch<SetStateAction<Pet | undefined>>;
-}
+import { usePet } from "@/context/PetContext";
 
 const aptosClient = getAptosClient();
 
-export function PetDetails({ pet, setPet }: PetDetailsProps) {
-  const [newName, setNewName] = useState(pet.name);
+export function PetDetails() {
+  const { pet, setPet } = usePet();
+
+  const [newName, setNewName] = useState<string>(pet?.name || "");
   const { account, network, signAndSubmitTransaction } = useWallet();
   const owner = account?.ansName
     ? `${account?.ansName}.apt`
     : account?.address || "";
 
-  const canSave = newName !== pet.name;
+  const canSave = newName !== pet?.name;
 
   const handleNameChange = async () => {
     if (!account || !network) return;
@@ -49,7 +46,7 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
       toast.error("Failed to update name. Please try again.");
     } finally {
       toast.success(
-        `Name was successfully updated from ${pet.name} to ${newName}!`
+        `Name was successfully updated from ${pet?.name} to ${newName}!`
       );
     }
   };
@@ -117,7 +114,7 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
         <label>Energy Points</label>
         <HealthBar
           totalHealth={10}
-          currentHealth={pet.energy_points}
+          currentHealth={pet?.energy_points || 0}
           icon="star"
         />
       </div>
