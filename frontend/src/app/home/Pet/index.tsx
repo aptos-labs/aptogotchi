@@ -39,9 +39,9 @@ export function Pet({ pet, setPet }: PetProps) {
   const [selectedAction, setSelectedAction] = useState<PetAction>("play");
 
   return (
-    <div className="flex flex-col self-center m-10">
-      <div className="flex flex-row self-center gap-12">
-        <div className="flex flex-col gap-4 w-[360px]">
+    <div className="flex flex-col self-center m-2 sm:m-10">
+      <div className="flex flex-col sm:flex-row self-center gap-4 sm:gap-12">
+        <div className="flex flex-col gap-2 sm:gap-4 sm:w-[360px] m-auto">
           <PetImage
             selectedAction={selectedAction}
             petParts={pet.parts}
@@ -49,7 +49,7 @@ export function Pet({ pet, setPet }: PetProps) {
           />
           <PetDetails pet={pet} setPet={setPet} />
         </div>
-        <div className="flex flex-col gap-8 w-[680px] h-full">
+        <div className="flex flex-col gap-2 sm:gap-8 sm:w-[680px] h-full">
           <Actions
             selectedAction={selectedAction}
             setSelectedAction={setSelectedAction}

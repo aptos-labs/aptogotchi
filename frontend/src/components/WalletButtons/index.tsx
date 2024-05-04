@@ -28,7 +28,7 @@ export const WalletButtons = () => {
 
   if (connected) {
     return (
-      <div className="flex flex-row">
+      <div className="flex flex-row m-auto sm:m-0 sm:px-4">
         <div
           className={cn(buttonStyles, "hover:bg-blue-700 btn-small")}
           onClick={onWalletDisconnectRequest}
