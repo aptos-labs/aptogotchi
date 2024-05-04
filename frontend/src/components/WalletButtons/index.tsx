@@ -8,18 +8,30 @@ import {
   WalletName,
 } from "@aptos-labs/wallet-adapter-react";
 import { cn } from "@/utils/styling";
+import { toast } from "sonner";
 
 const buttonStyles = "nes-btn is-primary";
 
 export const WalletButtons = () => {
   const { wallets, connected, disconnect, isLoading } = useWallet();
 
+  const onWalletDisconnectRequest = async () => {
+    try {
+      disconnect();
+    } catch (error) {
+      console.warn(error);
+      toast.error("Failed to disconnect wallet. Please try again.");
+    } finally {
+      toast.success("Wallet successfully disconnected!");
+    }
+  };
+
   if (connected) {
     return (
       <div className="flex flex-row">
         <div
           className={cn(buttonStyles, "hover:bg-blue-700 btn-small")}
-          onClick={disconnect}
+          onClick={onWalletDisconnectRequest}
         >
           Disconnect
         </div>
@@ -50,7 +62,9 @@ const WalletView = ({ wallet }: { wallet: Wallet }) => {
       await connect(walletName);
     } catch (error) {
       console.warn(error);
-      window.alert("Failed to connect wallet");
+      toast.error("Failed to connect wallet. Please try again.");
+    } finally {
+      toast.success("Wallet successfully connected!");
     }
   };
 

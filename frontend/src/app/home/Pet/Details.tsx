@@ -1,13 +1,14 @@
 "use client";
 
 import { AiFillSave } from "react-icons/ai";
-import { FaCopy } from "react-icons/fa";
+import { FaCopy, FaExternalLinkAlt } from "react-icons/fa";
 import { HealthBar } from "@/components/HealthBar";
 import { Pet } from ".";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { getAptosClient } from "@/utils/aptosClient";
 import { ABI } from "@/utils/abi";
+import { toast } from "sonner";
 
 export interface PetDetailsProps {
   pet: Pet;
@@ -45,11 +46,17 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
       });
     } catch (error: any) {
       console.error(error);
+      toast.error("Failed to update name. Please try again.");
+    } finally {
+      toast.success(
+        `Name was successfully updated from ${pet.name} to ${newName}!`
+      );
     }
   };
 
   const handleCopyOwnerAddrOrName = () => {
     navigator.clipboard.writeText(owner);
+    toast.success("Owner address copied to clipboard.");
   };
 
   const nameFieldComponent = (
@@ -76,7 +83,16 @@ export function PetDetails({ pet, setPet }: PetDetailsProps) {
 
   const ownerFieldComponent = (
     <div className="nes-field">
-      <label htmlFor="owner_field">Owner</label>
+      <a
+        className="flex items-center gap-2"
+        href={`https://explorer.aptoslabs.com/account/${owner}?network=testnet`}
+        target="_blank"
+      >
+        <label htmlFor="owner_field" className="mb-0">
+          Owner
+        </label>
+        <FaExternalLinkAlt className="h-4 w-4 drop-shadow-sm" />
+      </a>
       <div className="relative">
         <input
           type="text"

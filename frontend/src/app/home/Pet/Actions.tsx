@@ -10,6 +10,7 @@ import {
   NEXT_PUBLIC_ENERGY_INCREASE,
 } from "@/utils/env";
 import { ABI } from "@/utils/abi";
+import { toast } from "sonner";
 
 const aptosClient = getAptosClient();
 
@@ -75,8 +76,10 @@ export function Actions({
       });
     } catch (error: any) {
       console.error(error);
+      toast.error("Failed to feed your pet. Please try again.");
     } finally {
       setTransactionInProgress(false);
+      toast.success(`Thanks for feeding your pet, ${pet.name}!`);
     }
   };
 
@@ -111,8 +114,10 @@ export function Actions({
       });
     } catch (error: any) {
       console.error(error);
+      toast.error("Failed to play with your pet. Please try again.");
     } finally {
       setTransactionInProgress(false);
+      toast.success(`Thanks for playing with your pet, ${pet.name}!`);
     }
   };
 
