@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Pet, PetParts } from ".";
+import { PetParts } from ".";
 import { PetImage } from "./Image";
 import { ShuffleButton } from "@/components/ShuffleButton";
 import {

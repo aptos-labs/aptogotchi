@@ -4,6 +4,8 @@ import localFont from "next/font/local";
 import { PropsWithChildren } from "react";
 import { GeoTargetly } from "@/utils/GeoTargetly";
 import "nes.css/css/nes.min.css";
+import { Toaster } from "sonner";
+import { PetProvider } from "@/context/PetContext";
 import "./globals.css";
 
 const kongtext = localFont({
@@ -38,7 +40,22 @@ export default function RootLayout({ children }: PropsWithChildren) {
         />
       </head>
       <body className={kongtext.className}>
-        <WalletProvider>{children}</WalletProvider>
+        <Toaster
+          richColors
+          position="top-right"
+          toastOptions={{
+            style: {
+              letterSpacing: "0.02em",
+            },
+            className: "toast",
+            duration: 5000,
+          }}
+          closeButton
+          expand={true}
+        />
+        <PetProvider>
+          <WalletProvider>{children}</WalletProvider>
+        </PetProvider>
         <GeoTargetly />
       </body>
     </html>

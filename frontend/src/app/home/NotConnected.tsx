@@ -16,7 +16,7 @@ export function NotConnected() {
   return (
     <div className="flex flex-col gap-6 p-6">
       <ShufflePetImage petParts={petParts} setPetParts={setPetParts} />
-      <div className="nes-container is-dark with-title">
+      <div className="nes-container is-dark with-title text-sm sm:text-base">
         <p className="title">Welcome</p>
         <p>{text}</p>
       </div>
