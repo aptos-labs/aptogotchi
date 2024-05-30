@@ -8,7 +8,7 @@ const wallets = [new PetraWallet()];
 
 export function WalletProvider({ children }: PropsWithChildren) {
   return (
-    <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
+    <AptosWalletAdapterProvider autoConnect={true}>
       {children}
     </AptosWalletAdapterProvider>
   );
