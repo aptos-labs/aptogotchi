@@ -6,6 +6,7 @@ import {
   Wallet,
   isRedirectable,
   WalletName,
+  AptosStandardSupportedWallet,
 } from "@aptos-labs/wallet-adapter-react";
 import { cn } from "@/utils/styling";
 import { toast } from "sonner";
@@ -13,7 +14,12 @@ import { toast } from "sonner";
 const buttonStyles = "nes-btn is-primary m-auto sm:m-0 sm:px-4";
 
 export const WalletButtons = () => {
-  const { wallets, connected, disconnect, isLoading } = useWallet();
+  const {
+    connected,
+    disconnect,
+    wallets,
+    isLoading,
+  } = useWallet();
 
   const onWalletDisconnectRequest = async () => {
     try {
@@ -39,23 +45,27 @@ export const WalletButtons = () => {
     );
   }
 
-  if (isLoading || !wallets[0]) {
+  if (isLoading || !wallets || wallets.length === 0) {
     return (
       <div className={cn(buttonStyles, "opacity-50 cursor-not-allowed")}>
         Loading...
       </div>
     );
+  } 
+  if (wallets) {
+    const aptosConnectWallet = wallets.find(wallet => wallet.name.includes("AptosConnect"));
+    if (aptosConnectWallet) {
+      return <WalletView wallet={aptosConnectWallet} />;
+    }
   }
-
-  return <WalletView wallet={wallets[0]} />;
 };
 
-const WalletView = ({ wallet }: { wallet: Wallet }) => {
+const WalletView = ({ wallet }: { wallet: Wallet | AptosStandardSupportedWallet}) => {
   const { connect } = useWallet();
   const isWalletReady =
     wallet.readyState === WalletReadyState.Installed ||
     wallet.readyState === WalletReadyState.Loadable;
-  const mobileSupport = wallet.deeplinkProvider;
+  const mobileSupport = (wallet as Wallet).deeplinkProvider;
 
   const onWalletConnectRequest = async (walletName: WalletName) => {
     try {
