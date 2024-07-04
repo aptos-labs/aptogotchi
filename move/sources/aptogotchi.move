@@ -227,6 +227,9 @@ module aptogotchi_addr::main {
         assert!(has_aptogotchi(owner_addr), error::unavailable(ENOT_AVAILABLE));
         let token_address = get_aptogotchi_address(owner_addr);
         let gotchi = borrow_global_mut<Aptogotchi>(token_address);
+        assert!(body >= 0 && body <= BODY_MAX_VALUE, error::invalid_argument(EBODY_VALUE_INVALID));
+        assert!(ear >= 0 && ear <= EAR_MAX_VALUE, error::invalid_argument(EEAR_VALUE_INVALID));
+        assert!(face >= 0 && face <= FACE_MAX_VALUE, error::invalid_argument(EFACE_VALUE_INVALID));
         gotchi.parts.body = body;
         gotchi.parts.ear = ear;
         gotchi.parts.face = face;
