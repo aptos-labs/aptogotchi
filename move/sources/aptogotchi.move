@@ -1,4 +1,8 @@
 module aptogotchi_addr::main {
+
+    // ================================= Imports ================================= //
+    // aptos_framework and aptos_token are imported from git. The import is defined in Move.toml.
+
     use aptos_framework::event;
     use aptos_framework::object;
     use aptos_framework::timestamp;
@@ -12,29 +16,51 @@ module aptogotchi_addr::main {
     use std::signer;
     use std::string::{Self, String};
 
-    /// aptogotchi not available
+    // ================================= Error Codes ================================= //
+
+    /// Aptogotchi not available
     const ENOT_AVAILABLE: u64 = 1;
-    /// name length exceeded limit
+    /// Name length exceeded limit
     const ENAME_LIMIT: u64 = 2;
-    /// user already has aptogotchi
+    /// User already has aptogotchi
     const EUSER_ALREADY_HAS_APTOGOTCHI: u64 = 3;
-    /// invalid body value
+    /// Invalid body value
     const EBODY_VALUE_INVALID: u64 = 4;
-    /// invalid ear value
+    /// Invalid ear value
     const EEAR_VALUE_INVALID: u64 = 5;
-    /// invalid face value
+    /// Invalid face value
     const EFACE_VALUE_INVALID: u64 = 6;
 
-    // maximum health points: 5 hearts * 2 HP/heart = 10 HP
-    const ENERGY_UPPER_BOUND: u64 = 10;
-    const NAME_UPPER_BOUND: u64 = 40;
 
+    // ================================= Constants ================================= //
+
+    const APP_OBJECT_SEED: vector<u8> = b"APTOGOTCHI";
+    const APTOGOTCHI_COLLECTION_NAME: vector<u8> = b"Aptogotchi Collection";
+    const APTOGOTCHI_COLLECTION_DESCRIPTION: vector<u8> = b"Aptogotchi Collection Description";
+    const APTOGOTCHI_COLLECTION_URI: vector<u8> = b"https://otjbxblyfunmfblzdegw.supabase.co/storage/v1/object/public/aptogotchi/aptogotchi.png";
+    // Maximum health points: 5 hearts * 2 HP/heart = 10 HP
+    const ENERGY_UPPER_BOUND: u64 = 10;
+    // All namse must be less than 40 characters.
+    const NAME_UPPER_BOUND: u64 = 40;
+    // Body value range is [0, 4] inclusive
+    const BODY_MAX_VALUE: u8 = 4;
+    // Ear value range is [0, 5] inclusive
+    const EAR_MAX_VALUE: u8 = 6;
+    // Face value range is [0, 3] inclusive
+    const FACE_MAX_VALUE: u8 = 3;
+
+    // ================================= Struct Definitions ================================= //
+
+    // These parts can be copied, deleted, moved in global storage (ex. with `move_to`),
+    // and saved in other Resources thanks to the 4 abilities it "has".
     struct AptogotchiParts has copy, drop, key, store {
         body: u8,
         ear: u8,
         face: u8,
     }
 
+    // This contains all information needed for an Aptogotchi, as well as permission to
+    // change the fields after it is created, or destroy the Aptogotchi.
     struct Aptogotchi has key {
         name: String,
         birthday: u64,
@@ -44,6 +70,7 @@ module aptogotchi_addr::main {
         burn_ref: token::BurnRef,
     }
 
+    // All events must have the drop and store abilities.
     #[event]
     struct MintAptogotchiEvent has drop, store {
         token_name: String,
@@ -61,30 +88,27 @@ module aptogotchi_addr::main {
         app_extend_ref: ExtendRef,
     }
 
-    const APP_OBJECT_SEED: vector<u8> = b"APTOGOTCHI";
-    const APTOGOTCHI_COLLECTION_NAME: vector<u8> = b"Aptogotchi Collection";
-    const APTOGOTCHI_COLLECTION_DESCRIPTION: vector<u8> = b"Aptogotchi Collection Description";
-    const APTOGOTCHI_COLLECTION_URI: vector<u8> = b"https://otjbxblyfunmfblzdegw.supabase.co/storage/v1/object/public/aptogotchi/aptogotchi.png";
-    // Body value range is [0, 4] inslusive
-    const BODY_MAX_VALUE: u8 = 4;
-    // Ear value range is [0, 5] inslusive
-    const EAR_MAX_VALUE: u8 = 6;
-    // Face value range is [0, 3] inslusive
-    const FACE_MAX_VALUE: u8 = 3;
+    // ================================= Initialization ================================= //
 
-    // This function is only called once when the module is published for the first time.
+    // init_module is called when the module is published for the first time to initialize values and permissions (refs).
     fun init_module(account: &signer) {
+        // The constructor ref is a temporary permission (until the end of this function) which allows
+        // us to create any other permissions / refs we will need.
         let constructor_ref = object::create_named_object(
             account,
             APP_OBJECT_SEED,
         );
+        
+        // We will need to extend and modify the Aptogotchi contract as we generate more Aptogotchi tokens.
         let extend_ref = object::generate_extend_ref(&constructor_ref);
         let app_signer = &object::generate_signer(&constructor_ref);
 
+        // This adds a resource to the Aptogotchi contract holder with the extend ref.
         move_to(app_signer, ObjectController {
             app_extend_ref: extend_ref,
         });
 
+        // All Aptos tokens must be owned by a collection, so this helper creates one for us to use.
         create_aptogotchi_collection(app_signer);
     }
 
@@ -114,6 +138,7 @@ module aptogotchi_addr::main {
     }
 
     // ================================= Entry Functions ================================= //
+    // ================== Entry functions are called via transaction. ==================== //
 
     // Create an Aptogotchi token object
     public entry fun create_aptogotchi(
@@ -123,6 +148,8 @@ module aptogotchi_addr::main {
         ear: u8,
         face: u8,
     ) acquires ObjectController {
+        // Enforce that the inputs are within allowed values. 
+        // A failing assertion will cause the transaction to fail. 
         assert!(string::length(&name) <= NAME_UPPER_BOUND, error::invalid_argument(ENAME_LIMIT));
         assert!(
             body >= 0 && body <= BODY_MAX_VALUE,
@@ -134,6 +161,7 @@ module aptogotchi_addr::main {
             error::invalid_argument(EFACE_VALUE_INVALID)
         );
 
+        // Get the proper intermediary values to generate the Aptogotchi object.
         let uri = string::utf8(APTOGOTCHI_COLLECTION_URI);
         let description = string::utf8(APTOGOTCHI_COLLECTION_DESCRIPTION);
         let user_addr = address_of(user);
@@ -145,6 +173,8 @@ module aptogotchi_addr::main {
         };
         assert!(!has_aptogotchi(user_addr), error::already_exists(EUSER_ALREADY_HAS_APTOGOTCHI));
 
+        // Refs give permission to modify Objects.
+        // The constructur ref gives temporary permission to enable any other refs we will need.
         let constructor_ref = token::create_named_token(
             &get_app_signer(),
             string::utf8(APTOGOTCHI_COLLECTION_NAME),
@@ -154,12 +184,13 @@ module aptogotchi_addr::main {
             uri,
         );
 
+        // Generate the refs we will need to manage the Aptogotchi
         let token_signer = object::generate_signer(&constructor_ref);
         let mutator_ref = token::generate_mutator_ref(&constructor_ref);
         let burn_ref = token::generate_burn_ref(&constructor_ref);
         let transfer_ref = object::generate_transfer_ref(&constructor_ref);
 
-        // initialize/set default Aptogotchi struct values
+        // Initialize/set default Aptogotchi struct values
         let gotchi = Aptogotchi {
             name,
             birthday: timestamp::now_seconds(),
@@ -169,6 +200,7 @@ module aptogotchi_addr::main {
             burn_ref,
         };
 
+        // `move_to` transfers the Aptogotchi data (gotchi) onto the Token signer's account.
         move_to(&token_signer, gotchi);
 
         // Emit event for minting Aptogotchi token
@@ -180,6 +212,7 @@ module aptogotchi_addr::main {
             },
         );
 
+        // This transfers the Aptogotchi object from the contract holder's address to the user's address.
         object::transfer_with_ref(object::generate_linear_transfer_ref(&transfer_ref), address_of(user));
     }
 
